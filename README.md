@@ -1,9 +1,13 @@
 # FieldMind
 
+[![Tests](https://github.com/hugoprigent/FieldMind/actions/workflows/checks.yml/badge.svg)](https://github.com/hugoprigent/FieldMind/actions/workflows/checks.yml)
+
 **Un rover de terrain dont les missions et la perception sont pilotées par une IA locale.**
 
 Projet de Hugo Prigent, finaliste du **ASUS Ascent GX10 AI Developer Challenge 2026**.
 FieldMind relie un rover Raspberry Pi / ESP32, un poste opérateur web et des modèles exécutés sur un ASUS Ascent GX10. La navigation, les vérifications des commandes et l'arrêt restent dans le logiciel du rover.
+
+L'objectif : aider un opérateur à explorer et documenter une zone difficile d'accès, puis partager les observations entre robots. Le prototype vise un fonctionnement de terrain sans API d'IA externe ; cette autonomie de déploiement reste à valider.
 
 [**Essayer la démo publique**](https://hugoprigent.com/fieldmind/) · [Pitch de candidature](https://youtu.be/ZIIjRc_pI_E) · [Architecture](docs/architecture.md) · [État et résultats](docs/validation.md)
 
