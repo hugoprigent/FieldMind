@@ -26,3 +26,12 @@ La configuration des modèles complémentaires sur le GX10 est en intégration. 
 Une installation neuve dans la copie de publication a également passé **425 tests rover**, **22 tests web rover**, **98 tests de la première démo** et **3 tests web démo**. Ruff passe sur le rover ; son simulateur sert interface, état et image caméra en HTTP 200. Les commandes et limites sont dans [`checks-2026-10-21.json`](checks-2026-10-21.json). Ces contrôles sont locaux au Mac, pas des benchmarks GX10.
 
 Le firmware **ESP32-C5** compile également dans cette copie avec PlatformIO 6.2.0 (`pio run -e esp_c5`), sans téléversement sur le matériel.
+
+## Vérification sur GitHub Actions
+
+Les trois jobs **`rover`**, **`demo`** et **`firmware`** du
+[run GitHub Actions 39510932511](https://github.com/hugoprigent/FieldMind/actions/runs/39510932511)
+ont terminé avec succès pour le
+[commit `c1562b3`](https://github.com/hugoprigent/FieldMind/commit/c1562b35b958a626d3878688a7d8265450dd447f).
+Ce run vérifie le code et la compilation sous Linux ; il ne constitue pas un essai du
+rover physique. Les finitions documentaires ultérieures ne changent pas le code testé.

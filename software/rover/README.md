@@ -6,6 +6,12 @@ poste opérateur web. Il remplace la supervision `software/embarque` (mêmes por
 caméras). Architecture et interfaces : [ARCHITECTURE.md](ARCHITECTURE.md) ; messages du poste :
 [PROTOCOLE.md](PROTOCOLE.md).
 
+> **État du prototype, 21 octobre 2026.** Le rover physique roule en commande manuelle.
+> Les fonctions décrites ci-dessous incluent des développements testés en simulation :
+> aucune mission autonome sur le rover réel ni aucun vol du drone ne sont validés.
+> La coque n'est pas montée et la remorque n'est pas encore disponible.
+> Voir les [résultats et limites](../../docs/validation.md).
+
 ## Essayer sur le PC, sans le rover
 
 Le matériel est simulé (monde 3D, faux ESP au protocole du firmware, lidar, paire stéréo
@@ -14,16 +20,16 @@ rendue, GPS) ; le reste est le code du rover.
 ```bash
 cd software/rover
 uv venv --python 3.13 .venv
-uv pip install --python .venv/bin/python numpy scipy opencv-python-headless pyserial aiohttp \
-  pytest pytest-asyncio ruff
-FIELDMIND_IA_PROFIL=aucun .venv/bin/python -m fieldmind --materiel simulation          # monde « salle » ; --scenario jardin
+uv pip install --python .venv/bin/python -r requirements-ci.txt
+FIELDMIND_IA_PROFIL=aucun .venv/bin/python -m fieldmind \
+  --materiel simulation --scenario jardin --hote 127.0.0.1
 ```
 
 Puis <http://127.0.0.1:8080/>. Démo du poste sans serveur : `fieldmind/web/index.html?mock=1`.
 
 Tests : `.venv/bin/python -m pytest` ; style : `.venv/bin/ruff check fieldmind tests`.
 
-## Ce que fait le logiciel
+## Fonctions du logiciel
 
 - **Drone** : [reconnaissance sans vol et visée de la croix](DRONE.md), six captures,
   montage et rapport téléchargeables. Le vol autonome reste bloqué tant que le
@@ -31,7 +37,7 @@ Tests : `.venv/bin/python -m pytest` ; style : `.venv/bin/ruff check fieldmind t
   [Atelier local de la mission complète](DRONE_MISSION.md) : décollage et tour avec
   photos, caméra du bas et descente par paliers simulés, manette et préparation GX10.
 
-- **Conduite sûre** : sécurité à 20 Hz sur le Pi (couloir le long de l'arc prévu, lidar +
+- **Contrôles de conduite** : sécurité à 20 Hz sur le Pi (couloir le long de l'arc prévu, lidar +
   stéréo + mémoire des obstacles bas, capteurs périmés, inclinaison, choc, blocage, homme mort,
   zone autorisée GPS, ralenti près d'une personne détectée) ; firmware ROVER_3 avec chien de garde.
 - **Virages** : différentiel électronique sur l'angle réel du servo, corrigé par le gyroscope ;
@@ -59,8 +65,8 @@ Vérification des modèles : `.venv/bin/python deploiement/gx10/verifier.py --pr
 Profils dans [config/ia.toml](config/ia.toml) : `gemini` (en ligne : Gemini 4 Argon pour l'agent,
 Gemini Robotics ER 2 pour la vision, transcription Gemini), `gx10` (modèles locaux de l'ASUS
 Ascent GX10, voir [deploiement/gx10/](deploiement/gx10/README.md)), `aucun`. Le choix se fait dans
-le poste, menu Réglages. La sécurité ne dépend d'aucun modèle : sans IA, le rover se pilote,
-évite les obstacles et exécute les actions du poste.
+le poste, menu Réglages. Les contrôles de sécurité ne dépendent d'aucun modèle ;
+le pilotage et les actions du poste restent disponibles sans IA.
 
 ## Mettre sur le rover
 

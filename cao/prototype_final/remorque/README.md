@@ -1,5 +1,10 @@
 # FieldMind — remorque porte-drone
 
+> **Conception en CAO, 21 octobre 2026.** La remorque n'est pas encore disponible
+> physiquement. Les images et les contrôles ci-dessous concernent le modèle ;
+> aucun transport ni atterrissage réel du drone sur cette remorque n'est validé.
+> Les [pièces imprimables](exports/stl/) sont fournies pour préparer la fabrication.
+
 La remorque a son propre document Fusion, **`remorque fieldmind`**, inséré par référence dans le
 document du rover **`prtotype final fieldmind`** (voir [Documents Fusion et scripts](#documents-fusion-et-scripts)).
 La chape d'attelage côté rover reste dans le document du rover (`PF_IMP_Attelage`).
@@ -387,7 +392,8 @@ refaire :
 | `04_plan_planche.py` | hors Fusion | Plan de découpe et de perçage de la planche (PDF) |
 | `rm_helpers.py` | — | Cotes et outils communs |
 
-Modèles 3D réels utilisés (dans `../sources/`) :
+Référence 3D externe utilisée en conception (non redistribuée dans cette édition,
+voir les [sources CAO](../../README.md)) :
 - SG90 et son palonnier 1 bras : [bibliothèque FreeCAD](https://github.com/FreeCAD/FreeCAD-library/tree/master/Electrical%20Parts/Servos/SG-90), aux cotes Tower Pro.
 
 Les trous A1 et A2 (chape) et C1 (câbles) du rover sont ajoutés par `../scripts/05_percages.py`,

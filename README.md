@@ -11,7 +11,7 @@ L'objectif : aider un opérateur à explorer et documenter une zone difficile d'
 
 [**Essayer la démo publique**](https://hugoprigent.com/fieldmind/) · [Pitch de candidature](https://youtu.be/ZIIjRc_pI_E) · [Architecture](docs/architecture.md) · [État et résultats](docs/validation.md)
 
-> **Prototype, 21 octobre 2026.** Le rover physique roule en commande manuelle, avec son électronique visible. La coque est conçue en CAO ; la remorque est en préparation. Les missions autonomes sont testées en simulation ; leur validation sur le rover réel reste à réaliser. Le drone est une expérimentation simulée, sans vol réel validé.
+> **Prototype, 21 octobre 2026.** Le rover physique roule en commande manuelle, avec son électronique visible. La coque est conçue en CAO mais n'est pas montée ; la remorque n'est pas encore disponible. Les missions autonomes sont testées en simulation ; leur validation sur le rover réel reste à réaliser. Le drone est une expérimentation simulée, sans vol réel validé.
 
 ![Vue CAO du prototype FieldMind](docs/images/prototype-cao.png)
 *Vue CAO : coque et remorque projetées. Le prototype réel roule actuellement avec son châssis et son électronique visibles. Les photos et la vidéo des essais seront ajoutées ici.*

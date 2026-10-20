@@ -1,5 +1,11 @@
 # FieldMind — prototype final
 
+> **Statut, 21 octobre 2026.** Cette page décrit la conception en CAO et ses contrôles
+> géométriques. Les images sont des vues du modèle. Le rover réel roule en commande
+> manuelle, avec son châssis et son électronique visibles ; la coque n'est pas montée
+> et la remorque n'est pas encore disponible. Les contrôles CAO ne prouvent pas la tenue
+> mécanique en charge. Voir les [résultats et limites](../../docs/validation.md).
+
 Document Fusion **`prtotype final fieldmind`**. Il contient deux groupes :
 - `FM_Direction_V04` : le rover de la [direction V04](../mounts/prototype/direction_v04_servo_traversant/README.md),
   avec la planche, la direction, les roues, les deux mâts et les capteurs ;
