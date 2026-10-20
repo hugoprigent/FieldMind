@@ -1,0 +1,165 @@
+# Fournisseurs de modèles de l'IA du rover : agent (consignes → actions), vision, transcription.
+#
+# Trois profils : « gemini » (en ligne), « gx10 » (modèles locaux servis par vLLM sur l'ASUS
+# Ascent GX10, voir deploiement/gx10/), « aucun » (pas de modèle). Le profil se change en marche
+# depuis le poste (Réglages > IA, message `ia_profil`) ; le choix est gardé dans
+# ~/.config/fieldmind/ia.json, qui a priorité sur `profil_actif`. La variable FIELDMIND_IA_PROFIL
+# l'impose au démarrage.
+#
+# Clés : lues dans l'environnement, puis dans software/rover/.env (lignes NOM=valeur).
+# Rien ici ne touche à la sécurité : les actions proposées par un modèle sont validées par le code
+# (fieldmind/ia/outils.py) puis passent par la file de mission et le superviseur de sécurité.
+#
+# Rôle (sous-table agent / vision / transcription) :
+#   modele              nom du modèle chez le fournisseur
+#   url                 facultatif : remplace l'adresse du profil pour ce rôle
+#   reflexion           « low », « medium », « high » ; « aucune » coupe la réflexion (vLLM)
+#   delai_s             délai total d'une requête (une requête expirée n'est pas reprise)
+#   jetons_max          plafond de jetons de la réponse (réflexion comprise chez Gemini)
+#   temperature         facultatif ; absent : valeur par défaut du modèle (conseillé pour Gemini)
+#   requetes_par_heure, requetes_par_jour : plafonds de ce rôle, comptés sur le rover
+
+profil_actif = "gemini"
+
+# ------------------------------------------------------------------ Gemini en ligne
+[profils.gemini]
+description = "Google Gemini (en ligne)"
+api = "gemini"                 # gemini | openai (vLLM ou serveur compatible) | aucun
+url = "https://generativelanguage.googleapis.com/v1beta/openai/"     # API compatible OpenAI
+url_natif = "https://generativelanguage.googleapis.com/v1beta/"      # generateContent (audio)
+variable_cle = "GEMINI_API_KEY"  # clé payante, prioritaire ; seule clé de l'agent (Argon)
+cle_obligatoire = true
+reprises = 1                   # nouvelles tentatives sur erreur passagère (réseau, 5xx, 429 court)
+
+[profils.gemini.agent]
+modele = "gemini-4-argon"      # Gemini 4 Argon : appel de fonctions, réflexion low/medium/high
+reflexion = "low"              # consignes courtes : latence d'abord
+delai_s = 20.0
+jetons_max = 4096
+requetes_par_heure = 120
+requetes_par_jour = 1000
+
+[profils.gemini.vision]
+variable_cle_secours = "GEMINI_API_KEY_GRATUITE"   # clé gratuite : quota ou panne seulement
+modele = "gemini-robotics-er-2-preview"   # points [y, x] normalisés 0–1000, raisonnement spatial
+reflexion = "medium"           # recommandé par Google pour Robotics ER (latence / qualité)
+format_points = "yx_1000"      # yx_1000 (Gemini, Gemma) | xy_1000 (Qwen-VL)
+largeur_image = 640            # image envoyée au modèle et publiée au poste (px)
+delai_s = 30.0
+jetons_max = 4096
+requetes_par_heure = 60
+requetes_par_jour = 500
+
+[profils.gemini.transcription]
+variable_cle_secours = "GEMINI_API_KEY_GRATUITE"   # clé gratuite : quota ou panne seulement
+modele = "gemini-3.5-transcribe"
+# gemini_natif : generateContent + audioTranscriptionConfig (documenté pour ce modèle) ;
+# chat_audio : chat/completions avec input_audio (modèles Gemini généralistes) ;
+# openai_transcriptions : /audio/transcriptions (Whisper, GX10).
+mode = "gemini_natif"
+langue = "fr-FR"               # code BCP-47 (Gemini) ; « fr » pour Whisper
+style = "SMART"                # SMART : nombres écrits en chiffres, hésitations retirées ; "" = VERBATIM
+vocabulaire = ["FieldMind", "rover", "lidar", "demi-tour", "mètres", "degrés"]
+delai_s = 15.0
+requetes_par_heure = 400
+requetes_par_jour = 3000
+
+# ------------------------------------------------------------------ GX10 (local)
+[profils.gx10]
+description = "Modèles locaux sur l'ASUS Ascent GX10 (vLLM)"
+api = "openai"
+hote = "gx10.local"            # nom ou adresse IP du GX10 sur le réseau du rover
+variable_hote = "FIELDMIND_GX10_HOTE"   # si elle est définie, remplace `hote`
+url = "http://{hote}:8000/v1"
+variable_cle = "GX10_API_KEY"  # la même que VLLM_API_KEY de deploiement/gx10/.env
+cle_obligatoire = false
+reprises = 1
+
+[profils.gx10.agent]
+modele = "nvidia/Qwen3.6-35B-A3B-NVFP4"   # MoE 35 B (3 B actifs), 4 bits : rapide sur le GB10, images + outils
+reflexion = "aucune"
+delai_s = 30.0
+jetons_max = 2048
+requetes_par_heure = 3600
+requetes_par_jour = 50000
+
+[profils.gx10.vision]
+modele = "nvidia/Qwen3.6-35B-A3B-NVFP4"
+reflexion = "aucune"
+format_points = "xy_1000"      # Qwen-VL répond en [x, y] (Gemma : « yx_1000 »)
+largeur_image = 640
+delai_s = 30.0
+jetons_max = 2048
+requetes_par_heure = 3600
+requetes_par_jour = 50000
+
+[profils.gx10.pointage]
+# Modèle incarné (remplace Gemini Robotics-ER) : « chercher » un objet, en [(x, y)] 0–1000
+fournisseur = "openai"
+modele = "BAAI/RoboBrain2.5-4B"
+url = "http://{hote}:8002/v1"
+format_points = "robobrain"
+largeur_image = 640
+delai_s = 30.0
+jetons_max = 256
+requetes_par_heure = 3600
+requetes_par_jour = 50000
+
+# Outils du GX10 (deploiement/gx10/outils) : une image envoyée sert à toutes les tâches
+[profils.gx10.detection]
+fournisseur = "inference"
+modele = "ustc-community/dfine-xlarge-obj2coco"
+url = "http://{hote}:8003/v1"
+delai_s = 8.0
+
+[profils.gx10.profondeur]
+fournisseur = "inference"
+modele = "depth-anything/Depth-Anything-V2-Metric-Outdoor-Large-hf"
+url = "http://{hote}:8003/v1"
+delai_s = 10.0
+
+[profils.gx10.memoire]
+fournisseur = "inference"
+modele = "Qwen/Qwen3-VL-Embedding-2B"
+url = "http://{hote}:8003/v1"
+delai_s = 10.0
+
+[profils.gx10.synthese]
+fournisseur = "inference"
+modele = "Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice"
+url = "http://{hote}:8004/v1"
+delai_s = 20.0
+
+[profils.gx10.transcription]
+modele = "Qwen/Qwen3-ASR-1.7B"
+mode = "openai_transcriptions"
+url = "http://{hote}:8001/v1"
+langue = "fr"
+vocabulaire = ["FieldMind", "rover", "lidar", "demi-tour", "mètres", "degrés"]
+delai_s = 15.0
+requetes_par_heure = 3600
+requetes_par_jour = 50000
+
+# ------------------------------------------------------------------ sans modèle
+[profils.aucun]
+description = "Aucun modèle : consignes écrites et vocales désactivées (boutons et carte seulement)"
+api = "aucun"
+
+# ------------------------------------------------------------------ agent (tous profils)
+[agent]
+historique_echanges = 6        # derniers échanges opérateur / rover redonnés au modèle
+actions_max = 12               # actions d'un même plan
+
+# ------------------------------------------------------------------ écoute (tous profils)
+[voix]
+seuil_entree_db = 8.0          # rapport signal / plancher de bruit pour ouvrir un segment
+seuil_sortie_db = 4.0          # sous ce rapport, la parole est considérée comme finie
+modulation_min_db = 2.0        # variation syllabique minimale (un bruit de moteur est stable)
+duree_min_s = 0.4
+duree_max_s = 15.0
+pre_roulement_s = 0.3          # audio gardé avant le début détecté
+silence_fin_s = 0.7            # silence qui clôt un segment
+bande_hz = [250.0, 3500.0]     # bande de la parole analysée (sous 250 Hz : roulement, moteurs)
+mot_eveil = ""                 # vide : désactivé ; par exemple « rover »
+variantes_mot_eveil = ["rover", "roveur", "robert", "rovert"]
+niveau_hz = 10.0               # publication du niveau sonore (vumètre)

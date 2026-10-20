@@ -1,0 +1,160 @@
+{
+ "poses": [
+  {
+   "servo_deg": -31,
+   "fusee_D_deg": 35.4,
+   "fusee_G_deg": 25.1,
+   "collisions": []
+  },
+  {
+   "servo_deg": -30,
+   "fusee_D_deg": 33.92,
+   "fusee_G_deg": 24.46,
+   "collisions": []
+  },
+  {
+   "servo_deg": -20,
+   "fusee_D_deg": 20.98,
+   "fusee_G_deg": 17.36,
+   "collisions": []
+  },
+  {
+   "servo_deg": -10,
+   "fusee_D_deg": 9.97,
+   "fusee_G_deg": 9.13,
+   "collisions": []
+  },
+  {
+   "servo_deg": 0,
+   "fusee_D_deg": 0.0,
+   "fusee_G_deg": -0.0,
+   "collisions": []
+  },
+  {
+   "servo_deg": 10,
+   "fusee_D_deg": -9.13,
+   "fusee_G_deg": -9.97,
+   "collisions": []
+  },
+  {
+   "servo_deg": 20,
+   "fusee_D_deg": -17.36,
+   "fusee_G_deg": -20.98,
+   "collisions": []
+  },
+  {
+   "servo_deg": 30,
+   "fusee_D_deg": -24.46,
+   "fusee_G_deg": -33.92,
+   "collisions": []
+  },
+  {
+   "servo_deg": 31,
+   "fusee_D_deg": -25.1,
+   "fusee_G_deg": -35.4,
+   "collisions": []
+  }
+ ],
+ "largeurs": [
+  {
+   "essai": {
+    "d4_planche_larg": "250 mm"
+   },
+   "fonctions_en_erreur": [],
+   "collisions_neutre": [],
+   "E_mm": 260.0,
+   "axe_av_sous_planche_mm": 55.0,
+   "biellette_L_mm": 115.76,
+   "fusees_a_30deg": [
+    -24.37,
+    -34.07
+   ],
+   "liaisons_en_erreur": [],
+   "biellette_x_mm": [
+    1.0,
+    130.8
+   ]
+  },
+  {
+   "essai": {
+    "d4_planche_larg": "350 mm"
+   },
+   "fonctions_en_erreur": [],
+   "collisions_neutre": [],
+   "E_mm": 360.0,
+   "axe_av_sous_planche_mm": 55.0,
+   "biellette_L_mm": 165.76,
+   "fusees_a_30deg": [
+    -24.53,
+    -33.81
+   ],
+   "liaisons_en_erreur": [],
+   "biellette_x_mm": [
+    1.0,
+    180.8
+   ]
+  },
+  {
+   "essai": {
+    "d4_planche_ep": "10 mm"
+   },
+   "fonctions_en_erreur": [],
+   "collisions_neutre": [],
+   "E_mm": 360.0,
+   "axe_av_sous_planche_mm": 55.0,
+   "biellette_L_mm": 165.76,
+   "fusees_a_30deg": [
+    -24.53,
+    -33.81
+   ],
+   "liaisons_en_erreur": [],
+   "biellette_x_mm": [
+    1.0,
+    180.8
+   ]
+  },
+  {
+   "essai": {
+    "d4_roue_av_d": "130 mm"
+   },
+   "fonctions_en_erreur": [],
+   "collisions_neutre": [],
+   "E_mm": 360.0,
+   "axe_av_sous_planche_mm": 65.0,
+   "biellette_L_mm": 165.76,
+   "fusees_a_30deg": [
+    -24.53,
+    -33.81
+   ],
+   "liaisons_en_erreur": [],
+   "biellette_x_mm": [
+    1.0,
+    180.8
+   ]
+  },
+  {
+   "essai": {
+    "d4_planche_larg": "300 mm",
+    "d4_planche_ep": "5 mm",
+    "d4_roue_av_d": "150 mm"
+   },
+   "fonctions_en_erreur": [],
+   "collisions_neutre": [],
+   "E_mm": 310.0,
+   "axe_av_sous_planche_mm": 55.0,
+   "biellette_L_mm": 140.76,
+   "fusees_a_30deg": [
+    -24.46,
+    -33.92
+   ],
+   "liaisons_en_erreur": [],
+   "biellette_x_mm": [
+    1.0,
+    155.8
+   ]
+  }
+ ],
+ "point_le_plus_bas_mm": 0.0,
+ "dessous_planche_mm": 130.0,
+ "axe_avant_sol_mm": 75.0
+}

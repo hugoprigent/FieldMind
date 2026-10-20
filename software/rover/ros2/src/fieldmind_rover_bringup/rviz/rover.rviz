@@ -1,0 +1,154 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+  - Class: rviz_common/Tool Properties
+    Name: Tool Properties
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Enabled: true
+      Reference Frame: <Fixed Frame>
+      Cell Size: 1
+      Plane Cell Count: 40
+      Color: 160; 160; 164
+      Alpha: 0.3
+    - Class: rviz_default_plugins/Map
+      Name: Carte (slam_toolbox)
+      Enabled: true
+      Topic:
+        Value: /map
+        Durability Policy: Transient Local
+        Reliability Policy: Reliable
+      Color Scheme: map
+      Alpha: 0.8
+    - Class: rviz_default_plugins/Map
+      Name: Costmap globale
+      Enabled: true
+      Topic:
+        Value: /global_costmap/costmap
+        Durability Policy: Volatile
+        Reliability Policy: Reliable
+      Color Scheme: costmap
+      Alpha: 0.4
+    - Class: rviz_default_plugins/Map
+      Name: Costmap locale
+      Enabled: true
+      Topic:
+        Value: /local_costmap/costmap
+        Durability Policy: Volatile
+        Reliability Policy: Reliable
+      Color Scheme: costmap
+      Alpha: 0.5
+    - Class: rviz_default_plugins/RobotModel
+      Name: Rover
+      Enabled: true
+      Description Source: Topic
+      Description Topic:
+        Value: /robot_description
+        Durability Policy: Transient Local
+        Reliability Policy: Reliable
+      Alpha: 1
+    - Class: rviz_default_plugins/TF
+      Name: TF
+      Enabled: false
+    - Class: rviz_default_plugins/LaserScan
+      Name: Lidar
+      Enabled: true
+      Topic:
+        Value: /scan
+        Durability Policy: Volatile
+        Reliability Policy: Best Effort
+      Style: Points
+      Size (Pixels): 3
+      Color Transformer: FlatColor
+      Color: 255; 40; 40
+      Decay Time: 0
+    - Class: rviz_default_plugins/Odometry
+      Name: Odométrie
+      Enabled: true
+      Topic:
+        Value: /odom
+        Durability Policy: Volatile
+        Reliability Policy: Reliable
+      Keep: 50
+      Position Tolerance: 0.1
+      Angle Tolerance: 0.2
+      Shape:
+        Value: Arrow
+        Color: 255; 170; 0
+        Shaft Length: 0.3
+        Shaft Radius: 0.02
+        Head Length: 0.08
+        Head Radius: 0.05
+    - Class: rviz_default_plugins/Path
+      Name: Chemin global
+      Enabled: true
+      Topic:
+        Value: /plan
+        Durability Policy: Volatile
+        Reliability Policy: Reliable
+      Color: 25; 255; 0
+      Line Style: Lines
+    - Class: rviz_default_plugins/Path
+      Name: Chemin local
+      Enabled: true
+      Topic:
+        Value: /local_plan
+        Durability Policy: Volatile
+        Reliability Policy: Reliable
+      Color: 0; 170; 255
+    - Class: rviz_default_plugins/Polygon
+      Name: Emprise
+      Enabled: true
+      Topic:
+        Value: /local_costmap/published_footprint
+        Durability Policy: Volatile
+        Reliability Policy: Reliable
+      Color: 0; 120; 255
+    - Class: rviz_default_plugins/Image
+      Name: Caméra gauche
+      Enabled: true
+      Topic:
+        Value: /camera/gauche/image_raw
+        Durability Policy: Volatile
+        Reliability Policy: Best Effort
+      Transport Hint: compressed
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: map
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/Interact
+      Hide Inactive Objects: true
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/Measure
+      Line color: 128; 128; 0
+    - Class: rviz_default_plugins/SetGoal
+      Topic:
+        Value: /goal_pose
+    - Class: rviz_default_plugins/PublishPoint
+      Topic:
+        Value: /clicked_point
+      Single click: true
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/TopDownOrtho
+      Name: Vue de dessus
+      Scale: 60
+      X: 0
+      Y: 0
+      Angle: 0
+      Near Clip Distance: 0.01
+      Target Frame: base_link
+    Saved: ~
+Window Geometry:
+  Height: 900
+  Width: 1400
+  Displays:
+    collapsed: false

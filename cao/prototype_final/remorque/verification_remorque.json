@@ -1,0 +1,240 @@
+{
+ "jeux_mm": {
+  "pneu_G/volet_deplie": 5.5,
+  "volet_G_deplie/boitier_et_bloc_arriere": 3.0,
+  "pneu_D/volet_deplie": 5.5,
+  "volet_D_deplie/boitier_et_bloc_arriere": 3.0,
+  "pneu_G/volet_replie": 8.69,
+  "volet_G_replie/boitier_et_bloc_arriere": 3.28,
+  "pneu_D/volet_replie": 8.69,
+  "volet_D_replie/boitier_et_bloc_arriere": 3.28,
+  "pneu_G/rebords_planche_supports": 5.2,
+  "jante_G/support": 3.0,
+  "boitier_G/rebord_AV": 0.0,
+  "SG90_G/planche_et_rebord_AV": 5.87,
+  "SG90_G/rebord_AV": 3.47,
+  "pneu_D/rebords_planche_supports": 5.2,
+  "jante_D/support": 3.0,
+  "boitier_D/rebord_AV": 0.0,
+  "SG90_D/planche_et_rebord_AV": 5.87,
+  "SG90_D/rebord_AV": 3.47
+ },
+ "collisions_volets_deplies": [],
+ "collisions_volets_replies": [],
+ "pieces": {
+  "rebord_AV_G": [
+   10.5,
+   57.3,
+   146.7
+  ],
+  "rebord_AR_G": [
+   10.5,
+   16.4,
+   150.0
+  ],
+  "rebord_AR_D": [
+   10.5,
+   16.4,
+   150.0
+  ],
+  "rebord_AV_D": [
+   10.5,
+   57.3,
+   146.7
+  ],
+  "joue_M1_G": [
+   7.0,
+   16.4,
+   172.0
+  ],
+  "joue_M2_G": [
+   7.0,
+   16.4,
+   144.0
+  ],
+  "joue_M2_D": [
+   7.0,
+   16.4,
+   144.0
+  ],
+  "joue_M1_D": [
+   7.0,
+   16.4,
+   172.0
+  ],
+  "boitier_servo_G": [
+   39.0,
+   50.9,
+   69.5
+  ],
+  "charniere_AR_G": [
+   17.0,
+   34.4,
+   50.9
+  ],
+  "boitier_servo_D": [
+   39.0,
+   50.9,
+   69.5
+  ],
+  "charniere_AR_D": [
+   17.0,
+   34.4,
+   50.9
+  ],
+  "ferrure_AV_G": [
+   18.0,
+   31.5,
+   49.6
+  ],
+  "ferrure_AR_G": [
+   18.0,
+   26.0,
+   49.6
+  ],
+  "ferrure_AV_D": [
+   18.0,
+   31.5,
+   49.6
+  ],
+  "ferrure_AR_D": [
+   18.0,
+   26.0,
+   49.6
+  ],
+  "timon": [
+   25.5,
+   168.0,
+   168.0
+  ],
+  "support_roue_G": [
+   77.5,
+   94.5,
+   120.0
+  ],
+  "jante_remorque_G": [
+   33.0,
+   124.0,
+   124.0
+  ],
+  "pneu_TPU_remorque_G": [
+   30.6,
+   150.0,
+   150.0
+  ],
+  "flasque_pneu_remorque_G": [
+   3.0,
+   124.0,
+   124.0
+  ],
+  "bague_625_int_G": [
+   7.0,
+   22.0,
+   22.0
+  ],
+  "bague_625_ext_G": [
+   7.0,
+   22.0,
+   22.0
+  ],
+  "entretoise_625_G": [
+   6.2,
+   7.5,
+   7.5
+  ],
+  "rondelle_tete_G": [
+   2.0,
+   7.5,
+   7.5
+  ],
+  "cale_jambe_G": [
+   3.0,
+   7.5,
+   7.5
+  ],
+  "support_roue_D": [
+   77.5,
+   94.5,
+   120.0
+  ],
+  "jante_remorque_D": [
+   33.0,
+   124.0,
+   124.0
+  ],
+  "pneu_TPU_remorque_D": [
+   30.6,
+   150.0,
+   150.0
+  ],
+  "flasque_pneu_remorque_D": [
+   3.0,
+   124.0,
+   124.0
+  ],
+  "bague_625_int_D": [
+   7.0,
+   22.0,
+   22.0
+  ],
+  "bague_625_ext_D": [
+   7.0,
+   22.0,
+   22.0
+  ],
+  "entretoise_625_D": [
+   6.2,
+   7.5,
+   7.5
+  ],
+  "rondelle_tete_D": [
+   2.0,
+   7.5,
+   7.5
+  ],
+  "cale_jambe_D": [
+   3.0,
+   7.5,
+   7.5
+  ]
+ },
+ "morceaux": {
+  "rebord_AV_G": 1,
+  "rebord_AR_G": 1,
+  "rebord_AR_D": 1,
+  "rebord_AV_D": 1,
+  "joue_M1_G": 1,
+  "joue_M2_G": 1,
+  "joue_M2_D": 1,
+  "joue_M1_D": 1,
+  "boitier_servo_G": 1,
+  "charniere_AR_G": 1,
+  "boitier_servo_D": 1,
+  "charniere_AR_D": 1,
+  "ferrure_AV_G": 1,
+  "ferrure_AR_G": 1,
+  "ferrure_AV_D": 1,
+  "ferrure_AR_D": 1,
+  "timon": 1,
+  "support_roue_G": 1,
+  "jante_remorque_G": 1,
+  "pneu_TPU_remorque_G": 1,
+  "flasque_pneu_remorque_G": 1,
+  "bague_625_int_G": 1,
+  "bague_625_ext_G": 1,
+  "entretoise_625_G": 1,
+  "rondelle_tete_G": 1,
+  "cale_jambe_G": 1,
+  "support_roue_D": 1,
+  "jante_remorque_D": 1,
+  "pneu_TPU_remorque_D": 1,
+  "flasque_pneu_remorque_D": 1,
+  "bague_625_int_D": 1,
+  "bague_625_ext_D": 1,
+  "entretoise_625_D": 1,
+  "rondelle_tete_D": 1,
+  "cale_jambe_D": 1
+ },
+ "pieces_en_plusieurs_morceaux": [],
+ "corps_orphelins": []
+}

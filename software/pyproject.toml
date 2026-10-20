@@ -1,0 +1,48 @@
+[project]
+name = "fieldmind-navigation"
+version = "0.1.0"
+description = "FieldMind : cerveau de navigation autonome du rover, simulateur physique MuJoCo et poste opérateur web."
+requires-python = ">=3.12"
+readme = "README.md"
+
+# Les dépendances épinglées sont dans requirements-demo.txt (exécution)
+# et requirements-dev.txt (qualité et tests).
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+# rover/, embarque/ et esp32/ sont des projets à part, vérifiés par leurs propres jobs
+extend-exclude = [".venv", "interface/web/vendor", "rover", "embarque", "esp32"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "N", "PT", "ASYNC"]
+ignore = [
+    "RUF001", "RUF002", "RUF003",  # le code est commenté en français (apostrophes, espaces insécables)
+    "N818",  # noms d'exceptions en français (Echec…), sans suffixe « Error »
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["PLR2004"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.12"
+packages = ["services", "simulation"]
+strict = true
+warn_unreachable = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["mujoco", "mujoco.*", "scipy", "scipy.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "lent: scénarios de navigation complets (plusieurs dizaines de secondes)",
+    "navigateur: nécessite Chromium (Playwright)",
+]
+filterwarnings = ["error::DeprecationWarning:services.*", "error::DeprecationWarning:simulation.*"]

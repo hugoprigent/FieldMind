@@ -1,0 +1,82 @@
+{
+ "pcb": [
+  23.0,
+  54.0
+ ],
+ "trous_pcb": [
+  [
+   2.0,
+   9.4
+  ],
+  [
+   21.0,
+   44.6
+  ]
+ ],
+ "ecart": 5.0,
+ "ep": 3.0,
+ "plot_h": 3.6,
+ "pied": 0.0,
+ "plaque": [
+  -3.0,
+  -12.0,
+  54.0,
+  66.0
+ ],
+ "trous_vis": [
+  {
+   "module": 0,
+   "x": 2.0,
+   "y": 9.4
+  },
+  {
+   "module": 0,
+   "x": 21.0,
+   "y": 44.6
+  },
+  {
+   "module": 1,
+   "x": 30.0,
+   "y": 9.4
+  },
+  {
+   "module": 1,
+   "x": 49.0,
+   "y": 44.6
+  }
+ ],
+ "fixations": [
+  [
+   25.5,
+   -6.5
+  ],
+  [
+   25.5,
+   60.5
+  ]
+ ],
+ "place_sur_la_planche": {
+  "coin_module_Pi": [
+   -100.25,
+   34.0
+  ],
+  "fixations_planche": [
+   [
+    -74.75,
+    27.5
+   ],
+   [
+    -74.75,
+    94.5
+   ]
+  ]
+ },
+ "fixation_modules": "vis M3×8 par le dessus + écrou M3 dans la poche sous la plaque",
+ "taille_mm": [
+  57.0,
+  78.0,
+  6.6
+ ],
+ "volume_cm3": 13.44,
+ "morceaux": 1
+}

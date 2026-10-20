@@ -1,0 +1,539 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "5240d692-794a-56ea-8571-3be3a6fdba67")
+	(paper "A3")
+	(title_block
+		(title "FieldMind rover prototype / schéma électrique complet")
+		(date "2026-10-13")
+		(rev "S1 / non testé")
+		(company "FieldMind")
+		(comment 1 "Schéma de câblage du prototype : modules et liaisons, sans routage")
+		(comment 2 "Batterie, contrôleur et moteurs du donneur E600 : à identifier au démontage")
+	)
+	(lib_symbols)
+	(text "• Réglage des XL4015 à vide puis en charge avant de brancher Pi, servo ou relais."
+		(exclude_from_sim no)
+		(at 30.48 229.87 0)
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+			(justify left bottom)
+		)
+		(uuid "08409314-d08e-5a85-a5ba-b32bda295ad6")
+	)
+	(text "Puissance et arrêt :"
+		(exclude_from_sim no)
+		(at 25.4 165.1 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "0b0068d6-b25e-519b-904e-fa59ae88cdf7")
+	)
+	(text "• Arrêt d’urgence, relais, contacteur"
+		(exclude_from_sim no)
+		(at 29.21 83.82 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left bottom)
+		)
+		(uuid "0cd62880-2594-5788-91e2-55efa73d5547")
+	)
+	(text "• Modulino Knob sur J7"
+		(exclude_from_sim no)
+		(at 283.21 83.82 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left bottom)
+		)
+		(uuid "0d45b40e-a42a-523d-859c-b0692e6394bd")
+	)
+	(text "• Raspberry Pi 4 (USB-C 5,1 V)"
+		(exclude_from_sim no)
+		(at 156.21 73.66 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left bottom)
+		)
+		(uuid "1a9f46fd-f506-5afb-9877-e26851f3efda")
+	)
+	(text "• +5V_PI : XL4015 n°1 → USB-C du Pi"
+		(exclude_from_sim no)
+		(at 30.48 199.39 0)
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+			(justify left bottom)
+		)
+		(uuid "1d17baf1-1264-595c-858c-671381603f1b")
+	)
+	(text "• Contrôleur et moteurs du E600"
+		(exclude_from_sim no)
+		(at 29.21 88.9 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left bottom)
+		)
+		(uuid "2101d630-f165-5c3b-bc9d-6305d76e3ef8")
+	)
+	(text "• Servo (D8) et état d’arrêt (D9) sur J6"
+		(exclude_from_sim no)
+		(at 283.21 88.9 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left bottom)
+		)
+		(uuid "24980ff7-6587-5920-b6d1-6ab598bee9ee")
+	)
+	(text "• Batterie, BMS, chargeur, contrôleur et moteurs du E600 (type, tension, courants, commande, retours)."
+		(exclude_from_sim no)
+		(at 30.48 222.25 0)
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+			(justify left bottom)
+		)
+		(uuid "32e1e8c7-dcb9-5a88-b092-e52fc3933346")
+	)
+	(text "• ARRET_OK : contact K1 21-24 → J6.5 (D9), fermé vers GND = chaîne disponible"
+		(exclude_from_sim no)
+		(at 30.48 210.82 0)
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+			(justify left bottom)
+		)
+		(uuid "3b1a388b-220c-50db-879d-aa615f50a237")
+	)
+	(text "• J8 réservé (retours roues)"
+		(exclude_from_sim no)
+		(at 283.21 93.98 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left bottom)
+		)
+		(uuid "3d4d93f4-9ff7-564d-b1c8-9950ec689d16")
+	)
+	(text "• Calibres des fusibles F0-F4, section des câbles, tension DC des porte-fusibles ≥ tension max chargée."
+		(exclude_from_sim no)
+		(at 30.48 226.06 0)
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+			(justify left bottom)
+		)
+		(uuid "4f354501-cdaa-53a4-aa23-70b221a13f88")
+	)
+	(text "Batterie E600 → F0 → S1 → bus. Branches fusiblées : XL4015 5,1 V (Pi), 6 V (servo), 12 V (commande), traction."
+		(exclude_from_sim no)
+		(at 30.48 168.91 0)
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+			(justify left bottom)
+		)
+		(uuid "5233f0c6-2570-58f1-a9b5-61e17b1d6814")
+	)
+	(text "• Liaison USB vers le XIAO"
+		(exclude_from_sim no)
+		(at 156.21 88.9 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left bottom)
+		)
+		(uuid "53d57090-89ca-5384-bebc-5edf6c862c58")
+	)
+	(text "• SERVO_PWM : J6.6 (D8) → signal du servo M3"
+		(exclude_from_sim no)
+		(at 30.48 207.01 0)
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+			(justify left bottom)
+		)
+		(uuid "66751170-9aad-5c16-bf03-ad65680d61de")
+	)
+	(text "Carte capteurs :"
+		(exclude_from_sim no)
+		(at 25.4 184.15 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "6db5f5e0-9f10-5db9-a946-77cf6999928a")
+	)
+	(text "• Rien n’a été essayé physiquement."
+		(exclude_from_sim no)
+		(at 30.48 237.49 0)
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+			(justify left bottom)
+		)
+		(uuid "70f827cf-8fdb-5a61-b860-fae22d004f1d")
+	)
+	(text "• Servo de direction DT996"
+		(exclude_from_sim no)
+		(at 29.21 93.98 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left bottom)
+		)
+		(uuid "7a6da02e-f645-59d0-90d9-136fe6858ad5")
+	)
+	(text "FIELDMIND · ROVER PROTOTYPE · SCHÉMA ÉLECTRIQUE COMPLET"
+		(exclude_from_sim no)
+		(at 25.4 30.48 0)
+		(effects
+			(font
+				(size 3.2 3.2)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "83ec699f-6439-5197-98e3-dcca0620d3d4")
+	)
+	(text "Pi 4 alimenté en USB-C. USB 3.0 : 2 webcams. USB 2.0 : lidar C1 (via son adaptateur) et XIAO de la carte capteurs."
+		(exclude_from_sim no)
+		(at 30.48 180.34 0)
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+			(justify left bottom)
+		)
+		(uuid "897ba3b7-ad97-545c-b75c-0001420bf158")
+	)
+	(text "• 3 × XL4015 (5,1 V / 6 V / 12 V)"
+		(exclude_from_sim no)
+		(at 29.21 78.74 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left bottom)
+		)
+		(uuid "a78569ca-4da5-57e0-aae3-874f46dcf212")
+	)
+	(text "Étiquettes entre feuilles"
+		(exclude_from_sim no)
+		(at 25.4 195.58 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "b9abefec-d9fd-5a51-b3da-353cd5ccd400")
+	)
+	(text "• RPLIDAR C1 + adaptateur (USB 2.0)"
+		(exclude_from_sim no)
+		(at 156.21 83.82 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left bottom)
+		)
+		(uuid "bc5d9e5e-6639-5952-9a2d-9f2e7cd2fcef")
+	)
+	(text "• Brochage du GPS reçu ; signal 3,3 V reconnu par le servo ; bilan USB du Pi."
+		(exclude_from_sim no)
+		(at 30.48 233.68 0)
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+			(justify left bottom)
+		)
+		(uuid "c37be7c6-35f3-5f46-8e6e-33a6960e9aeb")
+	)
+	(text "• Carte A7 : XIAO, OLED, GY-521, BMP280"
+		(exclude_from_sim no)
+		(at 283.21 73.66 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left bottom)
+		)
+		(uuid "c6a22663-1f2c-5768-8824-63a9f9d829a1")
+	)
+	(text "Vue d’ensemble. Les trois feuilles détaillent le câblage ; les étiquettes globales relient les feuilles."
+		(exclude_from_sim no)
+		(at 25.4 37.47 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left bottom)
+		)
+		(uuid "cb5127ec-f064-5995-9742-c1c31ec3f884")
+	)
+	(text "• GPS ATGM336H sur J4"
+		(exclude_from_sim no)
+		(at 283.21 78.74 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left bottom)
+		)
+		(uuid "cbcce7be-59cf-5cbd-8dda-e14db1bfca5a")
+	)
+	(text "• Batterie, fusibles, interrupteur général"
+		(exclude_from_sim no)
+		(at 29.21 73.66 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left bottom)
+		)
+		(uuid "d19534f8-02d5-52fa-b02e-a765bcae4b56")
+	)
+	(text "Raspberry Pi et USB :"
+		(exclude_from_sim no)
+		(at 25.4 176.53 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "db0d467f-3f86-593c-8a07-032702a1960b")
+	)
+	(text "• 2 webcams UGREEN (USB 3.0)"
+		(exclude_from_sim no)
+		(at 156.21 78.74 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left bottom)
+		)
+		(uuid "ea3b2087-b1bf-5f43-bda0-1e51a2fce266")
+	)
+	(text "XIAO ESP32C5 + OLED + GY-521 + BMP280 sur la perfboard A7. J4 → GPS, J7 → Knob, J6 → servo (D8) et état d’arrêt (D9)."
+		(exclude_from_sim no)
+		(at 30.48 187.96 0)
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+			(justify left bottom)
+		)
+		(uuid "ef1c87cd-2aed-5c7e-b333-74de4a20ff78")
+	)
+	(text "• USB_XIAO : port USB 2.0 n°2 du Pi → USB-C du XIAO"
+		(exclude_from_sim no)
+		(at 30.48 203.2 0)
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+			(justify left bottom)
+		)
+		(uuid "f560f4b2-c43d-54eb-b2ed-c9adb055e79f")
+	)
+	(text "À relever avant câblage définitif"
+		(exclude_from_sim no)
+		(at 25.4 218.44 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "fab591dc-b82c-5cc3-902c-d9afe279db43")
+	)
+	(text "Arrêt d’urgence S2 (NF) + réarmement S3 → relais K1 (auto-maintien) → contacteur K2 de traction. Contact K1 21-24 → ESP D9."
+		(exclude_from_sim no)
+		(at 30.48 172.72 0)
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+			(justify left bottom)
+		)
+		(uuid "fcbd7fb5-ffd2-59a5-86fc-2474ac6b3d5e")
+	)
+	(sheet
+		(at 25.4 63.5)
+		(size 101.6 76.2)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 255 255 225 1)
+		)
+		(uuid "0d9abf60-d442-57e9-b820-2d08718ac540")
+		(property "Sheetname" "Puissance et arrêt"
+			(at 25.4 62.8 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.8 1.8)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "puissance_arret.kicad_sch"
+			(at 25.4 140.3 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "fieldmind_rover_systeme"
+				(path "/5240d692-794a-56ea-8571-3be3a6fdba67"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 152.4 63.5)
+		(size 101.6 76.2)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 255 255 225 1)
+		)
+		(uuid "963dbb8f-bdd7-5256-a9a1-098041add80d")
+		(property "Sheetname" "Raspberry Pi et USB"
+			(at 152.4 62.8 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.8 1.8)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "pi_usb.kicad_sch"
+			(at 152.4 140.3 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "fieldmind_rover_systeme"
+				(path "/5240d692-794a-56ea-8571-3be3a6fdba67"
+					(page "3")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 279.4 63.5)
+		(size 101.6 76.2)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 255 255 225 1)
+		)
+		(uuid "ae736f0a-7bf4-5f33-b7ce-b6d5952b34c9")
+		(property "Sheetname" "Carte capteurs et périphériques"
+			(at 279.4 62.8 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.8 1.8)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "capteurs_peripheriques.kicad_sch"
+			(at 279.4 140.3 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "fieldmind_rover_systeme"
+				(path "/5240d692-794a-56ea-8571-3be3a6fdba67"
+					(page "4")
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+)

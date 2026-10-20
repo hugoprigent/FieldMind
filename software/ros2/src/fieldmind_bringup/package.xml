@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>fieldmind_bringup</name>
+  <version>0.2.0</version>
+  <description>Pile autonome du rover FieldMind (identique en simulation et sur le rover) : localisation, SLAM, Nav2, perception, agent.</description>
+  <maintainer email="maintainer@fieldmind.example">FieldMind</maintainer>
+  <license>Propriétaire</license>
+  <exec_depend>robot_localization</exec_depend>
+  <exec_depend>slam_toolbox</exec_depend>
+  <exec_depend>fieldmind_perception</exec_depend>
+  <exec_depend>nav2_bringup</exec_depend>
+  <exec_depend>nav2_smac_planner</exec_depend>
+  <exec_depend>nav2_mppi_controller</exec_depend>
+  <export><build_type>ament_python</build_type></export>
+</package>

@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+<!--
+  Rover FieldMind réel (prototype final, octobre 2026) : direction Ackermann à servo unique,
+  deux roues arrière motrices, pas de codeurs de roue.
+
+  Valeurs de software/rover/config/rover.toml (CAO, pas encore mesurées sur le rover) : à garder
+  en accord avec ce fichier (vérifié par software/rover/tests/test_ros2_description.py).
+
+  Repères (comme fieldmind/types.py) : base_link AU SOL, au milieu de l'essieu arrière (axe des
+  moteurs, sous le lidar), x vers l'avant, y vers la gauche, z vers le haut. base_footprint est
+  confondu avec base_link (pour les outils qui l'attendent).
+
+  Capteurs : RPLIDAR C1 (plan laser à 0,322 m, au-dessus de l'essieu arrière), deux webcams en
+  stéréo (centres optiques à x = 0,415, y = ±0,06, z = 0,265, inclinées de 10° vers le sol),
+  MPU-6050 (axes déjà ramenés dans base_link par le logiciel du rover), GPS ATGM336H.
+  Toutes les articulations sont fixes : aucun retour de position de roue ni de braquage.
+-->
+<robot name="fieldmind_rover" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- Géométrie (m), section [geometrie] de rover.toml -->
+  <xacro:property name="empattement" value="0.38"/>
+  <xacro:property name="voie_arriere" value="0.39"/>
+  <xacro:property name="voie_avant" value="0.31"/>
+  <xacro:property name="diametre_roue_arriere" value="0.200"/>
+  <xacro:property name="diametre_roue_avant" value="0.150"/>
+  <xacro:property name="emprise_arriere" value="-0.11"/>
+  <xacro:property name="emprise_avant" value="0.46"/>
+  <xacro:property name="emprise_demi_largeur" value="0.225"/>
+  <xacro:property name="hauteur_max" value="0.36"/>
+  <xacro:property name="largeur_roue" value="0.05"/>
+
+  <!-- Capteurs, sections [lidar], [cameras], [gnss] -->
+  <xacro:property name="lidar_x" value="0.0"/>
+  <xacro:property name="lidar_y" value="0.0"/>
+  <xacro:property name="lidar_z" value="0.322"/>
+  <xacro:property name="camera_x" value="0.415"/>
+  <xacro:property name="camera_base" value="0.120"/>
+  <xacro:property name="camera_z" value="0.265"/>
+  <xacro:property name="camera_inclinaison_deg" value="10.0"/>
+  <xacro:property name="gnss_x" value="0.20"/>
+  <xacro:property name="gnss_y" value="-0.10"/>
+  <!-- Non renseignés dans rover.toml : positions approchées, à mesurer. Sans effet sur les
+       mesures (la centrale est déjà dans les axes de base_link, le GPS fait 2 à 3 m près). -->
+  <xacro:property name="gnss_z" value="0.30"/>
+  <xacro:property name="imu_x" value="0.15"/>
+  <xacro:property name="imu_z" value="0.12"/>
+
+  <xacro:property name="r_ar" value="${diametre_roue_arriere / 2}"/>
+  <xacro:property name="r_av" value="${diametre_roue_avant / 2}"/>
+  <xacro:property name="longueur" value="${emprise_avant - emprise_arriere}"/>
+
+  <material name="coque"><color rgba="0.92 0.55 0.15 1"/></material>
+  <material name="pneu"><color rgba="0.08 0.08 0.08 1"/></material>
+  <material name="capteur"><color rgba="0.20 0.22 0.25 1"/></material>
+
+  <link name="base_link">
+    <!-- Plateau et coque -->
+    <visual>
+      <origin xyz="${(emprise_avant - 0.02 + emprise_arriere + 0.06) / 2} 0 0.135"/>
+      <geometry><box size="${longueur - 0.08} 0.30 0.07"/></geometry>
+      <material name="coque"/>
+    </visual>
+    <!-- Mât du lidar -->
+    <visual>
+      <origin xyz="${lidar_x} ${lidar_y} ${(0.17 + lidar_z - 0.02) / 2}"/>
+      <geometry><cylinder radius="0.015" length="${lidar_z - 0.02 - 0.17}"/></geometry>
+      <material name="capteur"/>
+    </visual>
+    <!-- Barre stéréo -->
+    <visual>
+      <origin xyz="${camera_x - 0.015} 0 ${camera_z}"/>
+      <geometry><box size="0.03 ${camera_base + 0.05} 0.03"/></geometry>
+      <material name="capteur"/>
+    </visual>
+    <!-- Emprise au sol (rectangle englobant, roues comprises), de 0 à la hauteur maximale -->
+    <collision>
+      <origin xyz="${(emprise_avant + emprise_arriere) / 2} 0 ${hauteur_max / 2}"/>
+      <geometry><box size="${longueur} ${2 * emprise_demi_largeur} ${hauteur_max}"/></geometry>
+    </collision>
+  </link>
+
+  <link name="base_footprint"/>
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_link"/><child link="base_footprint"/>
+    <origin xyz="0 0 0"/>
+  </joint>
+
+  <!-- Roues (articulations fixes : affichage seulement) -->
+  <xacro:macro name="roue" params="nom x y rayon">
+    <link name="${nom}">
+      <visual>
+        <origin rpy="${pi / 2} 0 0"/>
+        <geometry><cylinder radius="${rayon}" length="${largeur_roue}"/></geometry>
+        <material name="pneu"/>
+      </visual>
+    </link>
+    <joint name="${nom}_joint" type="fixed">
+      <parent link="base_link"/><child link="${nom}"/>
+      <origin xyz="${x} ${y} ${rayon}"/>
+    </joint>
+  </xacro:macro>
+  <xacro:roue nom="roue_ar_g" x="0" y="${voie_arriere / 2}" rayon="${r_ar}"/>
+  <xacro:roue nom="roue_ar_d" x="0" y="${-voie_arriere / 2}" rayon="${r_ar}"/>
+  <xacro:roue nom="roue_av_g" x="${empattement}" y="${voie_avant / 2}" rayon="${r_av}"/>
+  <xacro:roue nom="roue_av_d" x="${empattement}" y="${-voie_avant / 2}" rayon="${r_av}"/>
+
+  <!-- Lidar : repère des rayons du LaserScan (angles déjà dans les axes de base_link) -->
+  <link name="lidar_link">
+    <visual>
+      <origin xyz="0 0 -0.012"/>
+      <geometry><cylinder radius="0.028" length="0.041"/></geometry>
+      <material name="capteur"/>
+    </visual>
+  </link>
+  <joint name="lidar_joint" type="fixed">
+    <parent link="base_link"/><child link="lidar_link"/>
+    <origin xyz="${lidar_x} ${lidar_y} ${lidar_z}"/>
+  </joint>
+
+  <link name="imu_link"/>
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/><child link="imu_link"/>
+    <origin xyz="${imu_x} 0 ${imu_z}"/>
+  </joint>
+
+  <link name="gnss_link"/>
+  <joint name="gnss_joint" type="fixed">
+    <parent link="base_link"/><child link="gnss_link"/>
+    <origin xyz="${gnss_x} ${gnss_y} ${gnss_z}"/>
+  </joint>
+
+  <!-- Caméras : camera_<nom>_link (x vers la scène, inclinée de 10° vers le sol) et
+       camera_<nom>_optical_frame (z vers la scène, x à droite, y en bas : convention optique) -->
+  <xacro:macro name="camera" params="nom y">
+    <link name="camera_${nom}_link">
+      <visual>
+        <origin xyz="-0.01 0 0"/>
+        <geometry><box size="0.02 0.035 0.025"/></geometry>
+        <material name="capteur"/>
+      </visual>
+    </link>
+    <joint name="camera_${nom}_joint" type="fixed">
+      <parent link="base_link"/><child link="camera_${nom}_link"/>
+      <origin xyz="${camera_x} ${y} ${camera_z}" rpy="0 ${radians(camera_inclinaison_deg)} 0"/>
+    </joint>
+    <link name="camera_${nom}_optical_frame"/>
+    <joint name="camera_${nom}_optical_joint" type="fixed">
+      <parent link="camera_${nom}_link"/><child link="camera_${nom}_optical_frame"/>
+      <origin rpy="${-pi / 2} 0 ${-pi / 2}"/>
+    </joint>
+  </xacro:macro>
+  <xacro:camera nom="gauche" y="${camera_base / 2}"/>
+  <xacro:camera nom="droite" y="${-camera_base / 2}"/>
+</robot>

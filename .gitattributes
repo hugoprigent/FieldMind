@@ -1,0 +1,8 @@
+* text=auto
+*.png binary
+*.jpg binary
+*.pdf binary
+*.glb binary
+*.stl binary
+# Generated KiCad drawings are reviewed visually.
+*.svg -diff

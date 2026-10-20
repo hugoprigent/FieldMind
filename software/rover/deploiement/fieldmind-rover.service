@@ -1,0 +1,20 @@
+# Service utilisateur du logiciel du rover (systemctl --user). Installé par deployer.sh.
+# Démarre au boot sans session ouverte grâce à « loginctl enable-linger ».
+[Unit]
+Description=FieldMind - logiciel du rover (conduite, sécurité, perception, IA, poste web)
+After=network-online.target
+
+[Service]
+WorkingDirectory=%h/fieldmind/rover
+# Environnement ~/fieldmind/venv (paquets du système + scipy, aiohttp), créé par deployer.sh
+ExecStart=%h/fieldmind/venv/bin/python -m fieldmind --materiel reel
+Restart=on-failure
+RestartSec=3
+# Un arrêt du service met la traction à zéro avant de fermer les ports (SIGTERM).
+KillSignal=SIGTERM
+TimeoutStopSec=5
+Environment=PYTHONUNBUFFERED=1
+Environment=OPENBLAS_NUM_THREADS=1
+
+[Install]
+WantedBy=default.target

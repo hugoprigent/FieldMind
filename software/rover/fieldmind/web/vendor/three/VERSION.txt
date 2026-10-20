@@ -1,0 +1,5 @@
+three.js 0.186.1 (npm), licence MIT (LICENSE). Copie de software/interface/web/vendor/three/.
+Fichiers : build/three.module.js, build/three.core.js, examples/jsm/controls/OrbitControls.js,
+examples/jsm/utils/BufferGeometryUtils.js.
+Seule modification : dans les deux addons, `from 'three'` devient `from '../../three.module.js'`
+pour que les modules se chargent sans import map (le poste n'en déclare pas).

@@ -1,0 +1,284 @@
+# Nav2 pour le rover FieldMind : véhicule Ackermann (empattement 0,40 m, braquage 30°), 0,70 × 0,53 m.
+# base_link est au milieu de l'essieu arrière : l'emprise va de −0,15 m (pare-chocs arrière) à
+# +0,55 m (pare-chocs avant).
+#
+# - Planificateur global : Smac Hybrid-A* (Reeds-Shepp), chemins que le rover peut suivre
+#   réellement (rayon de braquage minimal), marche arrière autorisée mais pénalisée.
+# - Contrôleur local : MPPI, modèle Ackermann.
+# - Récupérations : recul et attente (pas de rotation sur place).
+# - La vitesse est plafonnée à 1,0 m/s en navigation autonome (1,5 m/s au maximum mécanique).
+
+bt_navigator:
+  ros__parameters:
+    global_frame: map
+    robot_base_frame: base_link
+    odom_topic: /odometry/filtered
+    transform_tolerance: 1.0
+    bt_loop_duration: 10
+    default_server_timeout: 200
+    wait_for_service_timeout: 1000
+    action_server_result_timeout: 900.0
+    navigators: ["navigate_to_pose", "navigate_through_poses"]
+    navigate_to_pose:
+      plugin: "nav2_bt_navigator::NavigateToPoseNavigator"
+    navigate_through_poses:
+      plugin: "nav2_bt_navigator::NavigateThroughPosesNavigator"
+    error_code_names:
+      - compute_path_error_code
+      - follow_path_error_code
+
+controller_server:
+  ros__parameters:
+    # Vitesse actuelle du rover (état initial de MPPI) : sortie de l'EKF.
+    odom_topic: /odometry/filtered
+    controller_frequency: 10.0
+    costmap_update_timeout: 0.30
+    min_x_velocity_threshold: 0.001
+    min_y_velocity_threshold: 0.5
+    min_theta_velocity_threshold: 0.001
+    failure_tolerance: 0.5
+    progress_checker_plugins: ["progress_checker"]
+    goal_checker_plugins: ["general_goal_checker"]
+    controller_plugins: ["FollowPath"]
+    use_realtime_priority: false
+    progress_checker:
+      plugin: "nav2_controller::SimpleProgressChecker"
+      required_movement_radius: 0.3
+      movement_time_allowance: 12.0
+    general_goal_checker:
+      plugin: "nav2_controller::SimpleGoalChecker"
+      stateful: true
+      xy_goal_tolerance: 0.4
+      yaw_goal_tolerance: 6.28
+    FollowPath:
+      plugin: "nav2_mppi_controller::MPPIController"
+      motion_model: "Ackermann"
+      AckermannConstraints:
+        min_turning_r: 0.75
+      time_steps: 32
+      model_dt: 0.1
+      batch_size: 600
+      iteration_count: 1
+      vx_std: 0.2
+      vy_std: 0.2
+      wz_std: 0.4
+      vx_max: 1.0
+      vx_min: -0.4
+      vy_max: 0.0
+      wz_max: 1.4
+      ax_max: 1.0
+      ax_min: -2.0
+      ay_max: 3.0
+      ay_min: -3.0
+      az_max: 3.5
+      prune_distance: 2.0
+      # map → odom vient du SLAM, publié avec les scans (plus lent que l'odométrie).
+      transform_tolerance: 1.0
+      temperature: 0.3
+      gamma: 0.015
+      visualize: false
+      regenerate_noises: true
+      critics: ["ConstraintCritic", "CostCritic", "GoalCritic", "GoalAngleCritic",
+                "PathAlignCritic", "PathFollowCritic", "PathAngleCritic", "PreferForwardCritic"]
+      ConstraintCritic: {enabled: true, cost_power: 1, cost_weight: 4.0}
+      GoalCritic: {enabled: true, cost_power: 1, cost_weight: 5.0, threshold_to_consider: 1.4}
+      GoalAngleCritic: {enabled: true, cost_power: 1, cost_weight: 3.0, threshold_to_consider: 0.5}
+      PreferForwardCritic: {enabled: true, cost_power: 1, cost_weight: 8.0, threshold_to_consider: 0.5}
+      CostCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 6.0
+        near_collision_cost: 253
+        critical_cost: 300.0
+        consider_footprint: true
+        collision_cost: 1000000.0
+        near_goal_distance: 1.0
+        trajectory_point_step: 2
+      PathAlignCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 14.0
+        max_path_occupancy_ratio: 0.05
+        trajectory_point_step: 4
+        threshold_to_consider: 0.5
+        offset_from_furthest: 20
+        use_path_orientations: true
+      PathFollowCritic: {enabled: true, cost_power: 1, cost_weight: 5.0, offset_from_furthest: 5, threshold_to_consider: 1.4}
+      PathAngleCritic:
+        enabled: true
+        cost_power: 1
+        cost_weight: 2.0
+        offset_from_furthest: 4
+        threshold_to_consider: 0.5
+        max_angle_to_furthest: 1.0
+        mode: 1
+
+local_costmap:
+  local_costmap:
+    ros__parameters:
+      update_frequency: 5.0
+      publish_frequency: 2.0
+      global_frame: odom
+      robot_base_frame: base_link
+      transform_tolerance: 1.0
+      rolling_window: true
+      width: 8
+      height: 8
+      resolution: 0.05
+      footprint: "[[0.55, 0.265], [0.55, -0.265], [-0.15, -0.265], [-0.15, 0.265]]"
+      footprint_padding: 0.05
+      # La carte de traversabilité (caméra de profondeur + lidar) remplace entièrement la
+      # couche à chaque mise à jour : ce que la carte a oublié (impacts du lidar sur une pente,
+      # vus quelques secondes) disparaît aussi de la costmap.
+      plugins: ["traversabilite_layer", "inflation_layer"]
+      traversabilite_layer:
+        plugin: "nav2_costmap_2d::StaticLayer"
+        map_topic: /traversabilite/carte
+        map_subscribe_transient_local: true
+        subscribe_to_updates: false
+        track_unknown_space: true
+        use_maximum: false
+        trinary_costmap: true
+        lethal_cost_threshold: 99
+        transform_tolerance: 1.0
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        cost_scaling_factor: 3.0
+        inflation_radius: 0.8
+      always_send_full_costmap: true
+
+global_costmap:
+  global_costmap:
+    ros__parameters:
+      update_frequency: 1.0
+      publish_frequency: 1.0
+      global_frame: map
+      robot_base_frame: base_link
+      transform_tolerance: 1.0
+      # Fenêtre glissante : on planifie aussi dans l'inconnu, au-delà de ce qui a été vu.
+      # L'inconnu est traité comme libre (planification optimiste, corrigée en roulant) : Smac
+      # ne trouve pas de chemin long à travers des cellules « inconnues ». Les zones inconnues
+      # restent visibles dans /traversabilite/carte.
+      rolling_window: true
+      width: 60
+      height: 60
+      resolution: 0.1
+      track_unknown_space: false
+      footprint: "[[0.55, 0.265], [0.55, -0.265], [-0.15, -0.265], [-0.15, 0.265]]"
+      footprint_padding: 0.05
+      # Pas de couche statique : la carte du SLAM sert à se localiser ; les obstacles viennent
+      # de la traversabilité (la carte 2D du lidar ne sait pas ce qui est franchissable).
+      plugins: ["obstacle_layer", "inflation_layer"]
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: true
+        # Sources produites par fieldmind_perception/traversabilite (carte d'élévation issue de
+        # la caméra de profondeur et du lidar) : un lidar 2D seul prend les montées pour des murs.
+        observation_sources: obstacles libre
+        obstacles:
+          topic: /traversabilite/obstacles
+          data_type: "PointCloud2"
+          min_obstacle_height: 0.0
+          max_obstacle_height: 2.0
+          marking: true
+          clearing: false
+          obstacle_max_range: 9.5
+          obstacle_min_range: 0.0
+        libre:
+          topic: /traversabilite/libre
+          data_type: "PointCloud2"
+          min_obstacle_height: 0.0
+          max_obstacle_height: 2.0
+          marking: false
+          clearing: true
+          raytrace_max_range: 9.5
+          raytrace_min_range: 0.0
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        cost_scaling_factor: 2.0
+        inflation_radius: 1.5
+      always_send_full_costmap: true
+
+planner_server:
+  ros__parameters:
+    expected_planner_frequency: 1.0
+    planner_plugins: ["GridBased"]
+    costmap_update_timeout: 1.0
+    GridBased:
+      plugin: "nav2_smac_planner::SmacPlannerHybrid"
+      downsample_costmap: false
+      downsampling_factor: 1
+      tolerance: 0.5
+      allow_unknown: true
+      max_iterations: 1000000
+      max_on_approach_iterations: 1000
+      max_planning_time: 3.0
+      motion_model_for_search: "REEDS_SHEPP"
+      angle_quantization_bins: 72
+      analytic_expansion_ratio: 3.5
+      analytic_expansion_max_length: 3.0
+      analytic_expansion_max_cost: 200.0
+      analytic_expansion_max_cost_override: false
+      minimum_turning_radius: 0.75
+      reverse_penalty: 2.5
+      change_penalty: 0.0
+      non_straight_penalty: 1.2
+      cost_penalty: 4.0
+      retrospective_penalty: 0.015
+      lookup_table_size: 20.0
+      cache_obstacle_heuristic: false
+      debug_visualizations: false
+      use_quadratic_cost_penalty: false
+      downsample_obstacle_heuristic: true
+      allow_primitive_interpolation: false
+      smooth_path: true
+      smoother:
+        max_iterations: 1000
+        w_smooth: 0.3
+        w_data: 0.2
+        tolerance: 1.0e-10
+        do_refinement: true
+        refinement_num: 2
+
+smoother_server:
+  ros__parameters:
+    smoother_plugins: ["simple_smoother"]
+    simple_smoother:
+      plugin: "nav2_smoother::SimpleSmoother"
+      tolerance: 1.0e-10
+      max_its: 1000
+      do_refinement: true
+
+behavior_server:
+  ros__parameters:
+    local_costmap_topic: local_costmap/costmap_raw
+    global_costmap_topic: global_costmap/costmap_raw
+    local_footprint_topic: local_costmap/published_footprint
+    global_footprint_topic: global_costmap/published_footprint
+    cycle_frequency: 10.0
+    behavior_plugins: ["backup", "drive_on_heading", "wait"]
+    backup:
+      plugin: "nav2_behaviors::BackUp"
+    drive_on_heading:
+      plugin: "nav2_behaviors::DriveOnHeading"
+    wait:
+      plugin: "nav2_behaviors::Wait"
+    local_frame: odom
+    global_frame: map
+    robot_base_frame: base_link
+    transform_tolerance: 1.0
+    simulate_ahead_time: 2.0
+
+velocity_smoother:
+  ros__parameters:
+    smoothing_frequency: 20.0
+    scale_velocities: false
+    feedback: "OPEN_LOOP"
+    max_velocity: [1.0, 0.0, 1.4]
+    min_velocity: [-0.4, 0.0, -1.4]
+    max_accel: [1.0, 0.0, 2.5]
+    max_decel: [-2.0, 0.0, -2.5]
+    odom_topic: "/odometry/filtered"
+    odom_duration: 0.1
+    deadband_velocity: [0.0, 0.0, 0.0]
+    velocity_timeout: 1.0

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FieldMind · Pilotage USB</title>
+  <link rel="stylesheet" href="style.css?v=2">
+  <script type="module" src="app.mjs?v=2"></script>
+</head>
+<body>
+<main>
+  <header><div><span class="eyebrow">FIELDMIND / ATELIER</span><h1>Pilotage USB</h1></div><span id="badge" class="badge">Déconnecté</span></header>
+  <section class="connection">
+    <div><strong>ESP32-C5 · connexion par câble</strong><p id="message" role="status">Ferme le moniteur série de VS Code, puis connecte l’ESP.</p></div>
+    <div class="buttons"><button id="connect" class="primary">Connecter l’ESP</button><button id="disconnect" disabled>Déconnecter</button></div>
+  </section>
+  <p id="firmware-state" class="hint">Interface USB 2 · attend ROVER_3, ROVER_2 ou TOUT_MOTEUR_4 · ESP non connecté.</p>
+  <button id="stop" class="stop" disabled>STOP <small>Moteurs à zéro · signal servo coupé · raccourci Échap</small></button>
+  <div class="grid">
+    <section class="card">
+      <span class="eyebrow">TRACTION / D0 + D9</span><h2>Moteurs arrière</h2>
+      <form id="motor-form"><fieldset data-controls disabled>
+        <label for="motor">Commande PWM <output id="motor-value">0 %</output></label>
+        <input id="motor" type="range" min="0" max="100" step="1" value="0" aria-label="Pourcentage de commande moteur">
+        <div class="entry"><label for="motor-number">Pourcentage</label><input id="motor-number" type="number" min="0" max="100" step="1" value="0" required><span>%</span></div>
+        <div class="buttons"><button class="primary" type="submit">Appliquer la vitesse</button><button id="motor-zero" type="button">Moteurs à zéro</button></div>
+      </fieldset></form>
+      <p class="feedback" id="motor-state">ESP : en attente de connexion</p>
+      <p class="hint">La commande commune règle les deux pourcentages. Les commandes ci-dessous règlent chaque roue séparément.</p>
+      <div class="wheel">
+        <h3>Gauche · PWM D0 / DIR D1</h3>
+        <form id="left-form"><fieldset data-controls disabled>
+          <div class="entry"><label for="left-speed">PWM gauche</label><input id="left-speed" type="number" min="0" max="100" step="1" value="0" required><span>%</span></div>
+          <button type="submit">Appliquer gauche</button>
+        </fieldset></form>
+        <fieldset data-controls disabled class="buttons wheel-directions">
+          <button type="button" id="left-forward">Avant gauche</button><button type="button" id="left-reverse">Arrière gauche</button>
+          <button type="button" id="left-invert">Corriger l’avant gauche</button>
+        </fieldset>
+        <p id="left-state" class="hint">Gauche : en attente</p>
+      </div>
+      <div class="wheel">
+        <h3>Droite · PWM D9 / DIR D4</h3>
+        <form id="right-form"><fieldset data-controls disabled>
+          <div class="entry"><label for="right-speed">PWM droite</label><input id="right-speed" type="number" min="0" max="100" step="1" value="0" required><span>%</span></div>
+          <button type="submit">Appliquer droite</button>
+        </fieldset></form>
+        <fieldset data-controls disabled class="buttons wheel-directions">
+          <button type="button" id="right-forward">Avant droite</button><button type="button" id="right-reverse">Arrière droite</button>
+          <button type="button" id="right-invert">Corriger l’avant droit</button>
+        </fieldset>
+        <p id="right-state" class="hint">Droite : en attente</p>
+      </div>
+      <p class="hint">Pour changer de sens : mets la roue à 0 % et attends son arrêt. Pour corriger l’avant : mets les deux moteurs à 0 %. La correction est mémorisée.</p>
+    </section>
+    <section class="card">
+      <span class="eyebrow">DIRECTION / D7</span><h2>Servomoteur</h2>
+      <form id="servo-form"><fieldset data-controls disabled>
+        <label for="angle">Position demandée <output id="angle-value">0°</output></label>
+        <input id="angle" type="range" min="-90" max="90" step="1" value="0" aria-label="Angle du servo par rapport au milieu">
+        <div class="entry"><label for="angle-number">Angle</label><input id="angle-number" type="number" min="-90" max="90" step="0.5" value="0" required><span>°</span></div>
+        <div class="buttons"><button class="primary" type="submit">Appliquer l’angle</button><button id="center" type="button">Recentrer à 0°</button></div>
+      </fieldset></form>
+      <form id="speed-form"><fieldset class="speed" data-controls disabled>
+        <label for="servo-speed">Vitesse du déplacement</label><div class="entry"><input id="servo-speed" type="number" min="1" max="180" step="1" value="30" required><span>°/s</span><button type="submit">Régler</button></div>
+      </fieldset></form>
+      <p class="feedback" id="servo-state">ESP : en attente de connexion</p>
+      <p class="hint" id="angle-note">0 = milieu. Angles indicatifs, plage d’impulsions 800–2 200 µs.</p>
+      <p class="hint">Le firmware recentre le servo au démarrage. Pour régler le palonnier, déconnecte la tringlerie. Le premier mouvement peut être rapide.</p>
+    </section>
+  </div>
+  <section class="console card">
+    <div class="console-heading"><h2>Retour de l’ESP</h2><div class="buttons"><button id="refresh" disabled>Actualiser l’état</button><button id="clear">Effacer</button></div></div>
+    <pre id="log" role="log" aria-label="Messages du port série">Aucun port ouvert.</pre>
+  </section>
+  <footer>Tout reste sur ce PC · USB à 115200 bauds · STOP est envoyé avant une déconnexion et lorsque l’onglet est masqué.</footer>
+</main>
+</body>
+</html>

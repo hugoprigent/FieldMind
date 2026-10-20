@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="FieldMind : cerveau de navigation autonome d'un rover, piloté en simulation physique.">
+  <title>FieldMind — navigation autonome</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <header class="barre">
+    <div class="marque">
+      <svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18 L12 4 L20 18 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="14" r="2" fill="currentColor"/></svg>
+      <span class="nom">FieldMind</span>
+    </div>
+    <div class="indicateurs">
+      <span id="etat-liaison" class="pastille" data-etat="attente"><span class="point"></span><span class="texte">Connexion…</span></span>
+      <span id="etat-mission" class="pastille" data-etat="attente"><span class="point"></span><span class="texte">—</span></span>
+    </div>
+  </header>
+
+  <main class="poste">
+    <section class="scene" aria-label="Vue 3D de la simulation">
+      <canvas id="vue3d"></canvas>
+      <div class="hud hud-haut">
+        <div class="groupe-boutons" role="group" aria-label="Caméra">
+          <button type="button" data-camera="poursuite" aria-pressed="true">Poursuite</button>
+          <button type="button" data-camera="orbite" aria-pressed="false">Orbite</button>
+          <button type="button" data-camera="dessus" aria-pressed="false">Dessus</button>
+        </div>
+        <div class="groupe-boutons" role="group" aria-label="Affichage">
+          <button type="button" id="bascule-lidar" aria-pressed="true">Lidar</button>
+          <button type="button" id="bascule-chemin" aria-pressed="true">Chemin</button>
+        </div>
+      </div>
+      <div class="hud hud-bas-droite">
+        <figure class="camera-embarquee" data-source="robot">
+          <div class="cadre-camera-conteneur">
+            <div id="vue-camera" class="cadre-camera"></div>
+            <img id="flux-camera" class="flux-camera" alt="Caméra avant (œil gauche)">
+            <img id="flux-profondeur" class="flux-profondeur" alt="Profondeur calculée par la paire stéréo">
+            <div class="groupe-boutons source-camera" role="group" aria-label="Source de la vue caméra">
+              <button type="button" data-source-camera="robot" aria-pressed="true">Caméra</button>
+              <button type="button" data-source-camera="profondeur" aria-pressed="false">Profondeur</button>
+              <button type="button" data-source-camera="3d" aria-pressed="false">3D</button>
+            </div>
+          </div>
+          <figcaption id="legende-camera"></figcaption>
+        </figure>
+      </div>
+      <div class="hud hud-centre-bas">
+        <div class="compteurs">
+          <div><span id="hud-vitesse" class="valeur">0,00</span><span class="unite">m/s</span></div>
+          <div><span id="hud-braquage" class="valeur">0</span><span class="unite">° braquage</span></div>
+          <div><span id="hud-arret" class="valeur etiquette-etat" data-niveau="ok">Aucun arrêt</span></div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="colonne">
+      <section class="carte-panneau">
+        <header>
+          <h2>Carte</h2>
+          <div class="groupe-boutons" role="group" aria-label="Cadrage de la carte">
+            <button type="button" data-cadrage="suivi" aria-pressed="true">Suivre</button>
+            <button type="button" data-cadrage="ensemble" aria-pressed="false">Ensemble</button>
+          </div>
+        </header>
+        <canvas id="minicarte" aria-label="Mini-carte : cliquer pour donner un objectif"></canvas>
+        <p class="note"><span class="legende-carte"><i class="cle occupe"></i>lidar <i class="cle stereo"></i>stéréo <i class="cle pente"></i>pente <i class="cle trou"></i>trou <i class="cle libre"></i>libre <i class="cle inconnu"></i>inconnu</span></p>
+      </section>
+
+      <section class="carte-panneau mission">
+        <header>
+          <h2>Mission</h2>
+          <div class="actions-mission">
+            <button id="bouton-reprendre" type="button" class="bouton-discret">Reprendre</button>
+            <button id="bouton-reinitialiser" type="button" class="bouton-discret" title="Remet le rover au départ avec une carte vide">Réinitialiser</button>
+            <button id="bouton-stop" type="button" class="bouton-danger">Arrêt</button>
+          </div>
+        </header>
+        <p id="statut-message" class="statut-message">En attente de la connexion…</p>
+        <dl class="mesures" id="mesures-mission"></dl>
+      </section>
+
+      <section class="carte-panneau observation">
+        <header>
+          <h2>Observation IA</h2>
+          <button id="bascule-observation" type="button" class="bouton-discret" aria-pressed="false">Coupée</button>
+        </header>
+        <p id="observation-etat" class="statut-message"></p>
+        <ol id="observation-notes" class="observation-notes" aria-live="polite"></ol>
+      </section>
+
+      <section class="carte-panneau chat">
+        <header><h2>Consignes</h2><span id="chat-fournisseur" class="etiquette"></span></header>
+        <ol id="chat-fil" class="chat-fil" aria-live="polite"></ol>
+        <form id="chat-formulaire" class="chat-formulaire" autocomplete="off">
+          <input id="chat-saisie" type="text" maxlength="200" placeholder="« va à la clairière », « que vois-tu ? »…" aria-label="Consigne pour le rover">
+          <button type="submit">Envoyer</button>
+        </form>
+      </section>
+    </aside>
+
+    <section class="telemetrie" aria-label="Télémétrie en direct">
+      <header class="telemetrie-entete">
+        <h2>Télémétrie</h2>
+        <div class="groupe-boutons" role="tablist" aria-label="Vues de télémétrie">
+          <button type="button" role="tab" data-onglet="conduite" aria-selected="true">Conduite</button>
+          <button type="button" role="tab" data-onglet="inertiel" aria-selected="false">Centrale inertielle</button>
+          <button type="button" role="tab" data-onglet="capteurs" aria-selected="false">Lidar et GNSS</button>
+          <button type="button" role="tab" data-onglet="energie" aria-selected="false">Moteur et batterie</button>
+          <button type="button" role="tab" data-onglet="vision" aria-selected="false">Caméra</button>
+          <button type="button" role="tab" data-onglet="systeme" aria-selected="false">Système et journal</button>
+        </div>
+        <button type="button" id="bascule-telemetrie" class="bouton-discret" aria-expanded="true">Réduire</button>
+      </header>
+      <div class="telemetrie-corps" id="telemetrie-corps"></div>
+    </section>
+  </main>
+
+</body>
+</html>

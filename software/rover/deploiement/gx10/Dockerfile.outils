@@ -1,0 +1,8 @@
+# Outils de perception et de mémoire (D-FINE, Depth Anything V2, SAM 2.1, Qwen3-VL-Embedding) :
+# l'image vLLM fournit déjà PyTorch (CUDA 13, arm64), transformers, OpenCV et FastAPI.
+ARG VLLM_IMAGE=vllm/vllm-openai:v0.31.0
+FROM ${VLLM_IMAGE}
+RUN python3 -m pip install --no-cache-dir soundfile
+COPY outils/serveur.py /app/serveur.py
+WORKDIR /app
+ENTRYPOINT ["python3", "-m", "uvicorn", "serveur:app", "--host", "0.0.0.0"]

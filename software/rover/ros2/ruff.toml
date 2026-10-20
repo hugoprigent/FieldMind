@@ -1,0 +1,3 @@
+# Code ROS 2 : Python 3.12 d'Ubuntu 24.04 (image ros:jazzy), pas le 3.13 du Pi.
+extend = "../pyproject.toml"
+target-version = "py312"

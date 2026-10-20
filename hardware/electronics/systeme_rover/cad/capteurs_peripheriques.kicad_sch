@@ -1,0 +1,1699 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "9e4212df-c765-55d1-8490-ee5b43570b80")
+	(paper "A3")
+	(title_block
+		(title "FieldMind rover / carte capteurs A7 et périphériques")
+		(date "2026-10-13")
+		(rev "S1 / non testé")
+		(company "FieldMind")
+		(comment 1 "Schéma de câblage du prototype : modules et liaisons, sans routage")
+		(comment 2 "Batterie, contrôleur et moteurs du donneur E600 : à identifier au démontage")
+	)
+	(lib_symbols
+		(symbol "FieldMind_Rover:ATGM336H"
+			(pin_names
+				(offset 0.762)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "U"
+				(at -10.16 8.89 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "ATGM336H"
+				(at -10.16 -8.89 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "ATGM336H_0_1"
+				(rectangle
+					(start -10.16 7.62)
+					(end 10.16 -7.62)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "ATGM336H_1_1"
+				(pin passive line
+					(at -15.24 2.54 0)
+					(length 5.08)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -15.24 -5.08 0)
+					(length 5.08)
+					(name "PPS"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "PPS"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -15.24 5.08 0)
+					(length 5.08)
+					(name "RXD"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "RXD"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -15.24 -2.54 0)
+					(length 5.08)
+					(name "TXD"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "TXD"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -15.24 0 0)
+					(length 5.08)
+					(name "VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "FieldMind_Rover:Carte_Capteurs_A7"
+			(pin_names
+				(offset 0.762)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "A"
+				(at -20.32 29.21 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "Carte_Capteurs_A7"
+				(at -20.32 -36.83 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "Carte_Capteurs_A7_0_1"
+				(rectangle
+					(start -20.32 27.94)
+					(end 20.32 -35.56)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "Carte_Capteurs_A7_1_1"
+				(pin passive line
+					(at 25.4 22.86 180)
+					(length 5.08)
+					(name "J4.1 RX_GPS (D6)"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "J4.1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 25.4 20.32 180)
+					(length 5.08)
+					(name "J4.2 GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "J4.2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 25.4 17.78 180)
+					(length 5.08)
+					(name "J4.3 3V3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "J4.3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 25.4 15.24 180)
+					(length 5.08)
+					(name "J4.4 TX_GPS (D7)"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "J4.4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 25.4 -5.08 180)
+					(length 5.08)
+					(name "J6.1 5V USB"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "J6.1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 25.4 -7.62 180)
+					(length 5.08)
+					(name "J6.2 GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "J6.2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 25.4 -10.16 180)
+					(length 5.08)
+					(name "J6.3 3V3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "J6.3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 25.4 -12.7 180)
+					(length 5.08)
+					(name "J6.4 D10"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "J6.4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 25.4 -15.24 180)
+					(length 5.08)
+					(name "J6.5 D9"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "J6.5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 25.4 -17.78 180)
+					(length 5.08)
+					(name "J6.6 D8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "J6.6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 25.4 7.62 180)
+					(length 5.08)
+					(name "J7.1 GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "J7.1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 25.4 5.08 180)
+					(length 5.08)
+					(name "J7.2 3V3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "J7.2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 25.4 2.54 180)
+					(length 5.08)
+					(name "J7.3 SDA (D4)"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "J7.3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 25.4 0 180)
+					(length 5.08)
+					(name "J7.4 SCL (D5)"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "J7.4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 25.4 -22.86 180)
+					(length 5.08)
+					(name "J8.1 D0"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "J8.1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 25.4 -25.4 180)
+					(length 5.08)
+					(name "J8.2 D1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "J8.2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 25.4 -27.94 180)
+					(length 5.08)
+					(name "J8.3 D2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "J8.3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 25.4 -30.48 180)
+					(length 5.08)
+					(name "J8.4 D3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "J8.4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -25.4 0 0)
+					(length 5.08)
+					(name "USB-C du XIAO"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "USB"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "FieldMind_Rover:Modulino_Knob"
+			(pin_names
+				(offset 0.762)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "U"
+				(at -10.16 5.08 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "Modulino_Knob"
+				(at -10.16 -8.89 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "Modulino_Knob_0_1"
+				(rectangle
+					(start -10.16 3.81)
+					(end 10.16 -7.62)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "Modulino_Knob_1_1"
+				(pin passive line
+					(at -15.24 2.54 0)
+					(length 5.08)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -15.24 0 0)
+					(length 5.08)
+					(name "3.3V"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -15.24 -2.54 0)
+					(length 5.08)
+					(name "SDA"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -15.24 -5.08 0)
+					(length 5.08)
+					(name "SCL"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "power:GND"
+			(power global)
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "#PWR"
+				(at 0 -6.35 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "GND"
+				(at 0 -3.81 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "global power"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "GND_0_1"
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 -1.27) (xy 1.27 -1.27) (xy 0 -2.54) (xy -1.27 -1.27) (xy 0 -1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "GND_1_1"
+				(pin power_in line
+					(at 0 0 270)
+					(length 0)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+	)
+	(text "USB-C : Pi USB 2.0 n°2"
+		(exclude_from_sim no)
+		(at 71.12 121.92 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "1cf9e2a5-ba0f-5315-ab47-ed5cb276ea39")
+	)
+	(text "TX du GPS → TX_GPS (J4.4, D7) ; RX du GPS ← RX_GPS (J4.1, D6). PPS non utilisé."
+		(exclude_from_sim no)
+		(at 256.54 99.06 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "2634a53c-acb7-51c4-ad12-37dd544ef8c7")
+	)
+	(text "J6.6 D8 → signal du servo M3 ; J6.2 GND : référence (un fil le long du signal)."
+		(exclude_from_sim no)
+		(at 228.6 139.7 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "279b0321-79f9-59f8-8db9-cf92e47a1feb")
+	)
+	(text "La carte A7 (perfboard 4 × 6 cm) porte le XIAO ESP32C5, l’écran OLED, le GY-521 et le BMP280 :"
+		(exclude_from_sim no)
+		(at 25.4 36.83 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left bottom)
+		)
+		(uuid "3203d523-483c-538a-b232-305946e846cc")
+	)
+	(text "Antenne dégagée vers le ciel, loin du Pi et du lidar."
+		(exclude_from_sim no)
+		(at 256.54 106.68 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "61f33b96-679a-508e-8ac4-a9903d10da20")
+	)
+	(text "J6.5 D9 ← contact K1 21-24 (tirage interne, bas = chaîne d’arrêt disponible)."
+		(exclude_from_sim no)
+		(at 228.6 143.51 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "721750db-a9b0-5550-a481-e6c12cdc3161")
+	)
+	(text "Câble Qwiic → Dupont, ou fils soudés sur les pastilles 1×4 du Knob, même ordre."
+		(exclude_from_sim no)
+		(at 256.54 124.46 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "7b794b0a-1abf-54b5-99f3-5345ace9bcfd")
+	)
+	(text "Dans la carte, les broches de même nom sont reliées : GND (J4.2, J6.2, J7.1), 3V3 (J4.3, J6.3, J7.2),"
+		(exclude_from_sim no)
+		(at 25.4 223.52 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "928a8923-3514-52fa-a06a-215e1bb3111d")
+	)
+	(text "SDA/SCL de J7 avec l’OLED, le GY-521 et le BMP280. Adresses I2C attendues : OLED 0x3C, GY-521 0x68, BMP280 0x76, Knob 0x3A."
+		(exclude_from_sim no)
+		(at 25.4 227.33 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "992e0013-dc18-5eda-9aec-74844a060133")
+	)
+	(text "J8 (D0-D3) : réservé aux retours roues ou à la commande du contrôleur de traction,"
+		(exclude_from_sim no)
+		(at 167.64 160.02 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c25bb8f6-a9cf-529e-ab3d-41bbdb63cc35")
+	)
+	(text "J6.1 5V, J6.3 3V3, J6.4 D10 : libres pour un futur capteur."
+		(exclude_from_sim no)
+		(at 228.6 147.32 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c67951c3-bd87-5619-8945-83bc41cf2b69")
+	)
+	(text "CARTE CAPTEURS A7 ET PÉRIPHÉRIQUES"
+		(exclude_from_sim no)
+		(at 25.4 30.48 0)
+		(effects
+			(font
+				(size 3 3)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "cfeda2c5-c09a-558e-84b5-cf9d2f5b83c6")
+	)
+	(text "Ordre des broches du module à lire sur l’exemplaire reçu."
+		(exclude_from_sim no)
+		(at 256.54 102.87 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d2acac23-8eb4-5b87-aef8-fd6dba0d17ca")
+	)
+	(text "à affecter après démontage du E600. D2/D3 : broches de démarrage (rien qui les force à l’allumage)."
+		(exclude_from_sim no)
+		(at 167.64 163.83 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "dbf0b521-7e06-58ab-970d-704710e10a38")
+	)
+	(text "détail broche par broche dans ../carte_capteurs/cad/perfboard_c5_a7. Ici : ce qui se branche sur ses connecteurs."
+		(exclude_from_sim no)
+		(at 25.4 40.64 0)
+		(effects
+			(font
+				(size 1.6 1.6)
+			)
+			(justify left bottom)
+		)
+		(uuid "dcbe56d6-519c-5e3f-bfa5-ec278975f8ad")
+	)
+	(no_connect
+		(at 152.4 132.08)
+		(uuid "21ceaa2c-8239-526e-ae65-7fdf808ae940")
+	)
+	(no_connect
+		(at 152.4 137.16)
+		(uuid "2a5dacff-0274-5724-8540-b2bdf90c447d")
+	)
+	(no_connect
+		(at 208.28 114.3)
+		(uuid "b334b21f-b470-5aed-8944-2e7440d09f1b")
+	)
+	(no_connect
+		(at 152.4 157.48)
+		(uuid "b91d4b7c-1046-5249-9cfe-3eefb34bac47")
+	)
+	(no_connect
+		(at 152.4 152.4)
+		(uuid "c7913dd1-3b97-5dc1-9b9c-dd9e8609b3b8")
+	)
+	(no_connect
+		(at 152.4 154.94)
+		(uuid "ef5c0b56-d669-5e6a-b893-12762171eb67")
+	)
+	(no_connect
+		(at 152.4 139.7)
+		(uuid "f45d1f63-9268-5b19-ab05-f69fc3a2c629")
+	)
+	(no_connect
+		(at 152.4 149.86)
+		(uuid "fe100781-68a7-579a-96dd-ee5d10f42d39")
+	)
+	(wire
+		(pts
+			(xy 152.4 144.78) (xy 205.74 144.78)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "093d09c3-daf2-5899-9af1-ebde2745405c")
+	)
+	(wire
+		(pts
+			(xy 101.6 127) (xy 93.98 127)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "39f202d1-6151-52c0-845e-71af92e21198")
+	)
+	(wire
+		(pts
+			(xy 152.4 109.22) (xy 208.28 109.22)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "45f50324-b224-5a08-a202-38bdba54769f")
+	)
+	(wire
+		(pts
+			(xy 152.4 127) (xy 208.28 127)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "550eabe4-eeb8-5aa5-b189-3909fe032369")
+	)
+	(wire
+		(pts
+			(xy 152.4 111.76) (xy 208.28 111.76)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7fa6922b-d003-57c1-92d4-397b76aec78a")
+	)
+	(wire
+		(pts
+			(xy 152.4 121.92) (xy 208.28 121.92)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "88fc323e-5c35-5d23-9b21-8615eb876b3e")
+	)
+	(wire
+		(pts
+			(xy 152.4 124.46) (xy 208.28 124.46)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "91831e37-5252-5048-a864-90cf4d6e14e1")
+	)
+	(wire
+		(pts
+			(xy 152.4 104.14) (xy 208.28 104.14)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a07b7bd0-e417-54e5-bf6d-758b43288749")
+	)
+	(wire
+		(pts
+			(xy 152.4 106.68) (xy 208.28 106.68)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a8e15b6a-fa1f-59cc-a1cb-075b6ea0458c")
+	)
+	(wire
+		(pts
+			(xy 152.4 134.62) (xy 165.1 134.62)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b20fdfad-a3bf-57b0-aea1-f1267e94b78c")
+	)
+	(wire
+		(pts
+			(xy 152.4 142.24) (xy 205.74 142.24)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f7aa4110-1033-508d-aa23-160f2b10d397")
+	)
+	(wire
+		(pts
+			(xy 152.4 119.38) (xy 208.28 119.38)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fe912053-13b1-5d5a-beb7-9f79d5de3309")
+	)
+	(label "3V3_XIAO"
+		(at 153.67 109.22 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "18b0d8ad-f8cd-55b7-80bf-5322b96bc055")
+	)
+	(label "GND"
+		(at 153.67 119.38 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "5394012a-e735-56f8-bdee-91d314f4ed73")
+	)
+	(label "GND"
+		(at 153.67 106.68 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "9d744076-52e4-572e-adbf-4d51cd2dc2d1")
+	)
+	(label "3V3_XIAO"
+		(at 153.67 121.92 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "b02e4528-3527-5f36-a2e8-930d9f9329f7")
+	)
+	(label "GND"
+		(at 153.67 134.62 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d77e1d30-311f-59f0-925b-83262a3a43b7")
+	)
+	(global_label "ARRET_OK"
+		(shape input)
+		(at 205.74 142.24 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a7e499a6-9f36-5dc1-bd8b-1b41c2f3a754")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 205.74 142.24 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "SERVO_PWM"
+		(shape output)
+		(at 205.74 144.78 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "c0038d3a-7e92-5631-adf6-34e1f3c9cbbf")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 205.74 144.78 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "USB_XIAO"
+		(shape bidirectional)
+		(at 93.98 127 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "c51d606f-504d-5aa5-9fa6-5e2ea2e37abc")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 93.98 127 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "FieldMind_Rover:Modulino_Knob")
+		(at 223.52 121.92 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "376d761b-83b7-501b-a725-2f19f9caa68d")
+		(property "Reference" "U11"
+			(at 213.36 132.08 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Arduino Modulino Knob (I2C 0x3A)"
+			(at 213.36 134.62 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 223.52 121.92 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 223.52 121.92 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 223.52 121.92 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "3bc6b155-ed11-516e-b7d4-df9eef673b92")
+		)
+		(pin "2"
+			(uuid "54be126e-3609-5c8d-844d-3ccd0990b274")
+		)
+		(pin "3"
+			(uuid "ca834caa-936a-5856-95b6-dc5d1146923a")
+		)
+		(pin "4"
+			(uuid "10f2081b-d64b-544d-962e-833159be6837")
+		)
+		(instances
+			(project "fieldmind_rover_systeme"
+				(path "/5240d692-794a-56ea-8571-3be3a6fdba67/ae736f0a-7bf4-5f33-b7ce-b6d5952b34c9"
+					(reference "U11")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "FieldMind_Rover:Carte_Capteurs_A7")
+		(at 127 127 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "60638ee8-33d8-5f73-8581-ebfe29ef31db")
+		(property "Reference" "A1"
+			(at 106.68 100.33 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Carte capteurs A7 (XIAO ESP32C5 + OLED + GY-521 + BMP280)"
+			(at 106.68 165.1 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 127 127 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 127 127 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 127 127 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "USB"
+			(uuid "63b6c35f-daeb-5f39-bca6-c14e9ce0d604")
+		)
+		(pin "J4.1"
+			(uuid "bcbe6dea-ffa8-530f-857f-cba871c94f15")
+		)
+		(pin "J4.2"
+			(uuid "a7cba07e-56a3-5b4c-8705-85cb0df8abab")
+		)
+		(pin "J4.3"
+			(uuid "ab8a315c-826b-5e94-bda0-3ade78afd099")
+		)
+		(pin "J4.4"
+			(uuid "ff127a97-787d-5732-abca-558ec17f0a21")
+		)
+		(pin "J7.1"
+			(uuid "1c0acea3-81e1-5d06-acc4-ea9b7905801f")
+		)
+		(pin "J7.2"
+			(uuid "ef385897-cb89-5660-9293-2c876d0b3dd6")
+		)
+		(pin "J7.3"
+			(uuid "24c4a08e-0d8c-5f24-82e1-9e4601920afc")
+		)
+		(pin "J7.4"
+			(uuid "61d7b15e-0a3c-54da-bdf0-a4b7c5ab4d02")
+		)
+		(pin "J6.1"
+			(uuid "2923520e-853d-544a-9309-dc1f65934283")
+		)
+		(pin "J6.2"
+			(uuid "b6ac7cd0-c5fd-5d59-899f-00b5968c3b0b")
+		)
+		(pin "J6.3"
+			(uuid "72554c4f-8584-5b20-a951-f22b56aa76a8")
+		)
+		(pin "J6.4"
+			(uuid "6fd831eb-4990-5642-9148-5f387dabb176")
+		)
+		(pin "J6.5"
+			(uuid "7b5793ef-cdc1-5fc8-90de-e3fbfa54a147")
+		)
+		(pin "J6.6"
+			(uuid "861e7b27-87d2-5fe1-b7fa-2c858b560028")
+		)
+		(pin "J8.1"
+			(uuid "0d6e1442-950d-5add-ba39-f6b61745ec2c")
+		)
+		(pin "J8.2"
+			(uuid "28f6b0a7-9cfa-5bfa-8c82-38914942bccd")
+		)
+		(pin "J8.3"
+			(uuid "a891bf19-be32-589c-b01e-e07d30af611e")
+		)
+		(pin "J8.4"
+			(uuid "0da63b4a-7781-5f7a-9d35-939913b37d47")
+		)
+		(instances
+			(project "fieldmind_rover_systeme"
+				(path "/5240d692-794a-56ea-8571-3be3a6fdba67/ae736f0a-7bf4-5f33-b7ce-b6d5952b34c9"
+					(reference "A1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "FieldMind_Rover:ATGM336H")
+		(at 223.52 109.22 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "b227da7d-827b-51c1-acf9-4262b0a52d98")
+		(property "Reference" "U10"
+			(at 213.36 96.52 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "GPS ATGM336H (AYWHP) + antenne"
+			(at 213.36 99.06 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 223.52 109.22 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 223.52 109.22 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 223.52 109.22 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "RXD"
+			(uuid "ae1988d3-0e6a-53d8-afc3-61dfbedb62c7")
+		)
+		(pin "GND"
+			(uuid "551b42f1-824d-59b9-8ad2-d8188a78c0c6")
+		)
+		(pin "VCC"
+			(uuid "a69b9b8a-8bbc-5e75-8c54-33a6f7065902")
+		)
+		(pin "TXD"
+			(uuid "7a567c25-406f-5764-850e-54dd6908a1a7")
+		)
+		(pin "PPS"
+			(uuid "74c1ded4-3b47-516c-a516-6b50f22a839c")
+		)
+		(instances
+			(project "fieldmind_rover_systeme"
+				(path "/5240d692-794a-56ea-8571-3be3a6fdba67/ae736f0a-7bf4-5f33-b7ce-b6d5952b34c9"
+					(reference "U10")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 165.1 134.62 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "c8e787f8-1dd8-5efa-a71c-cbb41b6a4ceb")
+		(property "Reference" "#PWRS029"
+			(at 168.91 132.08 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 165.1 138.43 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 165.1 134.62 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 165.1 134.62 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 165.1 134.62 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "38e2727a-a952-5b37-9b63-93698edd17e0")
+		)
+		(instances
+			(project "fieldmind_rover_systeme"
+				(path "/5240d692-794a-56ea-8571-3be3a6fdba67/ae736f0a-7bf4-5f33-b7ce-b6d5952b34c9"
+					(reference "#PWRS029")
+					(unit 1)
+				)
+			)
+		)
+	)
+)

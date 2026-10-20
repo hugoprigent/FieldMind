@@ -1,0 +1,42 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+!.env.exemple
+**/env
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+
+# Environments, caches, generated logs
+.venv/
+**/.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pio/
+.vscode/
+node_modules/
+.DS_Store
+MUJOCO_LOG.TXT
+logs/
+*.log
+.donnees-atelier/
+*.kicad_prl
+*-backups/
+tmp/
+
+# Large production media are distributed separately
+*.blend
+*.blend1
+*.mp4
+*.mov
+*.zip
+
+.venv*/
+.publication/

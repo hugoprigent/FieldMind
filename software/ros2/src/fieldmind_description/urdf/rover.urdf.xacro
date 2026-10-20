@@ -1,0 +1,252 @@
+<?xml version="1.0"?>
+<!--
+  Rover FieldMind V3 : châssis rigide, direction Ackermann (servo unique et biellettes), essieu
+  arrière entraîné par un moteur via une courroie 3:1. Dimensions : config/rover_fieldmind.json.
+
+  Repères (REP 105) : base_footprint au sol sous le milieu de l'essieu arrière, base_link au
+  centre de l'essieu arrière (point de référence du modèle cinématique Ackermann de Nav2).
+  x vers l'avant, y vers la gauche, z vers le haut.
+
+  Capteurs, à leur place CAO (Robot_V3_rig.blend) :
+    - lidar 2D LDROBOT LD14P, 360 mesures, 6 Hz, 0,1 à 8 m, plan à 0,323 m du sol ;
+    - centrale inertielle BNO085, 50 Hz ;
+    - GNSS u-blox ZED-F9P (antenne ANN-MB), 10 Hz ;
+    - caméra Raspberry Pi Camera Module 3 Wide, 102° × 67°, inclinée de 10° vers le sol ;
+    - option recommandée : caméra de profondeur stéréo (type OAK-D Lite), 73°, 0,2 à 10 m.
+
+  Actionneurs simulés au plus près du matériel : couple des roues arrière limité (moteur et
+  VESC), braquage commandé en position avec couple limité (servo). Le modèle fin du servo
+  (retard, vitesse, zone morte, jeu) et le contrôleur embarqué sont dans fieldmind_mcu.
+-->
+<robot name="fieldmind_rover" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="profondeur" default="true"/>
+  <xacro:arg name="prefixe_gz" default="/rover"/>
+
+  <!-- Géométrie (m, kg) -->
+  <xacro:property name="empattement" value="0.400"/>
+  <xacro:property name="voie_avant" value="0.446"/>
+  <xacro:property name="voie_arriere" value="0.438"/>
+  <xacro:property name="r_roue" value="0.100"/>
+  <xacro:property name="l_roue" value="0.080"/>
+  <xacro:property name="longueur" value="0.70"/>
+  <xacro:property name="garde_sol" value="0.065"/>
+  <!-- Couple maximal par roue arrière : 2,5 N·m moteur × 3 de réduction / 2 roues. -->
+  <xacro:property name="couple_roue" value="3.75"/>
+  <xacro:property name="x_centre" value="0.20"/>
+  <xacro:property name="masse_caisse" value="12.3"/>
+  <xacro:property name="masse_roue" value="0.35"/>
+  <xacro:property name="braquage_butee" value="0.698"/>
+
+  <xacro:macro name="inertie_boite" params="m x y z">
+    <inertia ixx="${m*(y*y+z*z)/12}" iyy="${m*(x*x+z*z)/12}" izz="${m*(x*x+y*y)/12}" ixy="0" ixz="0" iyz="0"/>
+  </xacro:macro>
+  <xacro:macro name="inertie_cylindre_y" params="m r l">
+    <inertia ixx="${m*(3*r*r+l*l)/12}" iyy="${m*r*r/2}" izz="${m*(3*r*r+l*l)/12}" ixy="0" ixz="0" iyz="0"/>
+  </xacro:macro>
+
+  <material name="caisse"><color rgba="0.85 0.45 0.10 1"/></material>
+  <material name="pneu"><color rgba="0.08 0.08 0.08 1"/></material>
+
+  <link name="base_footprint"/>
+  <link name="base_link">
+    <inertial>
+      <origin xyz="${x_centre - 0.03} 0 0.06"/>
+      <mass value="${masse_caisse}"/>
+      <xacro:inertie_boite m="${masse_caisse}" x="0.6" y="0.32" z="0.235"/>
+    </inertial>
+    <visual>
+      <origin xyz="${x_centre} 0 ${garde_sol - r_roue + 0.1175}"/>
+      <geometry><box size="0.6 0.318 0.235"/></geometry>
+      <material name="caisse"/>
+    </visual>
+    <collision>
+      <origin xyz="${x_centre} 0 ${garde_sol - r_roue + 0.1175}"/>
+      <geometry><box size="0.6 0.318 0.235"/></geometry>
+    </collision>
+    <!-- Pare-chocs avant et arrière -->
+    <collision>
+      <origin xyz="${x_centre + longueur/2 - 0.025} 0 ${garde_sol - r_roue + 0.09}"/>
+      <geometry><box size="0.05 0.28 0.10"/></geometry>
+    </collision>
+    <collision>
+      <origin xyz="${x_centre - longueur/2 + 0.025} 0 ${garde_sol - r_roue + 0.09}"/>
+      <geometry><box size="0.05 0.28 0.10"/></geometry>
+    </collision>
+  </link>
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_footprint"/><child link="base_link"/>
+    <origin xyz="0 0 ${r_roue}"/>
+  </joint>
+
+  <!-- Roues arrière motrices -->
+  <xacro:macro name="roue" params="nom parent x y couple">
+    <link name="${nom}">
+      <inertial><mass value="${masse_roue}"/><xacro:inertie_cylindre_y m="${masse_roue}" r="${r_roue}" l="${l_roue}"/></inertial>
+      <visual><origin rpy="${pi/2} 0 0"/><geometry><cylinder radius="${r_roue}" length="${l_roue}"/></geometry><material name="pneu"/></visual>
+      <!-- Collision en sphère : le contact cylindre/maillage de DART est instable (le rover glisse
+           sur les pentes) ; une sphère de même rayon donne un point de contact unique et stable. -->
+      <collision><geometry><sphere radius="${r_roue}"/></geometry></collision>
+    </link>
+    <joint name="${nom}_joint" type="continuous">
+      <parent link="${parent}"/><child link="${nom}"/>
+      <origin xyz="${x} ${y} 0"/><axis xyz="0 1 0"/>
+      <limit effort="${couple}" velocity="40.0"/>
+      <dynamics damping="0.004" friction="0.0"/>
+    </joint>
+    <gazebo reference="${nom}">
+      <collision><surface><friction><ode><mu>0.9</mu><mu2>0.9</mu2></ode></friction></surface></collision>
+    </gazebo>
+  </xacro:macro>
+  <xacro:roue nom="roue_ar_g" parent="base_link" x="0" y="${voie_arriere/2}" couple="${couple_roue}"/>
+  <xacro:roue nom="roue_ar_d" parent="base_link" x="0" y="${-voie_arriere/2}" couple="${couple_roue}"/>
+
+  <!-- Fusées avant (braquage) et roues avant libres -->
+  <xacro:macro name="fusee" params="cote y">
+    <link name="fusee_${cote}">
+      <inertial><mass value="0.1"/><inertia ixx="1e-4" iyy="1e-4" izz="1e-4" ixy="0" ixz="0" iyz="0"/></inertial>
+    </link>
+    <joint name="braquage_${cote}_joint" type="revolute">
+      <parent link="base_link"/><child link="fusee_${cote}"/>
+      <origin xyz="${empattement} ${y} 0"/><axis xyz="0 0 1"/>
+      <limit lower="${-braquage_butee}" upper="${braquage_butee}" effort="3.4" velocity="7.0"/>
+      <dynamics damping="0.3"/>
+    </joint>
+    <xacro:roue nom="roue_av_${cote}" parent="fusee_${cote}" x="0" y="0" couple="10.0"/>
+  </xacro:macro>
+  <xacro:fusee cote="g" y="${voie_avant/2}"/>
+  <xacro:fusee cote="d" y="${-voie_avant/2}"/>
+
+  <!-- ================================================================ capteurs -->
+  <xacro:macro name="support" params="nom xyz rpy">
+    <link name="${nom}"/>
+    <joint name="${nom}_joint" type="fixed">
+      <parent link="base_link"/><child link="${nom}"/>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- Hauteurs du protocole (depuis le sol) ramenées à base_link (z = r_roue) ; x depuis l'essieu. -->
+  <xacro:support nom="lidar_link" xyz="${0.18 + x_centre} 0 ${0.323 - r_roue}" rpy="0 0 0"/>
+  <xacro:support nom="imu_link" xyz="${x_centre} 0 ${0.05}" rpy="0 0 0"/>
+  <xacro:support nom="gnss_link" xyz="${-0.05 + x_centre} 0 ${0.31 - r_roue}" rpy="0 0 0"/>
+  <xacro:support nom="camera_link" xyz="${0.162 + x_centre} -0.012 ${0.269 - r_roue}" rpy="0 0.1745 0"/>
+  <link name="camera_optical_frame"/>
+  <joint name="camera_optical_joint" type="fixed">
+    <parent link="camera_link"/><child link="camera_optical_frame"/>
+    <origin rpy="${-pi/2} 0 ${-pi/2}"/>
+  </joint>
+
+  <gazebo reference="lidar_link">
+    <sensor name="lidar" type="gpu_lidar">
+      <update_rate>6</update_rate>
+      <topic>$(arg prefixe_gz)/scan</topic>
+      <gz_frame_id>lidar_link</gz_frame_id>
+      <lidar>
+        <scan><horizontal><samples>360</samples><min_angle>-3.14159</min_angle><max_angle>3.12414</max_angle></horizontal></scan>
+        <range><min>0.10</min><max>8.0</max><resolution>0.01</resolution></range>
+        <noise><type>gaussian</type><mean>0</mean><stddev>0.01</stddev></noise>
+      </lidar>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="imu_link">
+    <sensor name="imu" type="imu">
+      <update_rate>50</update_rate>
+      <topic>$(arg prefixe_gz)/imu</topic>
+      <gz_frame_id>imu_link</gz_frame_id>
+      <imu>
+        <!-- Orientation absolue (est, nord, haut), comme le mode « rotation vector » du BNO085
+             (fusion avec le magnétomètre). Par défaut Gazebo la donne relative au départ. -->
+        <orientation_reference_frame><localization>ENU</localization></orientation_reference_frame>
+        <angular_velocity>
+          <x><noise type="gaussian"><stddev>0.003</stddev><bias_mean>0.002</bias_mean></noise></x>
+          <y><noise type="gaussian"><stddev>0.003</stddev><bias_mean>0.002</bias_mean></noise></y>
+          <z><noise type="gaussian"><stddev>0.003</stddev><bias_mean>0.002</bias_mean></noise></z>
+        </angular_velocity>
+        <linear_acceleration>
+          <x><noise type="gaussian"><stddev>0.05</stddev></noise></x>
+          <y><noise type="gaussian"><stddev>0.05</stddev></noise></y>
+          <z><noise type="gaussian"><stddev>0.05</stddev></noise></z>
+        </linear_acceleration>
+      </imu>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="gnss_link">
+    <sensor name="gnss" type="navsat">
+      <update_rate>10</update_rate>
+      <topic>$(arg prefixe_gz)/navsat</topic>
+      <gz_frame_id>gnss_link</gz_frame_id>
+      <!-- Sans bruit ici (Gazebo l'appliquerait en degrés) : l'erreur du ZED-F9P (RTK fixe,
+           flottant ou autonome selon le couvert) est modélisée par fieldmind_simulation/recepteur_gnss. -->
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="camera_link">
+    <sensor name="camera" type="camera">
+      <update_rate>5</update_rate>
+      <topic>$(arg prefixe_gz)/camera/image</topic>
+      <gz_frame_id>camera_optical_frame</gz_frame_id>
+      <camera>
+        <camera_info_topic>$(arg prefixe_gz)/camera/camera_info</camera_info_topic>
+        <horizontal_fov>1.780</horizontal_fov>
+        <image><width>640</width><height>360</height><format>R8G8B8</format></image>
+        <clip><near>0.05</near><far>120</far></clip>
+        <noise><type>gaussian</type><mean>0</mean><stddev>0.007</stddev></noise>
+      </camera>
+    </sensor>
+    <xacro:if value="$(arg profondeur)">
+      <sensor name="profondeur" type="rgbd_camera">
+        <update_rate>5</update_rate>
+        <topic>$(arg prefixe_gz)/profondeur</topic>
+        <gz_frame_id>camera_link</gz_frame_id>
+        <camera>
+          <horizontal_fov>1.274</horizontal_fov>
+          <image><width>320</width><height>200</height></image>
+          <clip><near>0.2</near><far>10.0</far></clip>
+          <depth_camera><clip><near>0.2</near><far>10.0</far></clip></depth_camera>
+          <noise><type>gaussian</type><mean>0</mean><stddev>0.01</stddev></noise>
+        </camera>
+      </sensor>
+    </xacro:if>
+  </gazebo>
+
+  <!-- ================================================================ actionneurs -->
+  <gazebo>
+    <!-- Vérité terrain (évaluation et affichage de la simulation, jamais lue par le cerveau). -->
+    <plugin filename="gz-sim-pose-publisher-system" name="gz::sim::systems::PosePublisher">
+      <publish_link_pose>false</publish_link_pose>
+      <publish_model_pose>true</publish_model_pose>
+      <use_pose_vector_msg>false</use_pose_vector_msg>
+      <update_frequency>30</update_frequency>
+    </plugin>
+    <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
+      <topic>$(arg prefixe_gz)/joint_states</topic>
+    </plugin>
+    <!-- Moteur et VESC : régulation de vitesse de roue, couple limité par la limite d'effort
+         de l'articulation (couple_roue). Actionneur « servo » de DART : stable même avec la
+         faible inertie d'une roue (une boucle PI en couple oscille au pas de 4 ms et patine). -->
+    <plugin filename="gz-sim-joint-controller-system" name="gz::sim::systems::JointController">
+      <joint_name>roue_ar_g_joint</joint_name>
+      <topic>$(arg prefixe_gz)/roue_ar_g/cmd_vel</topic>
+    </plugin>
+    <plugin filename="gz-sim-joint-controller-system" name="gz::sim::systems::JointController">
+      <joint_name>roue_ar_d_joint</joint_name>
+      <topic>$(arg prefixe_gz)/roue_ar_d/cmd_vel</topic>
+    </plugin>
+    <!-- Servo de direction : suit la position commandée (déjà filtrée par le modèle du servo du
+         contrôleur embarqué : vitesse, zone morte, jeu), couple limité à 3,4 N·m par l'effort. -->
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>braquage_g_joint</joint_name>
+      <topic>$(arg prefixe_gz)/braquage_g/cmd_pos</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <p_gain>30</p_gain><cmd_max>7.0</cmd_max><cmd_min>-7.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>braquage_d_joint</joint_name>
+      <topic>$(arg prefixe_gz)/braquage_d/cmd_pos</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <p_gain>30</p_gain><cmd_max>7.0</cmd_max><cmd_min>-7.0</cmd_min>
+    </plugin>
+  </gazebo>
+</robot>

@@ -1,0 +1,6 @@
+# Serveur de transcription : image vLLM + dépendances audio (extra `vllm[audio]`), au cas où
+# l'image de base ne les contient pas.
+ARG VLLM_IMAGE=vllm/vllm-openai:v0.31.0
+FROM ${VLLM_IMAGE}
+RUN python3 -c "import librosa, soundfile" 2>/dev/null \
+    || python3 -m pip install --no-cache-dir librosa soundfile

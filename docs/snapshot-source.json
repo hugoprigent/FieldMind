@@ -1,0 +1,2792 @@
+{
+  "capture_utc": "2026-10-20T22:45:01.107095+00:00",
+  "source_commit": "95fc7a1ed9b61931ed9fd956c42290262de15086",
+  "includes_local_uncommitted_changes": true,
+  "description": "Selected working tree snapshot, then publication-specific documentation and sanitization; no private Git history.",
+  "source_files": [
+    {
+      "path": "software/Dockerfile",
+      "sha256_source": "cfca422fa8e1566f9f9fc9e64eacabcc009bf7b72ff828780919b186290976a9"
+    },
+    {
+      "path": "software/pyproject.toml",
+      "sha256_source": "feb8da7e84397ce0b80c3cb7758c5efc574dd30f63612bc9b197a5b9409d1572"
+    },
+    {
+      "path": "software/README.md",
+      "sha256_source": "4428ff68a403b17b2d74969c953f24b060b06cae9a689f48a6d3e14c6c54af06"
+    },
+    {
+      "path": "software/requirements-dev.txt",
+      "sha256_source": "535e69a4df7c71f94fdbe69fef1ed11056a99aa7c614cd1bee56f4bb37b2084f"
+    },
+    {
+      "path": "software/package.json",
+      "sha256_source": "701b098b123c10f314c06d66ca32a2ca1c4b697dfeec12d4ff65dee6abfc65e9"
+    },
+    {
+      "path": "software/ARCHITECTURE_demo_web.md",
+      "sha256_source": "738276d63c6c394afe1dc66b0258cdfce933f4a3c8f85bbd06d78c9f6e8b1959"
+    },
+    {
+      "path": "software/requirements-demo.txt",
+      "sha256_source": "a1544d2f87d89d9100ab1ef902296e9aa400c10823ba0112066d0ce55fcd9f5f"
+    },
+    {
+      "path": "software/config/rover_fieldmind.json",
+      "sha256_source": "426d5abea2dddf84abf334e21e1ee117b39c5b10801f7ba0a70450912a45e882"
+    },
+    {
+      "path": "software/outils/evaluer_navigation.py",
+      "sha256_source": "259383786eee28aff6b81ad4ed807b1c35849ea418fa7cede556411a500ef7b3"
+    },
+    {
+      "path": "software/outils/faux_openrouter.py",
+      "sha256_source": "b7878155a626ba14fe37f1acc3aa38932dc146126ecd0fc1b8ebd9d2a2e789f5"
+    },
+    {
+      "path": "software/outils/__init__.py",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/outils/capture.py",
+      "sha256_source": "931bfe9c05d941d8351c8eb3063b5fe9bd3198e78c68bebf440b576395c10f85"
+    },
+    {
+      "path": "software/outils/mesurer_vision.py",
+      "sha256_source": "fe186b13990412ec17e4eb093fee4e7eda9f3f54b3dfa95cb11b42c7a9c074c7"
+    },
+    {
+      "path": "software/tests/test_consignes.py",
+      "sha256_source": "c1eba891f089e0373dcf0ab8d2556485a9cdb6f3f73b51d80929126ac2c35d5e"
+    },
+    {
+      "path": "software/tests/test_perception.py",
+      "sha256_source": "a2276d340f6e4856505cf5c02af0797a59a88637ea4208529d7c304ffdd5f83e"
+    },
+    {
+      "path": "software/tests/conftest.py",
+      "sha256_source": "eeb25062922b7ad3a9dbdf18c34f9eeee0c16c698274125f1bade556c26c9310"
+    },
+    {
+      "path": "software/tests/test_navigation.py",
+      "sha256_source": "c85f445258638f488017f3618fb3739bc17614065c75f782f672d11e5438301d"
+    },
+    {
+      "path": "software/tests/test_serveur.py",
+      "sha256_source": "170bbd9ab81e94b6fb65b1491303d5a47bcc8d854d827fce300e097d3cb1bfb6"
+    },
+    {
+      "path": "software/tests/test_session.py",
+      "sha256_source": "c87ef83564bad86a36d6b1a892b90ef76b2fbc3695e8fa3ad1c69839743a9ac1"
+    },
+    {
+      "path": "software/tests/test_observation.py",
+      "sha256_source": "2d9093910f714f7912c164831d44792074b6ba2e2b70eac4255021e15f5930c2"
+    },
+    {
+      "path": "software/tests/test_pont_ros2.py",
+      "sha256_source": "563162946b77b282758f773abc09760c95ecc1892db6fef48805bee06d7ca0ce"
+    },
+    {
+      "path": "software/tests/__init__.py",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/tests/test_architecture.py",
+      "sha256_source": "2f4bc048b6dc1aa18c3bd1de3b58cc1a3de31875063d9d6f20f6a7836a1912f0"
+    },
+    {
+      "path": "software/tests/test_vision.py",
+      "sha256_source": "949f16b5c988a33f58621cc7ffbe1e275f289232b160a72c01aa3da65b27b976"
+    },
+    {
+      "path": "software/tests/test_robot_distant.py",
+      "sha256_source": "4d61132835bbadd797acb744f6564135a0cd7bfa52ae6ac2b0dc20e7ad7321cb"
+    },
+    {
+      "path": "software/tests/test_elevation.py",
+      "sha256_source": "8e90cfbf4bd1065be8aa31542fee4021a99289d2e4eeb482f226573ae1c96e77"
+    },
+    {
+      "path": "software/tests/test_simulation.py",
+      "sha256_source": "7cd59ff6dbe084bccc61808e948dd2f776519ed8dc3b699a509322de81149747"
+    },
+    {
+      "path": "software/simulation/banc_essai.py",
+      "sha256_source": "c24072cec335979e436e8f5ab5e5cc493db30062a021b2fa1feb0818869b5aae"
+    },
+    {
+      "path": "software/simulation/robot_simule.py",
+      "sha256_source": "c8082103ee9e2cb1064cfa30841a66b22c40ca8db5c500210b74e4db37824276"
+    },
+    {
+      "path": "software/simulation/firmware.py",
+      "sha256_source": "fbd011167df55387e0d2792b16057cecc3fc4f5300aeb737d0a461e4f2f73500"
+    },
+    {
+      "path": "software/simulation/__init__.py",
+      "sha256_source": "c020e4c2dc2aee9e03f937b19e8e70634ff0811531416179ab28298b26f8c4f8"
+    },
+    {
+      "path": "software/simulation/monde.py",
+      "sha256_source": "8ba9af5c36199af641f25c2a312cff94167ef6435ba26983f8c1a3690c24c2ac"
+    },
+    {
+      "path": "software/simulation/modele_mujoco.py",
+      "sha256_source": "0cea168ffd5d2efe7bd019f472860e47d1b82fada431c88853671ad2376d3f64"
+    },
+    {
+      "path": "software/simulation/relief.py",
+      "sha256_source": "a414e023c545c1b30697039345c636bf6e10ccec79933ef2e1082153f8a634c5"
+    },
+    {
+      "path": "software/simulation/vision_oracle.py",
+      "sha256_source": "b2b57d53117671ac5e77f532a53df01b7b7ddb02c3d4cacc77bdbbfd22785c56"
+    },
+    {
+      "path": "software/simulation/camera_simulee.py",
+      "sha256_source": "7a6eb621dff950ba58e7c15d2f076b93a756fc42c386993a79cffbb22fdbbdd7"
+    },
+    {
+      "path": "software/simulation/pont_ws.py",
+      "sha256_source": "82510e0476988162643cc31ef85a667536f5a072f81761584068ca3759ba582f"
+    },
+    {
+      "path": "software/simulation/temps_reel.py",
+      "sha256_source": "cba65c711f9290c51e6b7a9a57ee084dc2d98bca9df69a8ccec06abf3957398f"
+    },
+    {
+      "path": "software/ros2/README.md",
+      "sha256_source": "2c3d0bc72b48a4a4a2e4ecd2f43de48140cacc86aa17bce4f8e8bae7eb0d29f5"
+    },
+    {
+      "path": "software/esp32/README.md",
+      "sha256_source": "8c8b80598ba60472a47a3df624beb2fe091d2641830baa927824e57f4b2344a1"
+    },
+    {
+      "path": "software/rover/DRONE_MISSION.md",
+      "sha256_source": "b34b248df506988a5306fc9cd9b3ef3eb4af40e8292c5f7b262582adef3b8a3a"
+    },
+    {
+      "path": "software/rover/ARCHITECTURE.md",
+      "sha256_source": "9db2951efc333bbfa8b4dab2c46281d05868a1144dc220b00ef6c6a2c0af089a"
+    },
+    {
+      "path": "software/rover/pytest.ini",
+      "sha256_source": "055fa238e12b57b69fc8a039f9dfbb4a6b593551d5111577e3537803b9e89144"
+    },
+    {
+      "path": "software/rover/pyproject.toml",
+      "sha256_source": "914869bd2b173393daab5ff1770984bb1486adec4184af22736eead7c19a0f35"
+    },
+    {
+      "path": "software/rover/README.md",
+      "sha256_source": "4d4cae5092c4b81647d0c1c8b7868538bb969835da9947bf42a4d88d05f482e8"
+    },
+    {
+      "path": "software/rover/PROTOCOLE.md",
+      "sha256_source": "80cd92364663a83b07ba3574fa179e3e07a747e84142fbb6e65f4598cdb77320"
+    },
+    {
+      "path": "software/rover/requirements-ci.txt",
+      "sha256_source": "bc0392e4fb514b0491b83d4a91766cdf0356d99807fbd4fd5d6c292e12eee50b"
+    },
+    {
+      "path": "software/rover/MODELES.md",
+      "sha256_source": "d418b1dc524add88355221e45ce86cd721551fc63b57a339327b23501715f1c4"
+    },
+    {
+      "path": "software/rover/DRONE.md",
+      "sha256_source": "e682202ab219b5ad7c319e47c5565f248228b68c947b4e5354356f3acdea04b2"
+    },
+    {
+      "path": "software/services/__init__.py",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/services/mission_planner/api_openai.py",
+      "sha256_source": "8f91b58bb947b7f75ac153e038701935b8e93c6af633f09614fef8d83235bd3b"
+    },
+    {
+      "path": "software/services/mission_planner/intentions.py",
+      "sha256_source": "284fa5ec2128ac322094cefa0f4900196d0ef30ba8842eafccf3c81a60f708ba"
+    },
+    {
+      "path": "software/services/mission_planner/__init__.py",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/services/mission_planner/consignes.py",
+      "sha256_source": "48ab676c6b604c3660e876a4cf04e82b51f79bc5e75cf7781d23612f87eaeb42"
+    },
+    {
+      "path": "software/services/navigation/planificateur.py",
+      "sha256_source": "6300505309ac1b2b3a9a0de8904dfa590fbbaae688f126da9658f03aa232fc60"
+    },
+    {
+      "path": "software/services/navigation/__init__.py",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/services/navigation/localisation.py",
+      "sha256_source": "84a99e4e263a9e5fc345eab426db89ca9c6a2e390867133e4a5b1f7525a6db55"
+    },
+    {
+      "path": "software/services/navigation/suivi.py",
+      "sha256_source": "5a4dd905b467c58b44fb3a389be4601076501217ce5202601197694f2df42894"
+    },
+    {
+      "path": "software/services/navigation/grille.py",
+      "sha256_source": "5a0796a8436c169a65c0d6c777181cefcc6584d75194d307fe17e7125cf7e268"
+    },
+    {
+      "path": "software/services/protocole/liaison.py",
+      "sha256_source": "271ab169a43bdb6df5d9a32375526898a97ea19ee98261b2df33fdca0ebeecb2"
+    },
+    {
+      "path": "software/services/protocole/__init__.py",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/services/protocole/fiche_rover.py",
+      "sha256_source": "db1f9da62ccd8c94ff2a022c594bb7abb119c440a834aaa14a29dcc0d999318b"
+    },
+    {
+      "path": "software/services/protocole/scenario.py",
+      "sha256_source": "411af6e4229edd59029c946dfd2b19c6ac1acb7a85cc9139c521947be558fe46"
+    },
+    {
+      "path": "software/services/protocole/messages.py",
+      "sha256_source": "e137292c9eb575edc23e81515789d828f229a6eaa1cb5b3a44e61ebbf7880dd3"
+    },
+    {
+      "path": "software/services/api/journal.py",
+      "sha256_source": "0739066c7229ff837a7792a0f36266d90c385c0b9d384688c30c349d02583398"
+    },
+    {
+      "path": "software/services/api/config.py",
+      "sha256_source": "85bae02ed5583204811e4d390a4e759e734df2efb6af3cde466898ecf79bf1e7"
+    },
+    {
+      "path": "software/services/api/session.py",
+      "sha256_source": "0dcd4810152cdfec17b0eb4fbbdcc792538008d0312e47c5db4558e4678771b5"
+    },
+    {
+      "path": "software/services/api/serveur.py",
+      "sha256_source": "b40972874d9b503d6499ad4655d9bc8080400d5713d15120cccafbebc0e72cbd"
+    },
+    {
+      "path": "software/services/api/__init__.py",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/services/api/robot_distant.py",
+      "sha256_source": "146378fc5f72987d4c55fde7a735a6b404c54ee243f7d0b1299312010a098ca1"
+    },
+    {
+      "path": "software/services/cerveau/__init__.py",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/services/cerveau/cerveau.py",
+      "sha256_source": "6777eca5015493621fbc5a61e19f9184fd4d14c27f49f857d8a0873749c4fa6e"
+    },
+    {
+      "path": "software/services/cerveau/mission.py",
+      "sha256_source": "5d401779dd870591b46522db0d14416ed5552b7283bacc9bcfa87780d688755d"
+    },
+    {
+      "path": "software/services/cerveau/evenements.py",
+      "sha256_source": "532cf86605c1069f67d2a999b454f8e3a70b4760bd24951d783964c73e615b9c"
+    },
+    {
+      "path": "software/services/perception/vision.py",
+      "sha256_source": "64214c125e4bc56bff4772b2d9165612bd2560d0ea1516d4c09729ac42510808"
+    },
+    {
+      "path": "software/services/perception/observations.py",
+      "sha256_source": "3d27b2f9eef0469109ec41fb5109dd6306686e953630fd922b89a395aeec6328"
+    },
+    {
+      "path": "software/services/perception/elevation.py",
+      "sha256_source": "ae5d2f506327aa97d1c0c6219a1cbbccf9858361c0161fb9f61863126f0f3ede"
+    },
+    {
+      "path": "software/services/perception/__init__.py",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/services/perception/camera.py",
+      "sha256_source": "fac80ee661b592eb4bb7a4510f08817f3c6c7a8493ed7fb9f07a99b1daba3aac"
+    },
+    {
+      "path": "software/services/perception/stereo.py",
+      "sha256_source": "1303b56798486303d85361cccddb84b5e212f53954b46434b4df58c338f59158"
+    },
+    {
+      "path": "software/rover/deploiement/fieldmind-rover.service",
+      "sha256_source": "107219bac31ebbd37d08e5ebc732275ddd6434a6bfdd0c0b343fcaaa7f57dfa9"
+    },
+    {
+      "path": "software/rover/deploiement/deployer.sh",
+      "sha256_source": "6781cdb8c07c361e3a37a27129472215149f2c03983f4a460c0fcad501541ac7"
+    },
+    {
+      "path": "software/rover/deploiement/verifier_pi.sh",
+      "sha256_source": "420d16acbb314217928f16ee117ee84442ce4d6002d5fc82ddb2256eb9ce877d"
+    },
+    {
+      "path": "software/rover/deploiement/installer_pi.sh",
+      "sha256_source": "305d519e9babfb71d2304980157b813187ee635416804d3ec1de1c3b662d46ea"
+    },
+    {
+      "path": "software/rover/deploiement/lancer_atelier_drone.sh",
+      "sha256_source": "2e752bd9e93a7df2e2e33f0ce97295f11f9d89f54c283951f4c46648345c0089"
+    },
+    {
+      "path": "software/rover/config/drone_vision_simulation.json",
+      "sha256_source": "ced952d42483a8ccaf3ce48a2353ff357d1d4728cf95b5208ff39c1ed4d129f8"
+    },
+    {
+      "path": "software/rover/config/rover.toml",
+      "sha256_source": "50806763a6c378f5bc0b9b5d4f4c988ffab9a32b0a89f1f38f78c4d0e5c235d9"
+    },
+    {
+      "path": "software/rover/config/ia.toml",
+      "sha256_source": "fbf0d9cff8faf166c5be8747b7e5a654ad951540b02527f40387bbeeac3c5a88"
+    },
+    {
+      "path": "software/rover/tests/test_securite.py",
+      "sha256_source": "de2e61060537ea66677294c03216e1dd07eeeb90218cb670d23716293649003d"
+    },
+    {
+      "path": "software/rover/tests/test_drone_atelier.py",
+      "sha256_source": "24d95b74e731ba9d02d73bbce551b770e919703612c44cd2bcc0fd77c20b3d42"
+    },
+    {
+      "path": "software/rover/tests/test_ia_agent.py",
+      "sha256_source": "7b97e5d45fd63b72ef4bda63847505981fb8330d02d03a6a4290e7f753be1e57"
+    },
+    {
+      "path": "software/rover/tests/test_ia_faux_serveur.py",
+      "sha256_source": "ea748503e3e262bde7ff03d4bf35657a5a1792341387a9b84c7712420e6bc37f"
+    },
+    {
+      "path": "software/rover/tests/test_estimation_cartographie.py",
+      "sha256_source": "1e1297ac3c736479858785a83e1869d49243c2a107ba256a9d8eb1f4efea7ec6"
+    },
+    {
+      "path": "software/rover/tests/test_enregistreur.py",
+      "sha256_source": "57f4c03b24d0078034350c711d109528c015f54ba701340f24c4c54d2e225aa3"
+    },
+    {
+      "path": "software/rover/tests/test_differentiel.py",
+      "sha256_source": "a5e4459d5a90d958d9a3fe6d1b92ce896f3f5574b6e6919c5776683e75d5fcbe"
+    },
+    {
+      "path": "software/rover/tests/test_navigation_planificateur.py",
+      "sha256_source": "663bd1a6dd930888edfba3c827d5eda4df1526e328dd397e459f41e5cf9cdc21"
+    },
+    {
+      "path": "software/rover/tests/test_estimation_odometrie.py",
+      "sha256_source": "0f48761cd5099f8c275abf4cb97f1e414911d0298c8c31e367fea94804dd5e47"
+    },
+    {
+      "path": "software/rover/tests/test_ros2_client.py",
+      "sha256_source": "459e0e248c3f2a6398abe6065470dcdb4fe9020a32da8e452b9ef35c25a08aa0"
+    },
+    {
+      "path": "software/rover/tests/budget.py",
+      "sha256_source": "d01df2e90b3212b88fbb06ff2c20a2af82cb13713b5c30a83616ffb19cb9a9ac"
+    },
+    {
+      "path": "software/rover/tests/test_perception_stereo.py",
+      "sha256_source": "1f9d03aa8576dcb09f5eb32766edf49296149a3427d91d1eaf827d17576a8d8c"
+    },
+    {
+      "path": "software/rover/tests/test_ia_voix.py",
+      "sha256_source": "aab853b0170c2502476e546eb94e1ae519c57419b7ad40a0db5f1f87ff8e9e18"
+    },
+    {
+      "path": "software/rover/tests/test_perception_calibration.py",
+      "sha256_source": "ba3c38087abe8ba5bcf3f79d5bb9001b18a374caefcdbf0b8aee1d16de735963"
+    },
+    {
+      "path": "software/rover/tests/test_perception_projection.py",
+      "sha256_source": "32904132aa7cf57e57c4f59ed47875aac59fb217a39bfd3a250ed9ed8b221e7b"
+    },
+    {
+      "path": "software/rover/tests/test_ia_distant.py",
+      "sha256_source": "08632663113049830d6fd1cbc88ec2fcee76b6de5b33ebee464945376855dc1d"
+    },
+    {
+      "path": "software/rover/tests/test_esp.py",
+      "sha256_source": "2d3a9753b90c755edcae41057473e94926af5de5aa39d9376b2d32148e73519c"
+    },
+    {
+      "path": "software/rover/tests/test_ia_transcription.py",
+      "sha256_source": "e62fc9d0d030aa2aca802638d78f174d0b31196065ce2d8b80bf4e2ab8d9d40f"
+    },
+    {
+      "path": "software/rover/tests/test_drone_protocoles.py",
+      "sha256_source": "37553fb0b19d20b74650f8821bd1b475c78143bdc4a4379a4e5ac57c5b8cb6fe"
+    },
+    {
+      "path": "software/rover/tests/test_mission.py",
+      "sha256_source": "dd7b0cbbc2fc28084291ba8e8d40fccdbf8436713a0aca63cab158b769b6d8b1"
+    },
+    {
+      "path": "software/rover/tests/test_drone_mission.py",
+      "sha256_source": "7f03abc2b1683c5c8ac747468dc1ebd4f5764bae5e311d93eef8f799b8b44570"
+    },
+    {
+      "path": "software/rover/tests/test_ia_cle_secours.py",
+      "sha256_source": "e2022dcf227f33862f9f9d3c3428873470dbeb67fe0e3cf89997313d1a4f5cc0"
+    },
+    {
+      "path": "software/rover/tests/test_drone_vision_distante.py",
+      "sha256_source": "9498d2eb32eb72bce2b048b98ab7befce216b7c25a3030f1ba4cc33c19ea7b46"
+    },
+    {
+      "path": "software/rover/tests/test_integration_ia.py",
+      "sha256_source": "a6ca7f630ac82f793112fca5f4c306625a6408a28aab6d17ba52faffedaed7e5"
+    },
+    {
+      "path": "software/rover/tests/test_navigation_local.py",
+      "sha256_source": "31e3fc54370b30183f7a8cba8e5d3cfdfefef0e765e139b714307c3859247a14"
+    },
+    {
+      "path": "software/rover/tests/test_integration.py",
+      "sha256_source": "29fb0877ca32ad0de03070586ed885483e17c66ee5c57bb1c730b930c37074cd"
+    },
+    {
+      "path": "software/rover/tests/test_ros2_coherence.py",
+      "sha256_source": "22c5b71bae4871f37ae053cf456cf603a293bbd658131fe581306877986ab09e"
+    },
+    {
+      "path": "software/rover/tests/test_ia_vision.py",
+      "sha256_source": "f4b66362bae624b5fc26db04076c20765879843e04e72b43bf0439cf6fd2e78c"
+    },
+    {
+      "path": "software/rover/tests/test_ros2_conversions.py",
+      "sha256_source": "692bfef51fb586aacb20a215db40bde970c8c9eeb9f4da52f4b8a95143fd3f9c"
+    },
+    {
+      "path": "software/rover/tests/test_integration_gps.py",
+      "sha256_source": "35adc09d6c8135fe8a0f6b8c66058849f8907c295b5c6e5411a5959147a91b65"
+    },
+    {
+      "path": "software/rover/tests/test_ia_config.py",
+      "sha256_source": "146f822c135b09cbbebe3951a7ca791d6174eea301b8d7657a4a6d9dba95d8cf"
+    },
+    {
+      "path": "software/rover/tests/test_remorque.py",
+      "sha256_source": "f22a7f866ccd9af6e249622d6c29d219045d23261c5385c28aa9d5833f32f122"
+    },
+    {
+      "path": "software/rover/tests/test_drone.py",
+      "sha256_source": "175d2bd4adc0799c733d77805d44cd6092ca1167c72c4f6fe565a1577ba1bd0b"
+    },
+    {
+      "path": "software/rover/tests/test_monde.py",
+      "sha256_source": "d6781becd5ebb5aca4212216b6c870f094dbed6028ee64d210eb3452f54961d5"
+    },
+    {
+      "path": "software/rover/tests/test_scene.py",
+      "sha256_source": "a0f8e1426ca32bbfc474b40721e1a221a252f0074f65e5ade340fa834f19dc35"
+    },
+    {
+      "path": "software/rover/tests/test_integration_navigation.py",
+      "sha256_source": "e38e1f104cace0ee213db8dd57a6a0e5f03200268fe2f03b53d3245502ace90b"
+    },
+    {
+      "path": "software/rover/ros2/README.md",
+      "sha256_source": "bff7fdcb755b657ccd88d0d2c57aa4a992f61f69d574d015de17a08d73458553"
+    },
+    {
+      "path": "software/rover/ros2/ruff.toml",
+      "sha256_source": "d4e04152e71aa9e4688c58cc5ce6545896bd12fc554c100d9e26dc6870abfd31"
+    },
+    {
+      "path": "software/rover/fieldmind/config.py",
+      "sha256_source": "5b7083f68f594dcb444c0bfa1a735e567e74a84e55b3182ce7fea2eba4bcadf2"
+    },
+    {
+      "path": "software/rover/fieldmind/__init__.py",
+      "sha256_source": "6eeccd2be42eba8526921d8b95d566b5cf9a738bc078c0fd124f53b91a9c1828"
+    },
+    {
+      "path": "software/rover/fieldmind/types.py",
+      "sha256_source": "9612e532ec823d7c6e585036dbae8db364214c6096bf9344e914e9b471f791c1"
+    },
+    {
+      "path": "software/rover/fieldmind/bus.py",
+      "sha256_source": "c21770ac719b0fb853535ebcff4ca2f803e6716f3b871e9d5c4b51baf5279c35"
+    },
+    {
+      "path": "software/rover/fieldmind/app.py",
+      "sha256_source": "58fc4cc7ab7ccd707d5baf869aacc79d4691033e14429a249f7fff7735203c60"
+    },
+    {
+      "path": "software/rover/fieldmind/__main__.py",
+      "sha256_source": "ed4ee1e59f59b6a3b1ba40fd611af3e52bd831751b878cc713dd3a992a66270b"
+    },
+    {
+      "path": "software/rover/fieldmind/enregistreur.py",
+      "sha256_source": "ca62ef02fc40ea8fb4805eac1ffec2d2d668b4830e8a857264c9517e557aec8b"
+    },
+    {
+      "path": "software/rover/fieldmind/controle/__init__.py",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/rover/fieldmind/controle/remorque.py",
+      "sha256_source": "ac6e3b5a7de46b28035c187294492de6d88a11dc8efe20b7bc3e32ebd58511c8"
+    },
+    {
+      "path": "software/rover/fieldmind/controle/conduite.py",
+      "sha256_source": "359bc55c82566bb38e9491fefcdcad1da28c1d07ccd109ec78e90798f49498d3"
+    },
+    {
+      "path": "software/rover/fieldmind/controle/differentiel.py",
+      "sha256_source": "bbcce308d9c1462aedab75a1e77c9d972be34564bb470711f28c95e299a5529c"
+    },
+    {
+      "path": "software/rover/fieldmind/securite/__init__.py",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/rover/fieldmind/securite/superviseur.py",
+      "sha256_source": "d2c910762f78881087fa3a58b53c0002e5c23d52362b47a14523a136b8191a51"
+    },
+    {
+      "path": "software/rover/fieldmind/web/vue3d.html",
+      "sha256_source": "150bc57a19face6d3a4083a84d0d04d146d5010e42370c817af90b347fb09962"
+    },
+    {
+      "path": "software/rover/fieldmind/web/index.html",
+      "sha256_source": "e8891210c07634a9725ce3345a547eb215a4be8e3ce299d7da5c52f23761c0b3"
+    },
+    {
+      "path": "software/rover/fieldmind/web/favicon.svg",
+      "sha256_source": "300b6a3312a0e31191cb7dbdf720c4918b03b0c54ef4cd29a429f6b5b57a4479"
+    },
+    {
+      "path": "software/rover/fieldmind/ia/transcription.py",
+      "sha256_source": "a24177420e9babf4464632c93c83e74531ef2f99e5525ca464b96eb8960b1d36"
+    },
+    {
+      "path": "software/rover/fieldmind/ia/config.py",
+      "sha256_source": "80365c6d65c1c13309ece3d3605440885c836d77cb9ac60de40e6ca7ead1511e"
+    },
+    {
+      "path": "software/rover/fieldmind/ia/vision.py",
+      "sha256_source": "5868e8c391012d2a03d556a80c63ea524907d63f7a94b5f3baf5bc45d7ac0c8b"
+    },
+    {
+      "path": "software/rover/fieldmind/ia/distant.py",
+      "sha256_source": "49d1d45957da08a817037702de3a898f44d92eda9187ae0a05b23eae3bba4da7"
+    },
+    {
+      "path": "software/rover/fieldmind/ia/voix.py",
+      "sha256_source": "0c37fae002832bec2b0cc4cabf6b5a68c42d4895ae4778e7364bd7c4257cd721"
+    },
+    {
+      "path": "software/rover/fieldmind/ia/__init__.py",
+      "sha256_source": "2b5a73a53e92f3d636a73406a8fd051a5aa941d91bc46600660aa8146a1e9919"
+    },
+    {
+      "path": "software/rover/fieldmind/ia/integration.py",
+      "sha256_source": "20c17187bc48e4e71a90f5cb43a230adccb8870fb1dd938c0580fa002400d17b"
+    },
+    {
+      "path": "software/rover/fieldmind/ia/agent.py",
+      "sha256_source": "93eec934a2947d53898330115f9d6ea265b5a2f0802e20af940aad3cdf860e0c"
+    },
+    {
+      "path": "software/rover/fieldmind/ia/fournisseurs.py",
+      "sha256_source": "3ea2054cea6da6915a9b771f9b2e0aac74273c89afdd020a6bda48a319b797c8"
+    },
+    {
+      "path": "software/rover/fieldmind/ia/messages.py",
+      "sha256_source": "bb2accc08944f137536ca6f9d40bddb9d205402e512a28e8d685a27d4e575428"
+    },
+    {
+      "path": "software/rover/fieldmind/ia/inference.py",
+      "sha256_source": "fa47371679ee8c784649d2b8e423a5f69e05bc62cd51ed904e3dec5651f29d59"
+    },
+    {
+      "path": "software/rover/fieldmind/ia/outils.py",
+      "sha256_source": "7e6dff12c503c7c6053f1427cf9b202cc2436f01c04c527ca631f5863b5a689d"
+    },
+    {
+      "path": "software/rover/fieldmind/navigation/planificateur.py",
+      "sha256_source": "62c872ee59f6a5a220eaa5d4a58585a27e38c34c6f7b6e2e14663c3e24b1c356"
+    },
+    {
+      "path": "software/rover/fieldmind/navigation/local.py",
+      "sha256_source": "5c277b8825c3d6a57325c0180ea7d4f82bd8ee4b78f416abb65396c65cd1daa4"
+    },
+    {
+      "path": "software/rover/fieldmind/navigation/__init__.py",
+      "sha256_source": "5038a10c0b80e51c516e0b5a2f10583807b868eda764151d197b37ea405f1da6"
+    },
+    {
+      "path": "software/rover/fieldmind/simulation/materiel_simule.py",
+      "sha256_source": "9c57a5b6c652c4407be44dfda0c3c1f8f4ebb69bbd5c609aca548f5898a8ba3a"
+    },
+    {
+      "path": "software/rover/fieldmind/simulation/__init__.py",
+      "sha256_source": "9a5c0609e7161ac56cb2fddf56552ae07bbd4f616cc68b7282c8afe74bedc82d"
+    },
+    {
+      "path": "software/rover/fieldmind/simulation/monde.py",
+      "sha256_source": "b0c6f4c1c0faa72c190452d4830b490c4a8f653980498fc55973712dc2580f26"
+    },
+    {
+      "path": "software/rover/fieldmind/drone/simulation.py",
+      "sha256_source": "9a3c25daf1ab8cbad7c17438c63a2db69910abd97bda5540d389ca7a553a7d37"
+    },
+    {
+      "path": "software/rover/fieldmind/drone/vision_service.py",
+      "sha256_source": "b7f18a51df4de251673b31c28f52c09893ed700d890b59c01d44a5540476a44e"
+    },
+    {
+      "path": "software/rover/fieldmind/drone/atelier.py",
+      "sha256_source": "03462f0b17db79e0ed10fbeeccc4471f9b44ed9922d01cd171a1e1f4c3713fe5"
+    },
+    {
+      "path": "software/rover/fieldmind/drone/vision.py",
+      "sha256_source": "7f412e6a5630812c1664654c9ff46f226f3ada9edccb8c62f3e23e9cb1fc7dea"
+    },
+    {
+      "path": "software/rover/fieldmind/drone/vision_distante.py",
+      "sha256_source": "edadfe2a74ed25412ff61c538f7738145683fb04136edacda12c5445aa0a9b94"
+    },
+    {
+      "path": "software/rover/fieldmind/drone/__init__.py",
+      "sha256_source": "370c7aba70dee26e2df2439c093a7b10c05e11db8bccc0c6c359418ff03ee6e5"
+    },
+    {
+      "path": "software/rover/fieldmind/drone/modele.py",
+      "sha256_source": "bf440c582a2166a203e8d57026b8f3876a9a8c5a1f422834e7445d52aa418a48"
+    },
+    {
+      "path": "software/rover/fieldmind/drone/autopilote.py",
+      "sha256_source": "b21dae4b13f4ae958033f40ab83b8404dc425587239f3974fff76c4215f2471c"
+    },
+    {
+      "path": "software/rover/fieldmind/drone/__main__.py",
+      "sha256_source": "efe5bba063a5c7ab8ca7cb2258c72bc89051d66cde730875ae768a88859098f6"
+    },
+    {
+      "path": "software/rover/fieldmind/drone/protocoles.py",
+      "sha256_source": "9ad85f43ab7c069ea96421b2cde6dd6d747688eb8d3dbe2b92fffab6cf929c18"
+    },
+    {
+      "path": "software/rover/fieldmind/mission/actions.py",
+      "sha256_source": "de7621776301553345071138e710086873fe87ba3f99ed826111595658b448b6"
+    },
+    {
+      "path": "software/rover/fieldmind/mission/__init__.py",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/rover/fieldmind/mission/executeur.py",
+      "sha256_source": "a42ed2ca2b8e83c32d6f0a66d582d915e6ced5b9e59847e1484305653b6b0e66"
+    },
+    {
+      "path": "software/rover/fieldmind/mission/calibration.py",
+      "sha256_source": "c3f3e338657230fde683c5861d19df539f83eafd2958c60d5db31d656963284d"
+    },
+    {
+      "path": "software/rover/fieldmind/materiel/detection.py",
+      "sha256_source": "3627fe7cccd26a0caf62506d4eb287f3169e10bee81537a30903414bb1f98ad5"
+    },
+    {
+      "path": "software/rover/fieldmind/materiel/esp.py",
+      "sha256_source": "fc377cef98adf09a1f65087c7f90855a95bb2de1264ded59d50790fa18775332"
+    },
+    {
+      "path": "software/rover/fieldmind/materiel/gnss.py",
+      "sha256_source": "fd35ee4d3e1786076bb7ec815250dfa912ee03c164b0ac0683e0de1f0a08c0cf"
+    },
+    {
+      "path": "software/rover/fieldmind/materiel/__init__.py",
+      "sha256_source": "f7529b552e83046b8a732fd19987e07207dd7855e75b6fde2df6be435ddb2a81"
+    },
+    {
+      "path": "software/rover/fieldmind/materiel/systeme.py",
+      "sha256_source": "d59fb9d0ba51ec211f9d6cc544c13d93e52aae42039808ff6669215c1b91e196"
+    },
+    {
+      "path": "software/rover/fieldmind/materiel/cameras.py",
+      "sha256_source": "ded5e3e7d0aa3563f7e2211771ae771896d1c9bd1e28e1e564cbddd1c253e796"
+    },
+    {
+      "path": "software/rover/fieldmind/materiel/audio.py",
+      "sha256_source": "1f4fa97cee6c2d5078bce5e2c7226d503eb25d666ae0fad4fbf229771cd6e455"
+    },
+    {
+      "path": "software/rover/fieldmind/materiel/lidar.py",
+      "sha256_source": "7fa9fe86b8d97406a029a8263b997bef474df99db54701d94a86ab3f9fd43438"
+    },
+    {
+      "path": "software/rover/fieldmind/materiel/reconnaissance.py",
+      "sha256_source": "81e892e79eca6fd92e941c6a32b00068d7d545bed5989e8a0070e576aa37afe7"
+    },
+    {
+      "path": "software/rover/fieldmind/estimation/icp.py",
+      "sha256_source": "5fd1ae1ab08e5ba25ed0012b67d899f89b0c96acb2475fe5672fede04a85de1a"
+    },
+    {
+      "path": "software/rover/fieldmind/estimation/gps.py",
+      "sha256_source": "25cd37ffe048898ab4fe436c6e18a71d97004ef4b4168cf269962aeda63ef979"
+    },
+    {
+      "path": "software/rover/fieldmind/estimation/__init__.py",
+      "sha256_source": "fab880af556941f7cdf77ee8f4fe8b2b0256f531b829d430e99779493ba22d07"
+    },
+    {
+      "path": "software/rover/fieldmind/estimation/odometrie.py",
+      "sha256_source": "a41d7154582c4de2a7141ee408819d1f876fa11b8464752032685c4fd2da493f"
+    },
+    {
+      "path": "software/rover/fieldmind/estimation/cartographie.py",
+      "sha256_source": "b2a89d42640d0890344314381a16245bbb8d8e7ad541c169eda88b8f61837807"
+    },
+    {
+      "path": "software/rover/fieldmind/api/diffusion.py",
+      "sha256_source": "be5890ffae08eccdcd3994132256175760ab895f641396dee5824ec3c4b19f07"
+    },
+    {
+      "path": "software/rover/fieldmind/api/serveur.py",
+      "sha256_source": "d922cb82613053baa7e2fe9b8a8b353b65006d3efd352838c0725fa81c276e49"
+    },
+    {
+      "path": "software/rover/fieldmind/api/__init__.py",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/rover/fieldmind/perception/calibration_stereo.py",
+      "sha256_source": "8b37a039ca09aaeb34e6e08678aca535bbe98e245cec37fe2a09bedf1862c6c3"
+    },
+    {
+      "path": "software/rover/fieldmind/perception/__init__.py",
+      "sha256_source": "aef8e903366fd5964032eaf1503accc8ed26f1a4806de791355d433df3eb4205"
+    },
+    {
+      "path": "software/rover/fieldmind/perception/scene.py",
+      "sha256_source": "0dc99b4e6c4337a5a15315cd980f3d54eca70fff48ac2c1e60b8569a8cd8d18c"
+    },
+    {
+      "path": "software/rover/fieldmind/perception/stereo.py",
+      "sha256_source": "9268bd670221d126da25d549d3287a85f7d174c67fc15bb32f79cb98fa2e4736"
+    },
+    {
+      "path": "software/rover/fieldmind/perception/projection.py",
+      "sha256_source": "d3ec4131ce66f0e51964303ddddfd36e3c4f56209f8cba33236629d02074fea6"
+    },
+    {
+      "path": "software/rover/fieldmind/web/css/poste.css",
+      "sha256_source": "f174c73ca81f65436412bf5c22ff5721487de63409d2fc4603aec86de0e64370"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/radar.js",
+      "sha256_source": "7a603e00b7b1ccb95a98feaa6357cbba720c9ec7d1477c9bb0e7522b56e87aa6"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/drone.js",
+      "sha256_source": "ce541f96903af8ad61d7554efd03b425dcf77e68a4350288d56d80a00b3b0432"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/cartegps.js",
+      "sha256_source": "66ca4a05c2f793ebc8108917c7bd4159723e56f82e1b1ca8ec938155cc948955"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/plan.js",
+      "sha256_source": "8ce19a63541ab9bf30eb04af8dad7bf185cf9565948069fecfdd827721fef85c"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/courbe.js",
+      "sha256_source": "83f8eb9132ea139e9c6e2c3d38799bdb19d7bfa9a4090d1c7bb59a4b194650ad"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/connexion.js",
+      "sha256_source": "4341c12892d8577fb5f1896bcbfe6cc0c83472959ce9db800d27ef2233826aa3"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/main.js",
+      "sha256_source": "c98de15d83e5f084fb143278cdb0fdc060616342b9e62b1ad04b132fdd5c24e9"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/mock.js",
+      "sha256_source": "a5b2811805a8df8e6be7d28a5225fe6a195daaf8b09f934001211eb240732b42"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/outils.js",
+      "sha256_source": "957a22f2d014b06ee18a7462ba33883ca35d60671391d9660584734bd41d5e72"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/geometrie.js",
+      "sha256_source": "0de5af76b46d5bc5ca5ce6c056e9a0c8c681bda26c1e85028d64a02211bf5dd0"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/camera.js",
+      "sha256_source": "e59d2a1a61fbd7836cf36585206815c012271d6486bd7e4ceca7666cdca3f180"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/donnees.js",
+      "sha256_source": "5b89e397fbd88175c74959d0c40b6a24b73d4c9a55e6ea6e3ee90898bc6996f5"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/teleop.js",
+      "sha256_source": "7ae749b30fcb2e2cec28fab6bbbeb0ca9d23b84e4d725c39028808064c28894e"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/textes.js",
+      "sha256_source": "854d7b5ce21cbc9c05d9ddd8ba80b3d8a1bd7072f320a7ae42ba4e8d98e84b70"
+    },
+    {
+      "path": "software/rover/fieldmind/web/vendor/three/three.module.js",
+      "sha256_source": "9052042d676cb0fdc1ddfefe193053f34b7ac0513a616fdac4535d49987812ea"
+    },
+    {
+      "path": "software/rover/fieldmind/web/vendor/three/LICENSE",
+      "sha256_source": "8b378ebe60e2fe500158cb0ac71cb5e8b7d92953c2abcc63a0eb90499653b5bc"
+    },
+    {
+      "path": "software/rover/fieldmind/web/vendor/three/three.core.js",
+      "sha256_source": "9edde002b066a9a05676a6127f67735b62baf399bdea529f2f7e31657da769e6"
+    },
+    {
+      "path": "software/rover/fieldmind/web/vendor/three/VERSION.txt",
+      "sha256_source": "f27652a70c5d6176dbd711019989c5392fc30876d788a926188924585f46a874"
+    },
+    {
+      "path": "software/rover/fieldmind/web/vendor/three/addons/utils/BufferGeometryUtils.js",
+      "sha256_source": "259085a7dac89e0840393a9347c77123fbc4206ec2146bf0c29ffc72e14a2800"
+    },
+    {
+      "path": "software/rover/fieldmind/web/vendor/three/addons/controls/OrbitControls.js",
+      "sha256_source": "1591ca0aadf47c55d1c0ee4f3dc9d47db0672e5345190f215e46f1948ca1fb6f"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/vues/systeme.js",
+      "sha256_source": "775af129e5556f225d23debf6bbd11e97acc7ff2048785066b25dcdd669960dd"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/vues/capteurs.js",
+      "sha256_source": "71064dd4d6b16f5bc00e2e4a487853db6ff876e1d7be47a3cda792ca9019a846"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/vues/reglages.js",
+      "sha256_source": "27ec9cad54330ccfb841ad2c8fbc83dc2ae44861057085f8562a965f58ddb0e0"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/vues/carte.js",
+      "sha256_source": "c361c66b012daf5da0d6ff2f89d6e3efb84e0ff25ef488b72da2e82b4c8ecbe8"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/vues/pilotage.js",
+      "sha256_source": "c8e4ef2f7ef192995558157fe77573a496deb146428db8d46339f68fc1714108"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/vues/barre.js",
+      "sha256_source": "e3747752c7382cd89e96dc4975b4911b3efafc781e72828f598ecf3638787f9d"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/vues/mission.js",
+      "sha256_source": "b50e24b738bc00748a13b5101dbbd59209851ce6f24355df837d7a30ae4301fb"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/vue3d/sol.js",
+      "sha256_source": "4db272ec5267f2afd45f995a56fe12401d46b1fb4b46d3129e6b61858e1c1e2d"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/vue3d/traces.js",
+      "sha256_source": "2726976cc6c33a6ef71d3170da27396ca8b0ab8c77f3bc9b28de1034932ab17e"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/vue3d/vue3d.js",
+      "sha256_source": "7a2a394f32754369be4435dd1fceddf649222be1190899cc7e34cca24bfb9a3a"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/vue3d/demo.js",
+      "sha256_source": "0afac6d65fc57c3758ac0c671ed34da346847fb306c7a2d6728f0164fb9f8302"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/vue3d/objets.js",
+      "sha256_source": "7e40ed4cc9ee9fc540d5958fe5b316f7b3df80c00b45a33ce31fde7f94b88e2f"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/vue3d/materiaux.js",
+      "sha256_source": "1642f1bb0c9285b35a8232438dc9482d9de0dba344cefaf5e9915a6de53a2aab"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/vue3d/rover.js",
+      "sha256_source": "4c9a97314680d45e69c1dace62a7a77062a1ed66afd5edb45377887c0313afac"
+    },
+    {
+      "path": "software/rover/fieldmind/web/js/vue3d/remorque.js",
+      "sha256_source": "e3118e5b4fe9180af7b4bd7f6e5628fa71c574b9bdb809cfbb2655d547de434b"
+    },
+    {
+      "path": "software/rover/ros2/docker/Dockerfile",
+      "sha256_source": "70a79e8a48518e6d8fa030e1425a5f611ef62fdeb8774727c8b485e4dc894145"
+    },
+    {
+      "path": "software/rover/ros2/docker/docker-compose.yml",
+      "sha256_source": "459153df7af69f986bb60daa36b3e412e741edc2ad17a485b8bad9c99b6bea25"
+    },
+    {
+      "path": "software/rover/ros2/docker/env.exemple",
+      "sha256_source": "79aced2308e10ceaa8baf9668d334434d686e857cbe52539a88b512d313018aa"
+    },
+    {
+      "path": "software/rover/ros2/docker/lancer.sh",
+      "sha256_source": "7be1d53027e85bfb9d723654c1e6350ed512bb0280b550ad4bef2a256c18057e"
+    },
+    {
+      "path": "software/rover/ros2/docker/entrypoint.sh",
+      "sha256_source": "3d24942c5ba2840577f77a9ada94256319a4855b68c86fcdb8f01eff36246554"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_bringup/package.xml",
+      "sha256_source": "ca497521d7e0fc9e713f580b47b6c30a41735ed7175925d38f2ff06b22fc8bb8"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_bringup/setup.py",
+      "sha256_source": "27b1fbd71813d68bbe3585078407fabad16a09afa6b0e2970e73f92c9727972c"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_bringup/setup.cfg",
+      "sha256_source": "10bd521db64df62e38bc49d2d79d41e1a468d7fa9e5ac913b6b625244092a24c"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_description/CMakeLists.txt",
+      "sha256_source": "f0bea04af3d510fdcbed462b96c66ba3623402b8389b6145d1c23aeb02ed67b7"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_description/package.xml",
+      "sha256_source": "fc06c10ab475302114fb45a67495a8221675b0b8350c8ac27db57c8c82205d44"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_ros/package.xml",
+      "sha256_source": "9b9e18f9a0afbd22460d187bea92942e67e2453b84a239af8343d27f81a9fa42"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_ros/setup.py",
+      "sha256_source": "615c39fa2f2874fafb39b468f832f5295c07a7901175a54b27bcc71bb0eaa428"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_ros/setup.cfg",
+      "sha256_source": "9f95bbc3a8ee6e1652d70232831d9224910e37c5eefa7dcac0e0475c154be696"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_ros/fieldmind_rover_ros/conversions.py",
+      "sha256_source": "8c42d67f128e65eb0cd2374f855e2ed94e38995e22d12376ba28463efd8e0525"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_ros/fieldmind_rover_ros/client.py",
+      "sha256_source": "8c90d8b3caa195ed4623c7cb243fca4b15a4372cb2957b84ba1e9d367c0caf2c"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_ros/fieldmind_rover_ros/__init__.py",
+      "sha256_source": "5dde6899c227460e5fb3a3ea776d53e7046781fd4a34b0a6dcaf183cfb14c5b9"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_ros/fieldmind_rover_ros/pont.py",
+      "sha256_source": "5cca8c0d8bbd17213ac303e32d011cafc29d1bb833a68b579da89f6c4900901e"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_ros/resource/fieldmind_rover_ros",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_description/urdf/rover.urdf.xacro",
+      "sha256_source": "60ec6f989ae41f4d56977926db5959068ba206a0f88c20b90c2e29a9614e1667"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_description/launch/description.launch.py",
+      "sha256_source": "063494e6114f9455af4e07a8eb06b424eadb1648a5c352cbcbbbd22d1ad218d7"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_bringup/fieldmind_rover_bringup/__init__.py",
+      "sha256_source": "ca7ccc0ac4c182f84dfc8157851fd732aaf5e74bf63ff04420308342f16d5a92"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_bringup/config/nav2_rpp.yaml",
+      "sha256_source": "c40e010eb28fa9e5ba74cdd4af99d674fdaf08779f09b9a2e36a21b59da42328"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_bringup/config/nav2.yaml",
+      "sha256_source": "c01ebea353191db0317702943f13af03b0abd3e1b2390974a1a7411ec9a39f18"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_bringup/config/slam.yaml",
+      "sha256_source": "78a5c1c918225ae028a8d1ec97619444c1983f378e50f7c9cb1607a160543fc4"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_bringup/config/naviguer_points_ackermann.xml",
+      "sha256_source": "ad6d2620ee2500b2d01da9abfca82c5fe2ef8e17d104f340be8d4e02571508c5"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_bringup/config/naviguer_ackermann.xml",
+      "sha256_source": "4e4a5e58a133b330e42655bc057b0af05640cd9d17d92574ba411032eed26b3b"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_bringup/config/pont.yaml",
+      "sha256_source": "037918e36b77e4e3b45a2ff0d2be77f906c93e0960b7c2bcdb4a33ab863e68bc"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_bringup/launch/tout.launch.py",
+      "sha256_source": "5b32d8c48f51b3bebf8eb638027dd2ef949e6c72905417d14c5e2671b8dfda2a"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_bringup/launch/navigation.launch.py",
+      "sha256_source": "ead0a3adce21e5c8b24746db8a65ae3e9d6cef16056683b185a712620efc8a60"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_bringup/launch/slam.launch.py",
+      "sha256_source": "d759e9831c3ee578b01ba5fbf2daab9053b7acdedc23ff0c1f8a6fad3272d272"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_bringup/launch/pont.launch.py",
+      "sha256_source": "8a70c6d0d2aa90e429ed816a6fd5e695582bd16f04c0462be755229b7784d15c"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_bringup/rviz/rover.rviz",
+      "sha256_source": "26b844272bf779fa699d8ed17f49423af2805f6bbed0416cf6edefe6c89837fe"
+    },
+    {
+      "path": "software/rover/ros2/src/fieldmind_rover_bringup/resource/fieldmind_rover_bringup",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/rover/tests/web/drone.test.mjs",
+      "sha256_source": "596785076235731f0f075153376af826dadc3b7ca888decf092670445cf44bf3"
+    },
+    {
+      "path": "software/rover/tests/web/teleop.test.mjs",
+      "sha256_source": "fb36776c0656fd79d40fbace9c104dc089f3055039e7976e5d3b80fecce87dc9"
+    },
+    {
+      "path": "software/rover/tests/web/geometrie.test.mjs",
+      "sha256_source": "5dd4104cacc0dfafecd22750169801ce24956b2432a3b2a15ea9aa1457fa2b6c"
+    },
+    {
+      "path": "software/rover/deploiement/calibration/damier_9x6_25mm_A4.pdf",
+      "sha256_source": "926019251f77a3a3ae857cf5253cf7052ca4bd9a285576b092995f2e163d1292"
+    },
+    {
+      "path": "software/rover/deploiement/gx10/Dockerfile.outils",
+      "sha256_source": "d9e3d88c221f556d2ab5e1d2bb81c0b0ad64d210c3f6417078911ccfc7b71116"
+    },
+    {
+      "path": "software/rover/deploiement/gx10/README.md",
+      "sha256_source": "88ba09c5ffa10f59f94cc32acdee7d39c71f27e8f4638084a6a180b1af3758fd"
+    },
+    {
+      "path": "software/rover/deploiement/gx10/Dockerfile.voix",
+      "sha256_source": "a9216895e6247bbc7af1f0ae5b4190b330b4488cb61f1567c1ff89b2b4da4191"
+    },
+    {
+      "path": "software/rover/deploiement/gx10/docker-compose.yml",
+      "sha256_source": "13ec4ab442e691cc8173a7f3a6fcd9af5209a4bdc9cd94cff3817fe883bef77c"
+    },
+    {
+      "path": "software/rover/deploiement/gx10/Dockerfile.whisper",
+      "sha256_source": "9104d7f8dd9455a4ac43080cec7faa3904e57d3f9d8b057e7bd329645037537e"
+    },
+    {
+      "path": "software/rover/deploiement/gx10/verifier.py",
+      "sha256_source": "834e14b9e22ff102432ed5dfd454f86b952f812975bc1d6cc5e075ea4429afc3"
+    },
+    {
+      "path": "software/rover/deploiement/gx10/outils/serveur.py",
+      "sha256_source": "91c40d23f2844735bc8bf35252c60844f9494dfab21c96b7ea7949185e5a2dea"
+    },
+    {
+      "path": "software/deployment/hf_space/publier.py",
+      "sha256_source": "5a880a2c44f5dd102ca7ba309133d06b75d804e462f59b0a66b6813c3839d01a"
+    },
+    {
+      "path": "software/deployment/demo_web/installer.sh",
+      "sha256_source": "43ccdcba4fb1da589f117eac57c99d1d15bc0e07868a15c9410153fc6b0a5d94"
+    },
+    {
+      "path": "software/deployment/demo_web/Caddyfile.modele",
+      "sha256_source": "ea803c0fe45e70b74c3e327f174e46f743d5f97a2b952d0db0be9b826a44b3dc"
+    },
+    {
+      "path": "software/deployment/demo_web/README.md",
+      "sha256_source": "4840379dff4809fe19cca26b32150b0daaac9748eec4b56daa4aeb7954c2ae91"
+    },
+    {
+      "path": "software/deployment/demo_web/fieldmind-demo.service",
+      "sha256_source": "4bc5bdfbb14d2a959205c549be8da1083d9bad920d846b58b7983179037c9e6b"
+    },
+    {
+      "path": "software/esp32/esp_c5/TEST_SERVO.md",
+      "sha256_source": "caae8204150b279b9f7c843001d36096278354e7cd90c865a41f86fdd7ae434f"
+    },
+    {
+      "path": "software/esp32/esp_c5/DIAGNOSTIC_MOTEUR.md",
+      "sha256_source": "330cb0199597e4ef65ff06df53b2cd561248bc4b8ffaf3f403a6c91063aa1d66"
+    },
+    {
+      "path": "software/esp32/esp_c5/INTERFACE_USB.md",
+      "sha256_source": "8c9639f9e22dceab8489c2562889ee7f7038bb97892d0570fdd3c921d16a5b2b"
+    },
+    {
+      "path": "software/esp32/esp_c5/platformio.ini",
+      "sha256_source": "36625a9464dd659b7e93c21632a4071be1fefe6fedc7236e753f0d68a230d9f6"
+    },
+    {
+      "path": "software/esp32/esp_c5/README.md",
+      "sha256_source": "3b6fe63a64a27bd40f2e90947c71873b01e6a44ef30e530f8e2e4a42df39d02d"
+    },
+    {
+      "path": "software/esp32/esp_c5/TEST_TOUT_MOTEUR.md",
+      "sha256_source": "d85efc79ab51a3694efe8caa9151cb039512aa323e95679a72a204329f169012"
+    },
+    {
+      "path": "software/esp32/esp_c5/DEUX_MOTEURS.md",
+      "sha256_source": "607dee1e1dcb56c35d6a491e402eed6ce7f35e004fc5fa92a08846c824d7cf4c"
+    },
+    {
+      "path": "software/esp32/esp_c5/lancer_interface_usb.py",
+      "sha256_source": "3740928e7aaacbf477b80b68307ac95b78a2b9d176a8ecff1c41c65d6738d858"
+    },
+    {
+      "path": "software/esp32/esp_c5/CONNEXION_RASPBERRY.md",
+      "sha256_source": "fb77caf2ee11bb589e19a419526e27d5e5409bcf56274b68c4064b00bc9eac27"
+    },
+    {
+      "path": "software/esp32/esp_c5/interface_usb/serial-link.mjs",
+      "sha256_source": "66ed8e5f773e18260d5457130c5aef323cd9ece5ca4fc7b3d1d8cd78be986487"
+    },
+    {
+      "path": "software/esp32/esp_c5/interface_usb/index.html",
+      "sha256_source": "39262f23c122986b1e13b19a195e691102d15d4e03b3844f1980ee18b7f3c5cb"
+    },
+    {
+      "path": "software/esp32/esp_c5/interface_usb/style.css",
+      "sha256_source": "b306d81e49f5b157009a6fb8c1f49296e78bc4d022eae6d0fd834ea28d32dbf6"
+    },
+    {
+      "path": "software/esp32/esp_c5/interface_usb/app.mjs",
+      "sha256_source": "70b5877a84d211a1f661829a7ec35c8a1925f363c421d99bd1d855f23c627d22"
+    },
+    {
+      "path": "software/esp32/esp_c5/tests/verifier_policy.py",
+      "sha256_source": "0eb74301e7a464eda2520ad2ee604af2138fbdf61094657f64c2215b61efcea9"
+    },
+    {
+      "path": "software/esp32/esp_c5/tests/servo_test.cpp",
+      "sha256_source": "10ce0293a126c281011b11c7ebace41e2e56d1e4b8207fba18aa7eda37b06119"
+    },
+    {
+      "path": "software/esp32/esp_c5/tests/policy_test.cpp",
+      "sha256_source": "1c104880cc67958c8783865dfecff532d903cae39ab7e36f033ea2d40261432e"
+    },
+    {
+      "path": "software/esp32/esp_c5/tests/actionneurs_integration_test.cpp",
+      "sha256_source": "0f4c47969a548712401d463456c767b92175d9a1cace0f080bd2c98188b0dd6b"
+    },
+    {
+      "path": "software/esp32/esp_c5/tests/interface_usb_browser_test.mjs",
+      "sha256_source": "1df9767a7dc8cbb74861d465e629ab488aa58a44730da29ea9723f00679db6cf"
+    },
+    {
+      "path": "software/esp32/esp_c5/tests/servo_angles_test.cpp",
+      "sha256_source": "ae478060a67cfe5620bcc742dd57d0bbc884d51ba90e29539357ed1994b15dab"
+    },
+    {
+      "path": "software/esp32/esp_c5/tests/pwm_combine_test.cpp",
+      "sha256_source": "8960b87c29e0acd02b8a6a103b78e5658bd5ac8a9cfaaa82e3fb51c1f463a155"
+    },
+    {
+      "path": "software/esp32/esp_c5/tests/test_tout_moteur_test.cpp",
+      "sha256_source": "11e42b4949616d78ef86b14a80837692c0596ac1b587147443e5992467d1d067"
+    },
+    {
+      "path": "software/esp32/esp_c5/tests/interface_usb.test.mjs",
+      "sha256_source": "cb93c38e07113d8210a4f009c73b6d31be1a7cffa6e66c28917df6ed9475577b"
+    },
+    {
+      "path": "software/esp32/esp_c5/tests/rover3_test.cpp",
+      "sha256_source": "176538f00d784d6244f4ede39dfe35d732a47d70a35a3364a3ae8ff743a43161"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/moteur_zs_x11d1.h",
+      "sha256_source": "6ecf96ff0240d6e9342792a9b88377bf090eb2fc0eaeb7716350ec4239ed0186"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/pilotage_rover3.h",
+      "sha256_source": "f995144d05524cb1617c9dddbcb147b7c232203510abf5561da9c1352c7cbc56"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/moteur_sorties.h",
+      "sha256_source": "b2bf7c057bceb8af24f795c154b8667956f992d433ed912ec1b60508a6d387b0"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/actionneurs.cpp",
+      "sha256_source": "945f3ea3c3d59d1c523d8a2775858fd1ec6eb64bfc9519d5649c53d804b8d4c2"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/moteur_zs_x11d1.cpp",
+      "sha256_source": "a6c6f05184aeaeb72398134e7a741daddf776c1baa7ab5df152793f2bb69a6be"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/test_tout_moteur_pwm.h",
+      "sha256_source": "82eae1bdb2ea1ce41d881666dd2563b85a388d6a759cabf5610c85b92869bdb7"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/actionneurs.h",
+      "sha256_source": "0cfaad6a3433869678b4ac993ca0ba3c9f59071d49bffcf201f56c0b199346ea"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/test_tout_moteur_logique.h",
+      "sha256_source": "6e4fe5963e6daf4931a5c91cdb389d9213de6634fc3421df93a98dba9b8b2373"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/moteur_policy.h",
+      "sha256_source": "c226515d8b9e5182914e5e432ba6fbf019ae08f29e2c31b595d9b9473e1c7c08"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/drone_wifi.cpp",
+      "sha256_source": "9bf37687877d7962801e394436ec3531024d419295e666b14e1f944fd88444e3"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/console_serie.h",
+      "sha256_source": "83234eede83f96a39f846ac2d1ad5902df9b1dc23276a5802daad9ac1429d4a9"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/servo_angles.h",
+      "sha256_source": "9779c047b72ff9ff88416775ba21f5505ec861c25c49edceb8aea193a37f2ae3"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/test_tout_moteur.cpp",
+      "sha256_source": "1e122fb66c9afbcaf88a46d1439562a364c6f8c986cf0e90eb0c1df4f9c1d8dd"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/roues_sc.h",
+      "sha256_source": "6bc6c09cfb1cccfb979d261642c1ccb7fe20fcf91dcd6ce0e628ada342555034"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/test_moteur.cpp",
+      "sha256_source": "8f05cd5ea6ff3522d4068ad42ad6fe918de205a69bdd7bb701b4f1f524460eea"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/centrale_lacet.h",
+      "sha256_source": "66855013d7113848dd51d6012f8314259512b4ad6ed39c09d96440fd6b895a21"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/servo_test_reglages.h",
+      "sha256_source": "bea8102e43d9e83d387d9198d2e0e0ff362bd05a4974d52349a4fd4ac2b59912"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/test_tout_moteur_broches.h",
+      "sha256_source": "4b382ed29b55070caaf2339ef88fff2b2e76be28eb906c722b2df8b59f2cd9d5"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/main.cpp",
+      "sha256_source": "9d97994c4fe1f912960ea79d08dda8afcaaea02c2ce595a2281c9a4dbab41b06"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/drone_wifi.h",
+      "sha256_source": "741e0bc27978434256aa9b28545c1eccd60dcc1edb64455f118ddab895acc795"
+    },
+    {
+      "path": "software/esp32/esp_c5/src/test_servo.cpp",
+      "sha256_source": "6f79ca42ee0b868795609d7c8cf53a5cfd94cb09831b321c4b996b7ddef78275"
+    },
+    {
+      "path": "software/esp32/esp_c5/tests/actionneurs_stubs/Preferences.h",
+      "sha256_source": "3daabb76ddde918ed4dc72e4bf61fbb104ffb26c4606fd90b91fa8a5b9fdf5cf"
+    },
+    {
+      "path": "software/esp32/esp_c5/tests/actionneurs_stubs/ESP32Servo.h",
+      "sha256_source": "5566bfa5e73d1766303171b8d10d687b3be3c7d6efbd6705360ec33a852b1abf"
+    },
+    {
+      "path": "software/esp32/esp_c5/tests/actionneurs_stubs/Arduino.h",
+      "sha256_source": "9097a822e28436ae7976ad3c945e9075d4a6f545010e32101fe35097a8f62ec0"
+    },
+    {
+      "path": "software/esp32/esp_c5/tests/pwm_stubs/esp32-hal-periman.h",
+      "sha256_source": "86ba7bbebf02cf0c7ff9f4ba57ecabc868216a19fdb0eb497bb5b05df9217578"
+    },
+    {
+      "path": "software/esp32/esp_c5/tests/pwm_stubs/esp32-hal-ledc.h",
+      "sha256_source": "f9fda78aad41bb43d93e5bde218928284190a413514ac34558fa4743ba83f23a"
+    },
+    {
+      "path": "software/esp32/esp_c5/tests/pwm_stubs/driver/ledc.h",
+      "sha256_source": "2d78d13ca7f89d101fc9b2ffc60503af55e23d65715c415feec628d90554d6dd"
+    },
+    {
+      "path": "software/esp32/esp_c5/tests/actionneurs_stubs/driver/gpio.h",
+      "sha256_source": "bea99e99d63071b836d58c3aea8fdc89faee196e80ea6c1ec0b41c8041289e16"
+    },
+    {
+      "path": "software/ros2/outils/parcours_piste.py",
+      "sha256_source": "2256403328ceefbec1bae4074e8e595cfb35d76f7fcce972bdbda3daf56e455a"
+    },
+    {
+      "path": "software/ros2/packages/COLCON_IGNORE",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_simulation/package.xml",
+      "sha256_source": "984ee488bf61520b28b0319927c1cba48b2aba49dbbaa86e65233fb19875a29e"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_simulation/CREDITS.md",
+      "sha256_source": "1b75338eb68c3fbc6533a017adc4c5d6ef8aa5ef58f5187c7be8325d324dea48"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_simulation/setup.py",
+      "sha256_source": "bd0789469209f79f9db8711e472b0fad3876e90ecee60c129a12a8697b6b7671"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_simulation/setup.cfg",
+      "sha256_source": "5dc6e5dee96d598b36224c40cb6c2e62d3e17e14f7213fe457f9962c683bde8d"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_description/CMakeLists.txt",
+      "sha256_source": "603a7d8e00eb0db09b8bd794f30734bd82d7404bfa81c29b9bc6ca2bf945af1f"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_description/package.xml",
+      "sha256_source": "4521287784495737ccc5b09d543a81984f41243b02bdd01eaf9bc35adae0dea7"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_perception/package.xml",
+      "sha256_source": "4d8b92210f28625821331b5ecd40ddcc116377bb01714b1f2a9eaaabceeed1a7"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_perception/setup.py",
+      "sha256_source": "42b70eee644cd4c26aeaa5c3ff0ae8bb1ad007eff0004f01048d2683230fc750"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_perception/setup.cfg",
+      "sha256_source": "06e619b3d316b99aac632d78dd06081158f832bb886eb55a0aac2d2dc465f384"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_bringup/package.xml",
+      "sha256_source": "c2302e6d17920eba4a34b227c1e4c172380e6cdedd47caa33c6ec81eb952e4ee"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_bringup/setup.py",
+      "sha256_source": "372a3b06320e0d4625462991fcc20b3df7ad2e95892e15939d0a73638c90ca6d"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_bringup/setup.cfg",
+      "sha256_source": "fa6e4bc374648256a1d8c9feffe1fc6dab410820beec44a6b1d435ae193f244a"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_bringup/config/nav2.yaml",
+      "sha256_source": "9c432770009efd6ee3f7a213f81e52320877e194de60ffbf760f81972a65d701"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_bringup/config/ekf.yaml",
+      "sha256_source": "26bd158f717d9a383a0ad7986c292eadfb21e27ebecbe755a1d2dae8303b8dd9"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_bringup/config/slam.yaml",
+      "sha256_source": "544283845bb6361116a03daf1284cee1a00c5abe735c0a126054c4f9237693d2"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_bringup/config/naviguer_points_ackermann.xml",
+      "sha256_source": "8c27bfbcb78ad645e897e56e3c5c0a4f72ce6f279ea8ce391f68049373263d22"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_bringup/config/naviguer_ackermann.xml",
+      "sha256_source": "e9dfc0d4314c55604ee64d7bb6912e0a968e89c72379d71f0fe0b6a58ed1e65f"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_bringup/launch/autonomie.launch.py",
+      "sha256_source": "6a70231f98ab5a21ae204d012b44b5a8f01fc706d69bb47f2d40b433399742cf"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_bringup/fieldmind_bringup/__init__.py",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_bringup/resource/fieldmind_bringup",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_perception/test/test_elevation.py",
+      "sha256_source": "09ccf80b68c7323c8d0ade6f0e3ad79e86fc78c1703610adc1906499353929df"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_perception/fieldmind_perception/elevation.py",
+      "sha256_source": "9c22f93ebc2081a8ac3f80d69881e37416243236b4facf64479368fd604cdb40"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_perception/fieldmind_perception/__init__.py",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_perception/fieldmind_perception/traversabilite.py",
+      "sha256_source": "010dde9010f5f987768a71f2fe1bace89fd4be4a4da534882de8a7dfcc75ef19"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_perception/resource/fieldmind_perception",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_description/urdf/rover.urdf.xacro",
+      "sha256_source": "a21d6e12eef6c5013f572e7fb2acb2ee165ff03d19eb5b4f10cd61b125861cbc"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_simulation/fieldmind_simulation/__init__.py",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_simulation/fieldmind_simulation/controleur_embarque.py",
+      "sha256_source": "fba5c73d83a75874e797b6a39cbbb38df05ee6a42ba10def41691787b67ea99b"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_simulation/fieldmind_simulation/recepteur_gnss.py",
+      "sha256_source": "5fc9745205064ca20a243e47d729942e493062d34da489bf5bb47c5114938da9"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_simulation/fieldmind_simulation/generateur_monde.py",
+      "sha256_source": "071e815302ed1df6d59c894daef04cff3d3d069ea84c77fa7208338b335352a1"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_simulation/config/pont_gz.yaml",
+      "sha256_source": "d96f2b9100173f497d420f206e4c6ef8f48f702ad59a80f4806f9d62688c30ee"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_simulation/launch/simulation.launch.py",
+      "sha256_source": "d404427315d618aeffe341285ba84448c7afaec9267db1d5f02ecfd34bd68a6b"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_simulation/worlds/essai_plat.sdf",
+      "sha256_source": "7e8865288db66dcf968fd36050cc8520acacd61fd247fc66d75575171d05f30b"
+    },
+    {
+      "path": "software/ros2/src/fieldmind_simulation/resource/fieldmind_simulation",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/ros2/packages/fieldmind_pont/package.xml",
+      "sha256_source": "3024e42825100d1ee12e2d8262584cc897a179dd115a2bb1487d6a0e15a87b94"
+    },
+    {
+      "path": "software/ros2/packages/fieldmind_pont/README.md",
+      "sha256_source": "92e7a7207ecd3a8233a7b636e29a6a6c4cc23bf1f7bf037e18f698762700d78d"
+    },
+    {
+      "path": "software/ros2/packages/fieldmind_pont/setup.py",
+      "sha256_source": "1139de04d40452df0a8d7cf772d42facbe0e25fef739a1b9c15421f3434557e8"
+    },
+    {
+      "path": "software/ros2/packages/fieldmind_pont/setup.cfg",
+      "sha256_source": "d8e1e5e548ef19d7194bfc2b3bb234d7383662de61261afb78925e02a5f6c11a"
+    },
+    {
+      "path": "software/ros2/packages/fieldmind_pont/fieldmind_pont/conversions.py",
+      "sha256_source": "10ebbd05f8d32b8ce4b5c1716d37e901d60f1c5dcaa3e52c0b06c9df4962a710"
+    },
+    {
+      "path": "software/ros2/packages/fieldmind_pont/fieldmind_pont/__init__.py",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/ros2/packages/fieldmind_pont/fieldmind_pont/noeud.py",
+      "sha256_source": "3542b205878c3d329bf97f187cbfdc940c88c67e2584264e1023477ddce84c1e"
+    },
+    {
+      "path": "software/ros2/packages/fieldmind_pont/config/pont.yaml",
+      "sha256_source": "3b7ca56d0ea55030af6b1d485c185f227f325330bc456ac855bf2b66815421e5"
+    },
+    {
+      "path": "software/ros2/packages/fieldmind_pont/launch/pont.launch.py",
+      "sha256_source": "af4cd906785b7c2b76d055acace71e8d3e52fe246ab9e8798797c1a22c1269a8"
+    },
+    {
+      "path": "software/ros2/packages/fieldmind_pont/resource/fieldmind_pont",
+      "sha256_source": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "software/simulation/scenarios/foret_demo.json",
+      "sha256_source": "3f7fc39ea1f66e78fff6956bde064ec7601496008bec4bda6b65be56553ad877"
+    },
+    {
+      "path": "software/tests/js/repere.test.js",
+      "sha256_source": "1ce477c059fea1df71b6c361e9f6ec102ac173ed91870904cad3387bb32b10c2"
+    },
+    {
+      "path": "software/outils/blender/exporter_rover_glb.py",
+      "sha256_source": "ab180a83d3ef6d4b3dd8d0c64ebda0c3f98e142c532e29a651adff4a4ef24fcb"
+    },
+    {
+      "path": "software/interface/web/index.html",
+      "sha256_source": "171a0e6fb1c7a2c8574ecfc85969c8b4b1be6f31f629b19d93fc347e746c09c4"
+    },
+    {
+      "path": "software/interface/web/favicon.svg",
+      "sha256_source": "f12029c252230e8c5916da864abed2391ef46186c27fc4977cf4cd5ee1b6603b"
+    },
+    {
+      "path": "software/interface/web/css/style.css",
+      "sha256_source": "fd924be4870ff3a9a2288f8417e59aa94e194f32999d032208c6aa584513d316"
+    },
+    {
+      "path": "software/interface/web/modeles/rover_v3.rig.json",
+      "sha256_source": "474ce02950e4b6249882e3259a3c529a9af1a835257c7db7843d7b7756b2d15b"
+    },
+    {
+      "path": "software/interface/web/modeles/rover_v3.glb",
+      "sha256_source": "d9bbf6d8668016f0dd441a5b9e2978b874a8e9f43a88d2af49e8b4d1e2446bd8"
+    },
+    {
+      "path": "software/interface/web/js/scene3d.js",
+      "sha256_source": "9e1d0d1429cf74d3be3ebc257cd65901812abc234fab6ee79cf6c52fd8b8993f"
+    },
+    {
+      "path": "software/interface/web/js/clavier.js",
+      "sha256_source": "454b36186f57aec613183603c47767d5b012699a827d3ea9b8202a17612836c9"
+    },
+    {
+      "path": "software/interface/web/js/minicarte.js",
+      "sha256_source": "3b9650fd967cafe6509cb9576ee9d6c0362e32d6a574b7352edfa3b9fae3397c"
+    },
+    {
+      "path": "software/interface/web/js/polaire.js",
+      "sha256_source": "5b6184237cf06ca0d82da2411538ea18ff1640b03cffe54032bb84c9bcb64244"
+    },
+    {
+      "path": "software/interface/web/js/courbe.js",
+      "sha256_source": "988707ddaf3ff98d90fbd0c59560727813c436e1c7881d7fedd9a1700f8ddb95"
+    },
+    {
+      "path": "software/interface/web/js/repere.js",
+      "sha256_source": "bbf7b6f9e5188835c7a343971000bb2723ca99ff98cf372c556f60fcefac7729"
+    },
+    {
+      "path": "software/interface/web/js/rover3d.js",
+      "sha256_source": "3058edb38a6be78a98d1cdf15e892d827d96b6c2d1e9a26e2a0db553f6d0c5ca"
+    },
+    {
+      "path": "software/interface/web/js/vision.js",
+      "sha256_source": "10510a213475b6e2ea876c0c2186a76c554d172ada3b17df284a8b55011a3cf8"
+    },
+    {
+      "path": "software/interface/web/js/connexion.js",
+      "sha256_source": "1a835afdbabe5cea6b92a9c305839a1a0e18dde2a75f269112102cf9a1b6b51e"
+    },
+    {
+      "path": "software/interface/web/js/foret3d.js",
+      "sha256_source": "09566bea4e13e9a7708f56da6e34adb270673ff1721f82dd48b00368fc691864"
+    },
+    {
+      "path": "software/interface/web/js/telemetrie.js",
+      "sha256_source": "d28fbbe815a3c723875844afcd5130aefa58d4ff6b019b14a96906bee214a477"
+    },
+    {
+      "path": "software/interface/web/js/main.js",
+      "sha256_source": "0d2dafeba007f9864466b917b16a19eb3a36147046911060cd2d06e6579efda1"
+    },
+    {
+      "path": "software/interface/web/js/vue_reconstruite.js",
+      "sha256_source": "0b93341230610662d31bec1f3a2fa757772cc2a5dd1106366b130598d677a12c"
+    },
+    {
+      "path": "software/interface/web/vendor/three/three.module.js",
+      "sha256_source": "9052042d676cb0fdc1ddfefe193053f34b7ac0513a616fdac4535d49987812ea"
+    },
+    {
+      "path": "software/interface/web/vendor/three/LICENSE",
+      "sha256_source": "8b378ebe60e2fe500158cb0ac71cb5e8b7d92953c2abcc63a0eb90499653b5bc"
+    },
+    {
+      "path": "software/interface/web/vendor/three/three.core.js",
+      "sha256_source": "9edde002b066a9a05676a6127f67735b62baf399bdea529f2f7e31657da769e6"
+    },
+    {
+      "path": "software/interface/web/vendor/three/VERSION.txt",
+      "sha256_source": "21acc7296a9f8523473747049ced7fa31b3a3dd6c499d10c471cac19e3842147"
+    },
+    {
+      "path": "software/interface/web/vendor/three/addons/utils/SkeletonUtils.js",
+      "sha256_source": "b1632a703206c3d830de9fcbe515696770d04b71a15ee6b50afa6d2c3298c86f"
+    },
+    {
+      "path": "software/interface/web/vendor/three/addons/utils/BufferGeometryUtils.js",
+      "sha256_source": "9fb63427ce6641fa14fd0baff9cc4d1b5f9c3d85fd084bf2e90e803c44ec1797"
+    },
+    {
+      "path": "software/interface/web/vendor/three/addons/libs/meshopt_decoder.module.js",
+      "sha256_source": "d428e73a000057c6c94bfcedc3412d0c2dc14ca8800e88553aab05113ad2bf19"
+    },
+    {
+      "path": "software/interface/web/vendor/three/addons/controls/OrbitControls.js",
+      "sha256_source": "3d79d07ecb686b4e5d93232eedab255331c1beef711e13164eaa1f68655a5f2b"
+    },
+    {
+      "path": "software/interface/web/vendor/three/addons/loaders/GLTFLoader.js",
+      "sha256_source": "131c0f78c01d19368ae495caa65b3adaa10487810a36a05bb5901b769a35ac16"
+    },
+    {
+      "path": "cao/prototype_final/support_moteur_v2_bilan.json",
+      "sha256_source": "1be32b79017ea85b8ff20e447e00cf72bca3051521c3b1d1da30f4bb08014695"
+    },
+    {
+      "path": "cao/prototype_final/VISSERIE.md",
+      "sha256_source": "18ae0a16e338e5478ef8d1064e0f5ae846e10387f45f74b2334fd3563664dbd1"
+    },
+    {
+      "path": "cao/prototype_final/masses.json",
+      "sha256_source": "d589ae10f8676fd41188b6b169433b9e45f12a63769a82e5d96cf970687246b6"
+    },
+    {
+      "path": "cao/prototype_final/centre_de_gravite.json",
+      "sha256_source": "1cf1e0890ab489c9c803462688c2e0f998ae56abf1dab8435fc7108687816c79"
+    },
+    {
+      "path": "cao/prototype_final/README.md",
+      "sha256_source": "f2ba3efeb19db36b43b2b5f71a26f43268a9f376f5dc21eaead41189efc3c9b9"
+    },
+    {
+      "path": "cao/prototype_final/trous_composants.json",
+      "sha256_source": "352595edf47c8587cf6e43b0dc714155844786f801f4eca4da0198373602f6ee"
+    },
+    {
+      "path": "cao/prototype_final/verification_prototype_final.json",
+      "sha256_source": "f309b8bdba6cb5b36093b116be2b04f93539d10c6bbf2ad4241ca42f2752ff8a"
+    },
+    {
+      "path": "cao/prototype_final/VISSERIE.csv",
+      "sha256_source": "e0fb01f001fdff42055d1d996a52aec67735d754c8a3b0805102df86e9ead32a"
+    },
+    {
+      "path": "cao/prototype_final/plan_percages.json",
+      "sha256_source": "ca371434f9ba931e12331fb65b41dcb2588f27b4473aa11686caa2dcae81eec5"
+    },
+    {
+      "path": "cao/prototype_final/coque_bilan.json",
+      "sha256_source": "b8cc9cf343e9e359007e39bc3c0b840b02aeda1d81d6e5ad4389a144daf9203e"
+    },
+    {
+      "path": "cao/prototype_final/vues/08_mats_90.png",
+      "sha256_source": "fff77f3e192da40bfa1ea42a858c1dc77140152b8a18f264168f8a4b61b7fd19"
+    },
+    {
+      "path": "cao/prototype_final/vues/09_mat_lidar_rehausse.png",
+      "sha256_source": "0e3e764edb55c0f62bec9e118255c49e1c8012847efaf97a79579fad21fe2743"
+    },
+    {
+      "path": "cao/prototype_final/vues/16_incrustation_fieldmind.png",
+      "sha256_source": "3e8921566773798fc222eae3d25e8d69d5124f71e69b62694f9beba9452ba2ae"
+    },
+    {
+      "path": "cao/prototype_final/vues/01_ensemble_avant.png",
+      "sha256_source": "c43864db118ddb405fddfd4cd6047f06fe307d546bdad99c0e7f4e0984e1877b"
+    },
+    {
+      "path": "cao/prototype_final/vues/05_ecran_knob.png",
+      "sha256_source": "2497a68b0501266358e0b97cc73374c4d7e9a9fb030bbb9474e72ae63018065d"
+    },
+    {
+      "path": "cao/prototype_final/vues/18_couleurs_coque.png",
+      "sha256_source": "ef22aaf5b3b5602d0b41453a4134e961b38da7476d994b0fee811718f4634435"
+    },
+    {
+      "path": "cao/prototype_final/vues/15_incrustations.png",
+      "sha256_source": "e98fb98eb35c1cd574b6ba6298de1076e7fb0382fa097bea8626482526a2665d"
+    },
+    {
+      "path": "cao/prototype_final/vues/12_mat_lidar_coque.png",
+      "sha256_source": "465feb278b366a39cad069711a291af0f3eb53ebaca2e5589feb8b14475d1788"
+    },
+    {
+      "path": "cao/prototype_final/vues/10_equilibrage_dessus.png",
+      "sha256_source": "183f77804742cf7c2a69debd0553cd94adb8a39181235d341bca3c6838ba2b8e"
+    },
+    {
+      "path": "cao/prototype_final/vues/13_support_lidar_dessous.png",
+      "sha256_source": "136a30f56a92aa3695a863fa9ca5072ed59b6718f07053712de58ffc852101bd"
+    },
+    {
+      "path": "cao/prototype_final/vues/14_support_moteur_v1_v2.png",
+      "sha256_source": "84c5408770b779b831fd58b22e935f72d8b93b8bc8bc69637b2f600d652d4ab8"
+    },
+    {
+      "path": "cao/prototype_final/vues/11_mat_lidar_manchon.png",
+      "sha256_source": "c853977ff8e93f495f430bc7d1c89adcb23c5e8f03835f23f1f6827ac3955b97"
+    },
+    {
+      "path": "cao/prototype_final/vues/04_flanc_gauche.png",
+      "sha256_source": "62d5fddfa30b29339e62b41bcdb8831e7fa3dc9f9be2e898255b3aa779ad3e42"
+    },
+    {
+      "path": "cao/prototype_final/vues/02_coque_dessus.png",
+      "sha256_source": "4250b8c29f109d7f60045fdbb01c22cef1e3afd3859944d2182cf5d0a51af611"
+    },
+    {
+      "path": "cao/prototype_final/vues/06_roue_arriere.png",
+      "sha256_source": "6e89ec1bd80b7d3f6e296927381cf209673767c0a23bcc9a2523f2cdb4bdd659"
+    },
+    {
+      "path": "cao/prototype_final/remorque/remorque_bilan.json",
+      "sha256_source": "d4f963a905b6667d95cf302a738fc68bfb83c22bb3585a16b18eb10fffd16369"
+    },
+    {
+      "path": "cao/prototype_final/remorque/verification_attelage.json",
+      "sha256_source": "26eb8de14c295b71da67d85d2a18a813f0de4d15cbf15fd4085cf0ea8414c3d6"
+    },
+    {
+      "path": "cao/prototype_final/remorque/chape_bilan.json",
+      "sha256_source": "eab24642d0a24ef312261ac40f91f37f4d74d2ba783f34b55e975da6664af26a"
+    },
+    {
+      "path": "cao/prototype_final/remorque/README.md",
+      "sha256_source": "57c45a4bf8780f355976b2d4f7a5599b1bd41af7f3a5dd0d7af4abf85b152443"
+    },
+    {
+      "path": "cao/prototype_final/remorque/verification_remorque.json",
+      "sha256_source": "abae3e6567722c6bd4900c1e9d52ab2a26863ecc4195dcdd3aa89f5e7f7935f2"
+    },
+    {
+      "path": "cao/prototype_final/exports/support_xl4015_gabarit.png",
+      "sha256_source": "b958366682b78f3778572026baa00426f2d9ecd183663a042abb40456936b697"
+    },
+    {
+      "path": "cao/prototype_final/exports/support_xl4015_gabarit.pdf",
+      "sha256_source": "56e89921ef285e887cf15b512920f606f6bff44db44a3525e798cc9e68f93b27"
+    },
+    {
+      "path": "cao/prototype_final/exports/support_xl4015_gabarit.svg",
+      "sha256_source": "76e4241545d00397b156deba8c72de6865b71d76491ea3f94159cc1de350141d"
+    },
+    {
+      "path": "cao/prototype_final/exports/support_xl4015.json",
+      "sha256_source": "42fd243b9bd28de3d11dc4949c104dc94d5d568ec5e7a016e5cf2c68c5db41b1"
+    },
+    {
+      "path": "cao/prototype_final/exports/manifest.json",
+      "sha256_source": "c8f1f4459e61891e3bb6c03ae8eec1e01f15a9600310d2f36151486bf6048fe3"
+    },
+    {
+      "path": "cao/prototype_final/scripts/10_support_xl4015.py",
+      "sha256_source": "e0924886a248c6aebd37cc53e74dbc89ccc59458f2330156d2daafddb2f0bebf"
+    },
+    {
+      "path": "cao/prototype_final/scripts/04_exporter.py",
+      "sha256_source": "2facd0d33b8c87631e1895a3595afaa1cc2e307c6f1f3bc9b433ea50714b6ea8"
+    },
+    {
+      "path": "cao/prototype_final/scripts/06_plan_percages.py",
+      "sha256_source": "e10f87c3f95cd3c0a988e4bee9014f8ea764e69b2af34d269458de6ff50940bc"
+    },
+    {
+      "path": "cao/prototype_final/scripts/08_roues_arriere.py",
+      "sha256_source": "921ee05138fd6fb6f3ee2547fc73279ea26d8ee226fe27888c513cf97cf6f54c"
+    },
+    {
+      "path": "cao/prototype_final/scripts/03_verifier.py",
+      "sha256_source": "813f2b5b3359e51e9aba3b37646e234c1e9d330ca6f002ac9c1773a2844ba8e2"
+    },
+    {
+      "path": "cao/prototype_final/scripts/pf_helpers.py",
+      "sha256_source": "c9b2d0607adc873815a4397a64de48dce903d45595e32c7705a9ce7541a375b2"
+    },
+    {
+      "path": "cao/prototype_final/scripts/01_composants.py",
+      "sha256_source": "84eaefc037e46c60cd8c17fdc4f04189541a8b01196f0b43288d6ca3d0aff075"
+    },
+    {
+      "path": "cao/prototype_final/scripts/07_apparences.py",
+      "sha256_source": "2569e7b91d535c35d6db04891de4024a66e6a902937508e4a2e6662ceb058b05"
+    },
+    {
+      "path": "cao/prototype_final/scripts/02_coque.py",
+      "sha256_source": "4d4f7713b0eb5a3e5067831b4dd7e25340f1e2d9e8e834bd2003503f934d06cf"
+    },
+    {
+      "path": "cao/prototype_final/scripts/15_ouverture_coque_lidar.py",
+      "sha256_source": "9ccf405b1578f34073186a470da9231099517218eb39e1b69092c92dbec75e8b"
+    },
+    {
+      "path": "cao/prototype_final/scripts/17_supports_pivot.py",
+      "sha256_source": "a2c44da3c97dca68761d71c5b1d58829d66d27f4101b80a062ed0408a15dcb92"
+    },
+    {
+      "path": "cao/prototype_final/scripts/12_mats_profiles_90.py",
+      "sha256_source": "86b461ad4815ffc5464060ed5ea47286451ba383ae3a2de6039a51030d3591a6"
+    },
+    {
+      "path": "cao/prototype_final/scripts/18_document_supports.py",
+      "sha256_source": "9b98dab75a51ab3810a89a211eb2ae3d932693974a98e07c4ae8267472993198"
+    },
+    {
+      "path": "cao/prototype_final/scripts/20_incrustations.py",
+      "sha256_source": "9e0b20c196d7cf2e14418cdf21c1e3ea7f06745a61846723320ed064e83c14ef"
+    },
+    {
+      "path": "cao/prototype_final/scripts/20_support_moteur_v2.py",
+      "sha256_source": "3054518443a45fc6162aeef63d03652f052dea23b186c939d3c54471746b4ffe"
+    },
+    {
+      "path": "cao/prototype_final/scripts/14_batterie_avant.py",
+      "sha256_source": "d66bb2eb66215185b76f7c4a1639825f97d1dabda4c67ecf8960c97733257f55"
+    },
+    {
+      "path": "cao/prototype_final/scripts/21_planche_10mm.py",
+      "sha256_source": "e97ee8d52d31178cd53c6dc4a0e5498d8041943afd50f93d25472acadeae93fe"
+    },
+    {
+      "path": "cao/prototype_final/scripts/11_gabarit_xl4015.py",
+      "sha256_source": "3ccf61fbcfdf0a9da5d9b5807d2232210a20a8b48fb1ac2df632ac151882dc50"
+    },
+    {
+      "path": "cao/prototype_final/scripts/09_plans_atelier.py",
+      "sha256_source": "a41ff1092a51c0f43d87b6d85f78c1f08757e0dbc1a94ae6237cb34dc2ed78bc"
+    },
+    {
+      "path": "cao/prototype_final/scripts/16_supports_moteurs.py",
+      "sha256_source": "c29ed6be050b09572fe96735d2c46d81f704b177050af0cf830d6526308f5b03"
+    },
+    {
+      "path": "cao/prototype_final/scripts/19_fusees_renfort.py",
+      "sha256_source": "083f7f8f026b2bbf38144173ea6516ca504bf29bd06c737b486b3edead37b645"
+    },
+    {
+      "path": "cao/prototype_final/scripts/05_percages.py",
+      "sha256_source": "659f89e4435ddc953acb6b3ce76330e0e0c9c6591cab112363864241e9dd4534"
+    },
+    {
+      "path": "cao/prototype_final/scripts/13_centre_de_gravite.py",
+      "sha256_source": "c1eab8c70cd5f3c8b4a97dbbbe0d1942349d405c36ce9626d9de00fbf9961093"
+    },
+    {
+      "path": "cao/prototype_final/plan_percages/page_3_gabarit_B1.svg",
+      "sha256_source": "f905357bd6222c08eec594459fea95de8cabd909519cf10077fc3149dbebd550"
+    },
+    {
+      "path": "cao/prototype_final/plan_percages/page_3_gabarit_B2.svg",
+      "sha256_source": "83cb1eb64eb50325aa8751f89b1e45a303252fd53b5b262a0f6de1a102751d69"
+    },
+    {
+      "path": "cao/prototype_final/plan_percages/plan_percages.pdf",
+      "sha256_source": "56fc298cd2aaba16cd47d9b2173847a58254f5a598fe46488b5580662e17625a"
+    },
+    {
+      "path": "cao/prototype_final/plan_percages/plan_percages.png",
+      "sha256_source": "187bcb8ce2e797ddf78b9fb77cc1dd18a78415e78240fa66b550637aa9939350"
+    },
+    {
+      "path": "cao/prototype_final/plan_percages/page_1_plan.svg",
+      "sha256_source": "c768ef47a03e278d2007ae56801794308a8ecabada7666cec968c671837ac8cf"
+    },
+    {
+      "path": "cao/prototype_final/plan_percages/page_3_gabarit_A2.svg",
+      "sha256_source": "27d29b61dccaac8b8a78f17a527dabdb41ba59f828b356c9137468aa1c37c7b3"
+    },
+    {
+      "path": "cao/prototype_final/plan_percages/page_2_coordonnees.svg",
+      "sha256_source": "c5eedb12aecf5190de8260b9f98aeb844cfc16c58407d2f9d34dbc2847caf702"
+    },
+    {
+      "path": "cao/prototype_final/plan_percages/page_3_gabarit_A1.svg",
+      "sha256_source": "bd3d4b3920c890cad9e7e5e4aded18731aa36719cf14441b177264132d9f5621"
+    },
+    {
+      "path": "cao/prototype_final/plans_atelier/page_2_remorque_percage.svg",
+      "sha256_source": "dcfa753d0af2352b40594080caee9513f15f3c86a65cf68ee39b8c3746fece2e"
+    },
+    {
+      "path": "cao/prototype_final/plans_atelier/page_1_remorque_decoupe.svg",
+      "sha256_source": "4ad8639327169d7b50788d2e0e2caec8055d2dc95cb8d4d5cb175dffc9a8d9e9"
+    },
+    {
+      "path": "cao/prototype_final/plans_atelier/page_6_rover_tableau.png",
+      "sha256_source": "55f114e013f6744d7b4b995f6d48072df8b83ae52acae78760c93b9735ceb918"
+    },
+    {
+      "path": "cao/prototype_final/plans_atelier/page_3_remorque_tableau.svg",
+      "sha256_source": "c3cfa288f3593a7ddafd51236a815cb8c237e330eef0d58fba683ddc1ad7f539"
+    },
+    {
+      "path": "cao/prototype_final/plans_atelier/page_5_rover_percage.png",
+      "sha256_source": "9edffe7569145ed015dd32c514979df0f464cb5888d936b997270fd434eed76f"
+    },
+    {
+      "path": "cao/prototype_final/plans_atelier/page_3_remorque_tableau.png",
+      "sha256_source": "7d74b04ea04077827e61fcf7dc76ea75e1c390d172d7be9e7ba2a2a63fbef427"
+    },
+    {
+      "path": "cao/prototype_final/plans_atelier/page_6_rover_tableau.svg",
+      "sha256_source": "a0668d9554dcf9da1aa3cc8b6e70582d5a585f7c096d8f44ff5229ec0d1b862a"
+    },
+    {
+      "path": "cao/prototype_final/plans_atelier/page_5_rover_percage.svg",
+      "sha256_source": "e78e0a6bd4de1e1074261ce4635d02b456260fb3891eeb1148c0359ef2ab1857"
+    },
+    {
+      "path": "cao/prototype_final/plans_atelier/page_1_remorque_decoupe.png",
+      "sha256_source": "cee6c40f87ccc3166a4a9b033496f74dc6e6ec5403c8d089076a9ed18e43c90e"
+    },
+    {
+      "path": "cao/prototype_final/plans_atelier/page_2_remorque_percage.png",
+      "sha256_source": "8296252833a9c39d365353085aba5bc6eedfee551b74af3303cc89d28cd3cf3a"
+    },
+    {
+      "path": "cao/prototype_final/plans_atelier/page_4_volets_percage.png",
+      "sha256_source": "dfec5af5b5658503059ac87a178f590c205debc7ff9446f71751a33894380255"
+    },
+    {
+      "path": "cao/prototype_final/plans_atelier/plans_atelier.pdf",
+      "sha256_source": "32f8b96f638af4da85edc5c62c4decbd1622b5f87f6e3e49ce1be79675af9ef6"
+    },
+    {
+      "path": "cao/prototype_final/plans_atelier/page_4_volets_percage.svg",
+      "sha256_source": "47c93e390e6a3068cf0b20b41a22fc1b4b8ca81bdb86291d56de0e6aff930c48"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/incrustation_FIELDMIND_G.stl",
+      "sha256_source": "ce3aaea1f9f28e2223d1ea7019534670ae1ae7572a35328505b3fb913d282b2d"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/incrustation_FIELDMIND_D.stl",
+      "sha256_source": "5c7a08f470cdd81f1b61a4d89a9f69f8664c29ab3c7dc3215e125eead34cae81"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/coque_C2_bande_avant.stl",
+      "sha256_source": "7267a186d79a0b29e6ebd29741e704cf059346270879057325cfbe7b3beef009"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/support_moteur_arriere_v2.stl",
+      "sha256_source": "fbe602e72733bdcf46f068356435e27815e261ee4abf5c8f7781a2c61321bfb7"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/coque_D2_flanc_avant_droit.stl",
+      "sha256_source": "35778abe86991416defe2bea2a8d513141a9af28ea130fdffd66563576b7c924"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/palonnier_planche_10mm.stl",
+      "sha256_source": "797be6e797047bafb232c2ba0062c63c235f05f6e8558841cdafe8e6d2c97d29"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/coque_G3_flanc_milieu_gauche.stl",
+      "sha256_source": "a72f4287666d5745ec305e6d9b75381d88e8d0ef649ee7e12607326a40817768"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/coque_D3_flanc_milieu_droit.stl",
+      "sha256_source": "ddf701c16494460ed76fbdbd191b1085600b5463420cc62b0f9a1ca06123f340"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/fusee_renforcee_G.stl",
+      "sha256_source": "bad4bb142571745fa5fad212e94f18967d4119d04d86927e3f7afaed591e3e6d"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/capuchon_knob.stl",
+      "sha256_source": "bae609b01eee1f561a4892dafdc53ca99711cd1cb2a9bc8f7af9a9f355b71db3"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/coque_G1_nez_gauche.stl",
+      "sha256_source": "241dee5442b40a6a686baf2cab07596183f1bc14f191c9312926f7886c995476"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/support_moteur_arriere.stl",
+      "sha256_source": "02d642fef8250c037b373c7e77cca0a57c43ed8c700ff1b7b54ce7bf43831e39"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/coque_C1_nez.stl",
+      "sha256_source": "3e0af15c8f6af1143daff8a9e95509ad7d88be9c13e89569c5814a457be86782"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/fusee_renforcee_D.stl",
+      "sha256_source": "6cc0723f06c8831c0aedbe4992485429cb8087647c5e0d50e8347330fade4d67"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/coque_C4_bande_arriere_lidar.stl",
+      "sha256_source": "da64e0c6198904e6d99bd5e5f2867a5532e4a35c9bc61b0097465aaa0269fab7"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/support_xl4015.stl",
+      "sha256_source": "6e1d951a9268c5c6d905aa07b1b3005a1d091f8a68d764d49fd2589c8b5bf694"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/coque_D1_nez_droit.stl",
+      "sha256_source": "bc756238adf381a2ee476bda03e3f9852d784c0c43269d945a3f6190a513f726"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/berceau_batterie.stl",
+      "sha256_source": "98b3bc53679ca08f209c03a5627f3299aa07d9c2c69f0512d2f363f933773620"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/coque_G2_flanc_avant_gauche.stl",
+      "sha256_source": "c6043b60858bf525ae681a188464be1119722e8af0a6e5af41c1818d0f0dbe4f"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/coque_C3_bande_ecran_knob.stl",
+      "sha256_source": "32cc0388b409a831bdcd663f8cc17eb2a7b2f3ff1e1ba8d0439a8b1bf8440532"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/coque_G4_flanc_arriere_gauche.stl",
+      "sha256_source": "38eb9efb3ab1704096f82c0dc28cd44cb29d804734fd7b4446e2761d3dba806b"
+    },
+    {
+      "path": "cao/prototype_final/exports/stl/coque_D4_flanc_arriere_droit.stl",
+      "sha256_source": "2b487e0b2643ee8091d66b9f915d972c7ae841342e09f193899c28165af07592"
+    },
+    {
+      "path": "cao/prototype_final/remorque/plan_planche/page_3_gabarit_B1.svg",
+      "sha256_source": "8ca56c7e61247aa5ad0f68d3b244c4f52bddef2c2fdc85ab5a13fafa9eaa17c7"
+    },
+    {
+      "path": "cao/prototype_final/remorque/plan_planche/page_3_gabarit_B2.svg",
+      "sha256_source": "9e5eb3e81fd19c541f67b934a0b17a24cb122a07f3d033624d1952f5c2caede1"
+    },
+    {
+      "path": "cao/prototype_final/remorque/plan_planche/plan_planche.png",
+      "sha256_source": "2a94da9728582717ed9e81160f421ad5f44650d07008b4e03348deb512dc6089"
+    },
+    {
+      "path": "cao/prototype_final/remorque/plan_planche/plan_planche.pdf",
+      "sha256_source": "040da32d8a4876796479901950ac64b0cbb7319e3fcace41dd9e7e16daa44cd6"
+    },
+    {
+      "path": "cao/prototype_final/remorque/plan_planche/page_1_plan.svg",
+      "sha256_source": "1a24f57257f441c44707d9e8756b4ee5f4e2cccdc8c0aed49bd597cd8c40f930"
+    },
+    {
+      "path": "cao/prototype_final/remorque/plan_planche/page_3_gabarit_A2.svg",
+      "sha256_source": "701d3bcc65486956b89e604783cd9e1d8bd9c3df8a8c8c6b3621fd1fbfaa3e3a"
+    },
+    {
+      "path": "cao/prototype_final/remorque/plan_planche/page_2_coordonnees.svg",
+      "sha256_source": "e85ec104caf07db6a7e05668bc6741a1fac4787e554f14721f40712e9201ab4c"
+    },
+    {
+      "path": "cao/prototype_final/remorque/plan_planche/page_3_gabarit_A1.svg",
+      "sha256_source": "aa1d7c646949845fa9cc11ff70c02c1290dd4f83ed7bca51819229fd714e3766"
+    },
+    {
+      "path": "cao/prototype_final/remorque/vues/09_dessous_cables.png",
+      "sha256_source": "7d5b0dc3e602789855b5215f6aa4c3598008ca591ca11f97e5080470c30a1a10"
+    },
+    {
+      "path": "cao/prototype_final/remorque/vues/05_braquee_40.png",
+      "sha256_source": "1fa2eeb602808e4f4978da451d124de5b285b206e32b5eb454505aed00d7f881"
+    },
+    {
+      "path": "cao/prototype_final/remorque/vues/04_roue.png",
+      "sha256_source": "ee943f2e977312011dac1fbb6e61c74b4b9c2b24d203b9a1505bbb210d7514f7"
+    },
+    {
+      "path": "cao/prototype_final/remorque/vues/08_servo.png",
+      "sha256_source": "7f3d35253139dbb9a5cda2a705da5de830df2e4d1cac962a68794c4ba2db956e"
+    },
+    {
+      "path": "cao/prototype_final/remorque/vues/06_volets_deplies.png",
+      "sha256_source": "eec3f41107a9bfd82474acb96460810ece3b9857750aef8489a7e3d0a3a255e1"
+    },
+    {
+      "path": "cao/prototype_final/remorque/vues/01_ensemble.png",
+      "sha256_source": "40a4a01406d5a690c7e99da955ea7354e608ad730e9b53871bd96e183b1f4d3f"
+    },
+    {
+      "path": "cao/prototype_final/remorque/vues/02_plateau.png",
+      "sha256_source": "572c6f5e22ff2b3c4e95fc57823283242917279d49b770ad35149ae4eafd85e1"
+    },
+    {
+      "path": "cao/prototype_final/remorque/vues/07_volets_replies.png",
+      "sha256_source": "e47d4d7f009114cc60ec5fa5ac76388b960c57b30aed80b1814432ab6ccbddcc"
+    },
+    {
+      "path": "cao/prototype_final/remorque/vues/03_attelage.png",
+      "sha256_source": "9863d75375169621510317c0f01fbd9889e8f491b874b45cb4d28e1dd1a37f5b"
+    },
+    {
+      "path": "cao/prototype_final/remorque/vues/10_support_dessous.png",
+      "sha256_source": "0eb08bd8e1b8fd5ff7ae1db3be6aed44196d9c474f84831775fc1e59826503ce"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/manifest.json",
+      "sha256_source": "5200ad917ca96e487707d71103a626e42c6300a88d79f9c7dc9629b43e4869ec"
+    },
+    {
+      "path": "cao/prototype_final/remorque/scripts/rm_helpers.py",
+      "sha256_source": "c4fb30be1d937aa499ba80a3fced50da422e48762f75dd4db1040811ec369fb0"
+    },
+    {
+      "path": "cao/prototype_final/remorque/scripts/08_inserer_dans_rover.py",
+      "sha256_source": "b99188191d6ce443679166b3b258d1e74d05e7b5fd8b82a1f46fcff99b71475e"
+    },
+    {
+      "path": "cao/prototype_final/remorque/scripts/06_creer_document.py",
+      "sha256_source": "3db1dcfc1a652bc9d8cc67ed73336d36c58af2747c4317ed6fe164f060214b0c"
+    },
+    {
+      "path": "cao/prototype_final/remorque/scripts/09_timon_m6.py",
+      "sha256_source": "3cef4b1c0e095d37ea3a9679efaadbfb774b6e198afff293fc3107a464f79f83"
+    },
+    {
+      "path": "cao/prototype_final/remorque/scripts/07_enregistrer_remorque.py",
+      "sha256_source": "082fb9c0fde843deba8d68bc6ab165ef736b2f0fe0f93a17a257ce47bbe88264"
+    },
+    {
+      "path": "cao/prototype_final/remorque/scripts/00_chape_rover.py",
+      "sha256_source": "d24efe2980ddfe827d74a23acc3ea35197df0091012c36b182bd8979691055aa"
+    },
+    {
+      "path": "cao/prototype_final/remorque/scripts/03_exporter.py",
+      "sha256_source": "fa81e3f0f22086aca8acc3b41a9b28714444210a845d639e8920f3d568eb1bd3"
+    },
+    {
+      "path": "cao/prototype_final/remorque/scripts/01_remorque.py",
+      "sha256_source": "315df609a8303ba8b09f8bd300e16469c2e9a3774ca954bd4f86a3fddf959691"
+    },
+    {
+      "path": "cao/prototype_final/remorque/scripts/02_verifier.py",
+      "sha256_source": "ac5d34306b6339f24e2a0bde02e0ce171f936acaf6eb295824f18294ec875440"
+    },
+    {
+      "path": "cao/prototype_final/remorque/scripts/04_plan_planche.py",
+      "sha256_source": "ae9691cb685bd205017218618e4326c3569b6e428d450963707eb650375a47a4"
+    },
+    {
+      "path": "cao/prototype_final/remorque/scripts/05_verifier_attelage.py",
+      "sha256_source": "e0de6db0d8f6d0ce6bce55ff2d790dac464471d68cdf4ba63308239e731a30c6"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/charniere_AR_G.stl",
+      "sha256_source": "bf70aa5e204853626e9f6f9ac64fc006c6e1da3857e4ee447182ba7eb078b3ca"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/ferrure_AR_G.stl",
+      "sha256_source": "868d01d2cdccceb312d5352a6db9f4bb7d8c084a7a96c3bc77ad74af82440fb6"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/support_roue_G.stl",
+      "sha256_source": "e8b3a7d19252c3455487d83aa4b9b6abcb7d18bd8e38fbf325e8d95c38626ce9"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/timon.stl",
+      "sha256_source": "de3827d3af7586248def9eadde76e4058e6869ef546db970773d31e8aa12d8a0"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/bague_625_dans_logement_608.stl",
+      "sha256_source": "8a4fcd1c50335ce8ce4869886319daed255c310a4f9868b460f4b086f29a66c4"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/charniere_AR_D.stl",
+      "sha256_source": "a68320e8ff1ee6a02e7136152abaa46374d23624ba089151ddd65da7c6eeb4fd"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/ferrure_AR_D.stl",
+      "sha256_source": "6a982d9bdc0f1614eee7a0c10b747e2bb36c7f3b766eb250356b4373b7e91f0f"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/support_roue_D.stl",
+      "sha256_source": "6c5ae998124285d1073bbcebf835af8a1befac2f2cd1158c4330b1783c794d8f"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/chape_attelage_rover.stl",
+      "sha256_source": "6bbe11394d4fc483d09792ade8c401d07b89580f466da9c7c882ad2d91135dde"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/ferrure_AV_D.stl",
+      "sha256_source": "9e19c1de3eafadfad0d312fa2dcdf76279bf8613fb0af666880648959d307bff"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/ferrure_AV_G.stl",
+      "sha256_source": "98fb38d33ded2550ace6b60fc10dbf65de3c9850b969c589d7ab4e894253ce7c"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/cale_jambe_3mm.stl",
+      "sha256_source": "fa880155a9f7dac6c9c44d7801f3b425aa5defde938628a8c3a26bc90ee15c4b"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/boitier_servo_G.stl",
+      "sha256_source": "c6cef4e781eb4a1ed8d574cb7ab577fe69b524a48b2e6db8cc6e0cd116a8cd81"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/boitier_servo_D.stl",
+      "sha256_source": "c1eeebbaa16611401eca957223a46ee7c3a44ac5e619ae42e2481feac5603af6"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/joue_M2_D.stl",
+      "sha256_source": "75f518b6e6b7145aa84fc657abdc3e9c76ed53baa1fe574f32ff0f36c782720e"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/joue_M2_G.stl",
+      "sha256_source": "9baab5080aa87497dc0b29f4e3b2e30625665addd21f4ac5ccdb98a938742098"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/joue_M1_D.stl",
+      "sha256_source": "184524b647ac97e837e86cfe71993a02905ee72af935bd89dbae23cac42f93d8"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/rebord_AV_G.stl",
+      "sha256_source": "e325c139f9a903b46d218227b62a412df793dda732f5403a7efd2cf9e927b1d6"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/joue_M1_G.stl",
+      "sha256_source": "9a9137cf1472e744a03daeb2203ef8f6b09987e4d8c5f477dad605af756c0d7a"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/rebord_AV_D.stl",
+      "sha256_source": "537fb65e0828fe9ce5a3f4ee68798e4f93bd1f8b34dbdb2c58dfe2cceab8d177"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/entretoise_625_6.2mm.stl",
+      "sha256_source": "db5005581f088582285b17aa5467fc4da361f35c0488ac5c310c53a4f12f879a"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/rebord_AR_D.stl",
+      "sha256_source": "a1858a036ae4c5bfaa7098443a5bb37729b810856a59998d5831734a73ac8439"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/rondelle_tete_M5_2mm.stl",
+      "sha256_source": "8010bed2b175b9dfbbd675434ae2244ed95072b8d9d65eb93dda3e64231d4c60"
+    },
+    {
+      "path": "cao/prototype_final/remorque/exports/stl/rebord_AR_G.stl",
+      "sha256_source": "d3c9c0415031325dd882d106f30c818b38e788753ab0386c709ee6d1ea8f597a"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/verification_capteurs.json",
+      "sha256_source": "cfb20def6c9d7840621aa3518616c45b6244a86e24e707340eb671e47fcece33"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/mouvement_verifie.json",
+      "sha256_source": "5a75c688db14a051cbf79cda5ebb218e2896649375423abc7d63bf5d88c04bba"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/verification_roues.json",
+      "sha256_source": "00f09b49e9e0ba8d07bc369c9f1294c4e2a8e78a5076404ebedab9cd3268d322"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/README.md",
+      "sha256_source": "4d40c188400d78ee150015662f30c489ae6923f22263b4103cb9fa95e0ce92bb"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/plan_percages.json",
+      "sha256_source": "e99288207e9f6e29309455b46066cc1797cd1a5642bb5f26a4107c865068b3cb"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/20_roue_flasque_visse.png",
+      "sha256_source": "b6a3a5e35af6e0510e71bdaac56eeb03633942f2e876e519953f0946350b83a5"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/13_mat_lidar_C1.png",
+      "sha256_source": "09fccc385faebb849d0a57ed3c16e5c3a0dbbee704ffdd805b625ca001a14ecf"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/19_coupe_moyeu_roue.png",
+      "sha256_source": "4cb9b1ec3e2540f8032af1d5e12d46efbb6a45880993370f0d960918fac6fe89"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/14_support_lidar_dessous.png",
+      "sha256_source": "b07bdd53c1500f986f4f6944b65e950f0b8bc3fede3cb994cd747111bb98ee6a"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/07_face_roues.png",
+      "sha256_source": "368576278646fc3ca1fe28d8ce5cef80e89574da4a7460dcb2bd1aae6f38430d"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/11_jante_rayons.png",
+      "sha256_source": "1f01ff1d5ac97e43560948e359ccde2cbe7f5a522b29265b329b85864877ab05"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/21_jante_inserts_M3.png",
+      "sha256_source": "fb4be0c63bddabcd0c906fe8fa8c44f10b80b517c0d188c1063417430ae3ea07"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/05_module_droit.png",
+      "sha256_source": "67a11c3203582b5110006bedeaa5b6bec112ce8bdf01e088c307a2ff40de2431"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/08_roue_droite.png",
+      "sha256_source": "1f0c87523b772083c58a8fca74c1148b73f4b2e4d1b1e62fa6c9c8832c9e57bb"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/12_palonnier_etoile_coupes.png",
+      "sha256_source": "7e517c96be050bd66e04c40ccd3ce8c2d0b669e23af8862c86c7cdc1a9db676a"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/17_ensemble_capteurs.png",
+      "sha256_source": "9fef08451e3ce43cc973fb2499ec3ef50a156f7ccc22f9bc54d3d2cbb4697fff"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/10_ensemble_dessous.png",
+      "sha256_source": "331c71af36371ce2a82c01d4f9a6e28db03b9915f5c1d61bd61ccf4636402fc2"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/18_barre_stereo_dessous.png",
+      "sha256_source": "115e7e5117928ee95579a91a03dd90b98bbd5ee12a983549623c38201179fec7"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/04_face_neutre.png",
+      "sha256_source": "7329da813d242184c3f073b3d421cc71e27f2de04cbd18ff577381aea284ed66"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/09_ensemble_planche_30x50.png",
+      "sha256_source": "36735bbeae959dafa5f5c60ced19735f57c96e6a3e977d2cb775aa061ad827c5"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/16_mat_cameras_profil_10deg.png",
+      "sha256_source": "a73ae7356f1cfc85c6f000425294595c4f5f29e80662fba2266c02b268231b6c"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/02_dessous_iso_braquage_31deg.png",
+      "sha256_source": "5cf7493f21381e5663c2059eb8f3f6113e9b4ccc87c6e579b87cf7ff3285f9fa"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/06_iso_roues_braquage_31deg.png",
+      "sha256_source": "fa821cba5a558236a8b2b0b1a7567f73ed31404677dd26e166fd19387b5988a9"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/15_mat_cameras.png",
+      "sha256_source": "c5e52da70cd5da59ec13664d982b13d227d7d6f0ca858da1201de7d8737b11de"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/03_dessous_braquage_31deg.png",
+      "sha256_source": "986a0cb1bafface9334848567c9558318d328779c2d0be7cbbfe3bd56f9cf6d7"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/vues/01_iso_neutre.png",
+      "sha256_source": "7855d4987bafd78b901d38cb7cff3cb0ca3a4f18fb3348211dce83da8171c2fb"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/exports/manifest.json",
+      "sha256_source": "3a450f058d7d07e8f66f1eeec6eb51b82ff1e885fbf5eb9c483e3dfccba46c23"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/scripts/05_roues.py",
+      "sha256_source": "4ef46b98dbbe22f90b922a6662f59ef9b57cc149eef061e12ad75f7778be0d44"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/scripts/fusion_mcp.py",
+      "sha256_source": "398253270d38bf39a2a828acdf7eb353f06f46b049435dda43e2f51e71703e12"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/scripts/04_portee_roue.py",
+      "sha256_source": "0ea0b84206d0c163e6a4770e4f56e515d8f9910bc4de6eba0169b165b85ab982"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/scripts/09_supports_M8.py",
+      "sha256_source": "92ab74eb184d2a77f86e8eea8a121fbd07437ad0ce777ce46c710207827ec25f"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/scripts/13_plan_percages.py",
+      "sha256_source": "7caa2e2283d9684bd5a386141f473cc31f29d2b5d7b3cc096eb5bc1f4d24e194"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/scripts/01_construire.py",
+      "sha256_source": "aa5bb7a763ebcf6687940343e918051b40a583a13505b3a150d48a3e369a88b1"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/scripts/15_jante_flasque.py",
+      "sha256_source": "e1b59b3f0e6f2b36157e3eceb39b5849583bc0cf88a799d832077b2b8ece5ad1"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/scripts/07_supports_moteurs.py",
+      "sha256_source": "b554bb1ac7bd8eeb171079d5afd488832bfbab6fc5c5c23c8546da94d319de83"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/scripts/11_lidar_stereo.py",
+      "sha256_source": "76da0a5bdfae8b195a77b0355c5c9e994e343ad0d937138b46fed148ec215e1f"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/scripts/16_roue_annexes.py",
+      "sha256_source": "5ab40b44f9b4cc822dd357c4057b1a363c163291d5026eecdc1708d7d9fe0e73"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/scripts/12_verifier_capteurs.py",
+      "sha256_source": "7fbf2ddcd24ce086a3802468412172800ba6ae06d77bb743fdfbe11223a61c36"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/scripts/08_planche_5mm.py",
+      "sha256_source": "437af9269d93fa8a95e252a096957b53223cc3a36a427d255467d91b4a09a2ae"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/scripts/10_servo_mesure_etoile.py",
+      "sha256_source": "4daf34e2ccd295d0ff8c3a1ec0c5df0fefcc5d81148e8bba3d498e95ce7ef766"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/scripts/03_exporter.py",
+      "sha256_source": "f07bdd41a3823abb84103cda7128b7a14b1c18aeb7c821b688ce19b6ae527bff"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/scripts/06_planche_30cm.py",
+      "sha256_source": "90920975941445c5f432c68ddd270b386f9f6418b2602c0986a5b82226386e56"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/scripts/14_verifier_roues.py",
+      "sha256_source": "8896d371cacfe5a276d2e01305e51d216287dc63f0ed26d2896b6316ece27394"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/scripts/02_verifier.py",
+      "sha256_source": "a0219ba6df5e8e9b31009e2a14809a2ad1eea7bd498a2ca28696f785ff9de006"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/plan_percages/page_3_gabarit_B1.svg",
+      "sha256_source": "1ff6bb8c6bae723401e31da2d6ec7122171eca40ac819cdc70cb8fda8bcd37f3"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/plan_percages/page_3_gabarit_B2.svg",
+      "sha256_source": "0b3271f5d2500ad0c6dd93d0acab248efe814672552ea3b3443ec777a238f6fd"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/plan_percages/plan_percages.pdf",
+      "sha256_source": "d3e19c3346db690bb6f204868ce08583743fc6d63c44788c543cbcccc41ba12c"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/plan_percages/plan_percages.png",
+      "sha256_source": "3fe3cb64fc76f55a035a2b2091904b4c3ee284f918ac63f6c357d69f2c561a43"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/plan_percages/page_1_plan.svg",
+      "sha256_source": "d93df936868ed1cc1dd2a2dd58ce0e1fa2c114a5883684957ab0c978f6da84e3"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/plan_percages/page_3_gabarit_A2.svg",
+      "sha256_source": "a8fa494e4eaf812f08baeb22ebaac8e0e825898b4ab80be1bceab22e4b43e0af"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/plan_percages/page_2_coordonnees.svg",
+      "sha256_source": "37b0f3034c7e173606d39bba533da505814b7f04643b7ba6fa6d53a8e63ebcf5"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/plan_percages/page_3_gabarit_A1.svg",
+      "sha256_source": "5f8d819cf29f357ce29e82b0a978240f6f15f4e94d4a8370f40da896f8fe1918"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/exports/stl/biellette.stl",
+      "sha256_source": "827b9258a0c9a499b3196fbbd99ff142efcfb68f1431be963d79eb45adf2ea85"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/exports/stl/entretoise_roue_2.2mm.stl",
+      "sha256_source": "e0a3d52a308cc52a52b302364728574c934dd30c71e8d203220159aff5a04c6c"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/exports/stl/rondelle_precharge_1.9mm.stl",
+      "sha256_source": "b61290b07c610c23273fd7ce7bac94ac353b198e3b167a731281b96ca348dbf5"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/exports/stl/rondelle_2mm.stl",
+      "sha256_source": "6ff98d277150936cc7c6027d0045b606f6b27b3efc71f8f768d6c6537b6f2c86"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/exports/stl/rondelle_precharge_1.8mm.stl",
+      "sha256_source": "45d91269f17f61fa9237a6ac9843616945f7790fc3a6b281550a83424b7f0498"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/exports/stl/jante_608ZZ.stl",
+      "sha256_source": "37735ad83c7ac10b7ab473c883e162a61a6cce4dc58b1e2c66b34235a96a082f"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/exports/stl/rondelle_M3_0.6mm.stl",
+      "sha256_source": "e795f036e97fdd19087415a56ec7abcc4c0899f0c5042a6c4e28f18db5eaca12"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/exports/stl/support_pivot_D.stl",
+      "sha256_source": "712f5ae32ef429bbcfd03681290ecc26058681c5b1fb1cd727a4c2dbf7e430cf"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/exports/stl/palonnier.stl",
+      "sha256_source": "dd6b37c21044d52512e80e0cda83766154c9b2865dd2abfac253b3fa9c3db6de"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/exports/stl/support_pivot_G.stl",
+      "sha256_source": "bc2bab994a0c9f6165df62d56fdaadf8ac82c5e6f441653ec0e701eb1f32cf39"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/exports/stl/pneu_TPU.stl",
+      "sha256_source": "3745307981d82f42228467273a1851b0bdfc679d827db85d6b59b75c15b5f223"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/exports/stl/barre_stereo.stl",
+      "sha256_source": "9b734be4c85f09c47bc504c77dfd0b9e8c7950542b2179d720417d85e59ea05f"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/exports/stl/fusee_D.stl",
+      "sha256_source": "9e017b56e8864bd1a6ee8852abb5e8a50e83ffea2df227c30c34e7f95c3ffd61"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/exports/stl/support_lidar_C1.stl",
+      "sha256_source": "373aa87bf312f55bf5a0ed93bf525260174b5d3b49ac9d1f12fa817a23bef225"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/exports/stl/fusee_G.stl",
+      "sha256_source": "6cab91d9ccf2b7ecf3d78ccd65b801ec16ab5172e65c7c5c86a432148a7db7a0"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v04_servo_traversant/exports/stl/flasque_pneu.stl",
+      "sha256_source": "fd88f4b325a760efa44275489ecade6e4ffdd60f4fa6c533bb295b430183f3c2"
+    },
+    {
+      "path": "cao/mounts/prototype/direction_v03_simple/scripts/d3_helpers.py",
+      "sha256_source": "23564fb4191e4328d7a21cfea4252b9778cbf5490f3880f2c2ac5469aefd9541"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/fieldmind_c5_a7.kicad_pro",
+      "sha256_source": "d134fc16e26dce993a9f9c5ab7ba19d5cc32d46b536df2b179f968c267192480"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/FieldMind_C5_A7.kicad_sym",
+      "sha256_source": "e01e7caf2e3be699df2616ba5d34330301f3f094bad372e75fb13e75949a8bb7"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/cablage_a7.json",
+      "sha256_source": "ed8337d881c9357b1ea35581eebdf5ca7210ff3080f2364ffefb537b9d24bc03"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/fp-lib-table",
+      "sha256_source": "91cfde5e96cfa3c9fd5efe423faa7a14ed900169b93c0ead40ee5fe79a9ec3f0"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/fieldmind_c5_a7.kicad_sch",
+      "sha256_source": "aa4c85be86b931c43918702e638532f133c038985a63e9d6a301ef6c2fd5617c"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/README.md",
+      "sha256_source": "8fdf7cd1fc018e05e2d77d53ca950ddba35f7891338a7a315d1e5bd9f81fc6ae"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/capteurs_i2c.kicad_sch",
+      "sha256_source": "868569bb67fe8a29fcb2aa45cab08a49bb64b46ccd9cc11768fb9121c93563af"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/fieldmind_c5_a7.kicad_pcb",
+      "sha256_source": "1d17e94cd5eaef3a3cc4d031730aa7c54149bc7eb5f10d4e38e2c2e395a9e96f"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/sym-lib-table",
+      "sha256_source": "c310267c58857d680adac9f337b14086e1603ea9d718f5141768f20f22bb3ac9"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/3d/A7_U1.wrl",
+      "sha256_source": "2e2c56ed4f510388ad264a8dbe8ad37922e9491ecfc9c5833ef732b132537d67"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/3d/A7_J6.wrl",
+      "sha256_source": "3c45d6c58f9ff673cfc47e2b152867db79784ac952f5c48805828de1b2d8dfd1"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/3d/A7_J7.wrl",
+      "sha256_source": "d71ccbc981eb2a8b56aeb368e69a34a7e235683ecaadb3bbfec5a9f661168c8f"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/3d/A7_J4.wrl",
+      "sha256_source": "7cc62a9bd489a3c73233931da2e4a45361dcaa450904405ab24e76c492423e3c"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/3d/A7_J1.wrl",
+      "sha256_source": "b6ab3afcae29aee8df2ffa19a6d8a43cd90a92ccfa58be2faf985a80806a73f1"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/3d/A7_J3.wrl",
+      "sha256_source": "e4d8cd69c17c5e27cdf619242f016df38880ea61c8c4f163553b017b1dc7c580"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/3d/A7_J2.wrl",
+      "sha256_source": "193310e1b91dba8015c788aed7f6684be1306db1bb5775aa33d4cba889116d9e"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/3d/A7_J8.wrl",
+      "sha256_source": "d71ccbc981eb2a8b56aeb368e69a34a7e235683ecaadb3bbfec5a9f661168c8f"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/FieldMind_C5_A7.pretty/A7_J7.kicad_mod",
+      "sha256_source": "219e735f79e6222dd604ff949e5437ae1ab50c8a6a9a2d00f68af81f7b75324e"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/FieldMind_C5_A7.pretty/A7_PERF.kicad_mod",
+      "sha256_source": "3a2b43bf886597baa881868e1e7a973c88c4a31e3be21fa4e708d61274173ebe"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/FieldMind_C5_A7.pretty/A7_J1.kicad_mod",
+      "sha256_source": "6157ff5818391e66b82d0e4e91e4fa02cccd5519d5f17c8fb630a760ecb43670"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/FieldMind_C5_A7.pretty/A7_J6.kicad_mod",
+      "sha256_source": "1725bf3dcfaa18c621d394146727eeed75549fba8d671c759e560d402a8489a7"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/FieldMind_C5_A7.pretty/A7_J8.kicad_mod",
+      "sha256_source": "71ee120e0184cb49e0da7fbee3af394315abf7146c9de35bd8346e085f04f06a"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/FieldMind_C5_A7.pretty/A7_U1.kicad_mod",
+      "sha256_source": "222f30249f53b5ec6009d2345434cd21a0600d349e7f598f2a7492b7dd384433"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/FieldMind_C5_A7.pretty/A7_J3.kicad_mod",
+      "sha256_source": "0d92e41224f422953323e8e8f72b6f5f43920300b8d2ba12cc4a1666d4c07206"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/FieldMind_C5_A7.pretty/A7_J4.kicad_mod",
+      "sha256_source": "6917e38c732a877ba886967eb2f930f8b5e1dddbe98784ff03e27c3e2815e6b7"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/cad/perfboard_c5_a7/FieldMind_C5_A7.pretty/A7_J2.kicad_mod",
+      "sha256_source": "2dd0ec61086b37be89d5fc8304fb8e4b7fee90e01b4fc04a305c8b880b432e68"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/exports/c5_a7/guide_cablage.html",
+      "sha256_source": "f3f00d581d72d407e4d4dee5b4f2dc96c5bdfb69ed20b15f7f324acb8e0b2a49"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/exports/c5_a7/rendu_3d_dessus_iso.png",
+      "sha256_source": "e2ea6bc92f80c9b60f608a2879df29d322a2f5ee25e4e481164801a0572d3b81"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/exports/c5_a7/deux_faces.png",
+      "sha256_source": "db439ce706be29056869192aa9de3baa4f65d21658982d48abe640ede49252c6"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/exports/c5_a7/rendu_3d_dessous.png",
+      "sha256_source": "b456a0e778fc286d301a1b78986bd1106fce228da204f073a26c0cae7c7f5ceb"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/exports/c5_a7/deux_faces.svg",
+      "sha256_source": "aa8c0209cfb87632c41daa091b90bf075b601bf5290819607315a88b872ea0d2"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/exports/c5_a7/plan_broches.html",
+      "sha256_source": "eac26d330d423c6f4bcbce0be6abe8f8c3d26039094d2263306cff62073de56b"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/exports/c5_a7/plan_broches.svg",
+      "sha256_source": "cd76f021504c1c5b677506590c60e396f25d49df540457ef50d7c5ad01ee9a5b"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/exports/c5_a7/plan_broches.png",
+      "sha256_source": "40e150e7063bb8b89711e378c661c43a65d6b9dcc72ca8691a87819137fbeda9"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/exports/c5_a7/rendu_3d_dessous_iso.png",
+      "sha256_source": "a76df744feb2f07eb3989333366d61317b20eb2456588a99a74762bf5986196d"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/exports/c5_a7/rendu_3d_dessus.png",
+      "sha256_source": "dafdf1a76d8acb8675bbfa1069a392e26da045b343cd4a3746928f22d0bdb08c"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/exports/c5_a7/schema/fieldmind_c5_a7-Capteurs I2C et écran.svg",
+      "sha256_source": "8b3b2bae06741546de12ac4555bfa0c1a64129daecea1cfffc77257b8c750ec4"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/exports/c5_a7/schema/fieldmind_c5_a7.svg",
+      "sha256_source": "9361c865ba2a69a99d3a014ab4e4bb40551fd00d3412086d49c4b11f554b564b"
+    },
+    {
+      "path": "hardware/electronics/systeme_rover/README.md",
+      "sha256_source": "774e3ceea964ce5fcff9341f3bf30b2a107eb31833385c6f1f4afa8b24a41f0e"
+    },
+    {
+      "path": "hardware/electronics/systeme_rover/exports/nomenclature.csv",
+      "sha256_source": "d5d40f82018f590fcad0392018ea9e8a462a449b3d7aeac699cd069323006a42"
+    },
+    {
+      "path": "hardware/electronics/systeme_rover/exports/schema_rover_complet.pdf",
+      "sha256_source": "a5f34d596aa82913fbfbb494c56539304dfaa24c8b34b44e8c06228e899bafda"
+    },
+    {
+      "path": "hardware/electronics/systeme_rover/cad/pi_usb.kicad_sch",
+      "sha256_source": "884261b81c7315d6e1a0e4181e40979ce8796fb0e69654ce7469d463312df3cf"
+    },
+    {
+      "path": "hardware/electronics/systeme_rover/cad/fieldmind_rover_systeme.kicad_sch",
+      "sha256_source": "611e673c391a7457324513c95052ef4bfa7d6e32efd355c0e37b87ad1b755a1f"
+    },
+    {
+      "path": "hardware/electronics/systeme_rover/cad/puissance_arret.kicad_sch",
+      "sha256_source": "7f6b97a18bd73737e4fe379c8a35833163daeea9b84739f6248d48b4ee938877"
+    },
+    {
+      "path": "hardware/electronics/systeme_rover/cad/FieldMind_Rover.kicad_sym",
+      "sha256_source": "4dff425ea69ebb5def002c8225943c8b13e81a28a1ba1f7aa5fc48bed189df88"
+    },
+    {
+      "path": "hardware/electronics/systeme_rover/cad/fieldmind_rover_systeme.kicad_pro",
+      "sha256_source": "1d07740eecdacaf471133c88993cd02a62e70fb0a80ced649494bceb51feab1b"
+    },
+    {
+      "path": "hardware/electronics/systeme_rover/cad/capteurs_peripheriques.kicad_sch",
+      "sha256_source": "5a851ba4abe701faf1839a04cafc518bb811aeabbcfaf9ae4df09c8a58f4ff12"
+    },
+    {
+      "path": "hardware/electronics/systeme_rover/cad/sym-lib-table",
+      "sha256_source": "18e697d6aee9f68209107994c7fbc2bce03abc1c217ea79611616570507982f7"
+    },
+    {
+      "path": "hardware/electronics/systeme_rover/scripts/generer_systeme.py",
+      "sha256_source": "2bd4fc297d4d7bfc7ff10fc992967235c93746122e50e8fa235ffbbaf413a117"
+    },
+    {
+      "path": "hardware/electronics/systeme_rover/exports/svg/fieldmind_rover_systeme-Carte capteurs et périphériques.svg",
+      "sha256_source": "347b164f170e4875bd9c7845c970b5b114ac3317ebc8f716d754f9d6193dfc6c"
+    },
+    {
+      "path": "hardware/electronics/systeme_rover/exports/svg/fieldmind_rover_systeme.svg",
+      "sha256_source": "248a134a72cbf97590e8123761d70afff14554180d3e35c736354c720990f443"
+    },
+    {
+      "path": "hardware/electronics/systeme_rover/exports/svg/fieldmind_rover_systeme-Puissance et arrêt.svg",
+      "sha256_source": "8ef8c9bf973ced42b232726a38e80816d7041c018d46f62f9f782810a6c2d479"
+    },
+    {
+      "path": "hardware/electronics/systeme_rover/exports/svg/fieldmind_rover_systeme-Raspberry Pi et USB.svg",
+      "sha256_source": "4ca65e29201bef42205da53b91aad4d54c48ca82b45986bd2244ef39fabdec61"
+    },
+    {
+      "path": "hardware/electronics/CONNEXIONS.md",
+      "sha256_source": "f95baba043217c7836190e02ba32bb74268c035c5a27532bc56f85da7e8bea58"
+    },
+    {
+      "path": "hardware/electronics/CONNEXIONS_MOTEUR_ZS_X11D1.md",
+      "sha256_source": "ee3fd7ad21623f7bfaddaf6d2b85b0d9137e7ac3a8f60a63d4bedf12f7e294d4"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/README.md",
+      "sha256_source": "e4834ee25053940fdaa2210a67cb5e91115bc07d36063e8f8725dcb1549011e6"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/perfboard_une_plaque_c5_a7.md",
+      "sha256_source": "47ec876dd7bff3fa70ce9779c26465e296f0e3c9f7e0f35d8964593ac0aaeb76"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/connexions_gpio.md",
+      "sha256_source": "21fc1755799859fe287d53a670c34bcc60bba0befa8ae50f9aafff5b6f4272f6"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/contrat_esp_pi.md",
+      "sha256_source": "87e653dbffb9da2f4e3c90ee8f1533689b429cdc176295163b99132bc73ec268"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/alimentation_arret.md",
+      "sha256_source": "cf8e0582509b88091f90cb45ae3e3ebbe02711df9e18427b864bf50a00f640a9"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/scripts/generer_c5_a7.py",
+      "sha256_source": "8bc0b50ff3368a010ad56450254557771eded00c4dde7f2b2c935dae6bed4cd1"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/scripts/plan_c5_a7.py",
+      "sha256_source": "480e25eaeb64e1e4b4673f2bdfffc256ab81fd7b43e891b95b84e91291216e7e"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/scripts/plan_broches_c5_a7.py",
+      "sha256_source": "8a265f2a4b02b1c492ce2b3b5eba23d27d1c6c646e023d1180e3a8d0e36bd04b"
+    },
+    {
+      "path": "hardware/electronics/carte_capteurs/scripts/valider_c5_a7.py",
+      "sha256_source": "7019f5c7d6e8a4f6ae0917875d26631c2e548acd547a5fd5c556d7b6a65f323b"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+# Outils de qualité et de test, en plus des dépendances d'exécution.
+-r requirements-demo.txt
+pytest==9.1.1
+ruff==0.16.9
+mypy==2.3.1
+playwright==1.56.0

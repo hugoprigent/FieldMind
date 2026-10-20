@@ -1,0 +1,10 @@
+# Paramètres du pont FieldMind. Le jeton se passe en argument de lancement, pas dans ce fichier.
+pont_fieldmind:
+  ros__parameters:
+    url: "ws://127.0.0.1:8000/ws/robot"   # le cerveau tourne sur le GX10, à bord
+    rayon_roue: 0.100
+    # Origine du repère local (x vers l'est, y vers le nord) : point de départ de la mission.
+    origine_latitude: 0.0
+    origine_longitude: 0.0
+    # Images de la caméra avant (sensor_msgs/CompressedImage, JPEG 640 × 360) transmises au cerveau.
+    frequence_image_hz: 2.0

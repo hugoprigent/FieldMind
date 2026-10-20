@@ -1,0 +1,9 @@
+{
+  "name": "fieldmind-poste-operateur",
+  "private": true,
+  "description": "Modules ES du poste opérateur. Aucune dépendance npm : three.js est copié dans interface/web/vendor.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test \"tests/js/**/*.test.js\""
+  }
+}

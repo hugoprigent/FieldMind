@@ -1,0 +1,200 @@
+{
+ "pieces": [
+  {
+   "stl": "stl/capuchon_knob.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "debout, alésage en D contre le plateau",
+   "taille_impression_mm": [
+    22.0,
+    22.0,
+    11.0
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 3.6
+  },
+  {
+   "stl": "stl/coque_D1_nez_droit.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "couché sur la paroi extérieure",
+   "taille_impression_mm": [
+    90.0,
+    93.0,
+    114.0
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 66.6
+  },
+  {
+   "stl": "stl/coque_G1_nez_gauche.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "couché sur la paroi extérieure",
+   "taille_impression_mm": [
+    90.0,
+    93.0,
+    114.0
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 66.6
+  },
+  {
+   "stl": "stl/coque_C1_nez.stl",
+   "quantite": 1,
+   "couleur": "bleu",
+   "orientation": "debout sur la face avant (grille)",
+   "taille_impression_mm": [
+    100.0,
+    90.0,
+    103.0
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 29.4
+  },
+  {
+   "stl": "stl/coque_D2_flanc_avant_droit.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "couché sur la paroi extérieure",
+   "taille_impression_mm": [
+    85.0,
+    133.0,
+    114.0
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 76.5
+  },
+  {
+   "stl": "stl/coque_G2_flanc_avant_gauche.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "couché sur la paroi extérieure",
+   "taille_impression_mm": [
+    85.0,
+    133.0,
+    114.0
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 76.5
+  },
+  {
+   "stl": "stl/coque_C2_bande_avant.stl",
+   "quantite": 1,
+   "couleur": "bleu",
+   "orientation": "dessus contre le plateau",
+   "taille_impression_mm": [
+    100.0,
+    133.0,
+    7.9
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 33.2
+  },
+  {
+   "stl": "stl/coque_D3_flanc_milieu_droit.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "couché sur la paroi extérieure",
+   "taille_impression_mm": [
+    85.0,
+    133.0,
+    114.0
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 74.8
+  },
+  {
+   "stl": "stl/coque_G3_flanc_milieu_gauche.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "couché sur la paroi extérieure",
+   "taille_impression_mm": [
+    85.0,
+    133.0,
+    114.0
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 75.0
+  },
+  {
+   "stl": "stl/coque_C3_bande_ecran_knob.stl",
+   "quantite": 1,
+   "couleur": "bleu",
+   "orientation": "dessus contre le plateau",
+   "taille_impression_mm": [
+    100.0,
+    133.0,
+    16.4
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 34.3
+  },
+  {
+   "stl": "stl/coque_D4_flanc_arriere_droit.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "couché sur la paroi extérieure",
+   "taille_impression_mm": [
+    90.0,
+    147.0,
+    114.0
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 100.9
+  },
+  {
+   "stl": "stl/coque_G4_flanc_arriere_gauche.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "couché sur la paroi extérieure",
+   "taille_impression_mm": [
+    90.0,
+    147.0,
+    114.0
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 100.9
+  },
+  {
+   "stl": "stl/coque_C4_bande_arriere_lidar.stl",
+   "quantite": 1,
+   "couleur": "bleu",
+   "orientation": "dessus contre le plateau",
+   "taille_impression_mm": [
+    100.0,
+    147.0,
+    90.0
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 45.3
+  },
+  {
+   "stl": "stl/berceau_batterie.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "fond contre le plateau",
+   "taille_impression_mm": [
+    75.0,
+    89.0,
+    30.0
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 52.1
+  },
+  {
+   "stl": "stl/support_xl4015.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "à plat, dessous contre le plateau (poches des écrous en dessous)",
+   "taille_impression_mm": [
+    57.0,
+    78.0,
+    6.6
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 13.4
+  }
+ ],
+ "plateau_mm": 180.0
+}

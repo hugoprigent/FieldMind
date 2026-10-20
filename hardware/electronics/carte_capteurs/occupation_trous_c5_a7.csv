@@ -1,0 +1,210 @@
+trou,composant,broche,face_composant,net,extremites_de_fil
+F1,J3,1,F,GND,P08/B
+G1,J3,2,F,+3V3,P14/B
+H1,J3,3,F,I2C_SCL,P04/B
+I1,J3,4,F,I2C_SDA,P01/B
+J1,pastille,,,+3V3,
+K1,pastille,,,+3V3,
+L1,pastille,,,+3V3,
+M1,pastille,,,+3V3,
+N1,pastille,,,+3V3,
+A2,J6,1,F,VBUS_USB,P21/B
+B2,pastille,,,VBUS_USB,
+C2,pastille,,,VBUS_USB,P21/B S14/F
+D2,U1,14,B,VBUS_USB,S14/F
+F2,pastille,,,GND,
+G2,pastille,,,+3V3,P18/B
+H2,pastille,,,I2C_SCL,
+I2,pastille,,,I2C_SDA,
+J2,U1,1,B,EXT_D0,S01/F
+K2,pastille,,,EXT_D0,P24/B S01/F
+L2,pastille,,,EXT_D0,
+M2,pastille,,,EXT_D0,
+N2,J8,1,F,EXT_D0,P24/B
+A3,J6,2,F,GND,P10/B
+B3,pastille,,,GND,
+C3,pastille,,,GND,P10/B S13/F
+D3,U1,13,B,GND,
+E3,pastille,,,GND,P09/B S13/F
+F3,pastille,,,GND,P09/B
+G3,pastille,,,+3V3,
+H3,pastille,,,I2C_SCL,
+I3,pastille,,,I2C_SDA,
+J3,U1,2,B,EXT_D1,S02/F
+K3,pastille,,,EXT_D1,P25/B S02/F
+L3,pastille,,,EXT_D1,
+M3,pastille,,,EXT_D1,
+N3,J8,2,F,EXT_D1,P25/B
+A4,J6,3,F,+3V3,P16/B
+B4,pastille,,,+3V3,P17/B
+C4,pastille,,,+3V3,P16/B S12/F
+D4,U1,12,B,+3V3,
+E4,pastille,,,+3V3,P15/B S12/F
+F4,pastille,,,GND,
+G4,pastille,,,+3V3,
+H4,pastille,,,I2C_SCL,
+I4,pastille,,,I2C_SDA,
+J4,U1,3,B,EXT_D2,S03/F
+K4,pastille,,,EXT_D2,P26/B S03/F
+L4,pastille,,,EXT_D2,
+M4,pastille,,,EXT_D2,
+N4,J8,3,F,EXT_D2,P26/B
+A5,J6,4,F,EXT_D10,P30/B
+B5,pastille,,,EXT_D10,
+C5,pastille,,,EXT_D10,P30/B S11/F
+D5,U1,11,B,EXT_D10,S11/F
+F5,pastille,,,GND,
+G5,pastille,,,+3V3,P15/B
+H5,pastille,,,I2C_SCL,
+I5,pastille,,,I2C_SDA,
+J5,U1,4,B,EXT_D3,S04/F
+K5,pastille,,,EXT_D3,P27/B S04/F
+L5,pastille,,,EXT_D3,
+M5,pastille,,,EXT_D3,
+N5,J8,4,F,EXT_D3,P27/B
+A6,J6,5,F,EXT_D9,P29/B
+B6,pastille,,,EXT_D9,
+C6,pastille,,,EXT_D9,P29/B S10/F
+D6,U1,10,B,EXT_D9,S10/F
+F6,pastille,,,GND,
+G6,pastille,,,+3V3,
+H6,pastille,,,I2C_SCL,
+I6,pastille,,,I2C_SDA,S05/F
+J6,U1,5,B,I2C_SDA,S05/F
+A7,J6,6,F,EXT_D8,P28/B
+B7,pastille,,,EXT_D8,
+C7,pastille,,,EXT_D8,P28/B S09/F
+D7,U1,9,B,EXT_D8,S09/F
+F7,pastille,,,GND,
+G7,pastille,,,+3V3,
+H7,pastille,,,I2C_SCL,
+I7,pastille,,,I2C_SDA,
+J7,U1,6,B,I2C_SCL,S06/F
+K7,pastille,,,I2C_SCL,P05/B S06/F
+N7,J7,1,F,GND,P12/B
+A8,pastille,,,GNSS_RX,
+B8,pastille,,,GNSS_RX,
+C8,pastille,,,GNSS_RX,P23/B S08/F
+D8,U1,8,B,GNSS_RX,S08/F
+F8,pastille,,,GND,
+G8,pastille,,,+3V3,
+H8,pastille,,,I2C_SCL,
+I8,pastille,,,I2C_SDA,
+J8,U1,7,B,GNSS_TX,S07/F
+K8,pastille,,,GNSS_TX,P22/B S07/F
+L8,pastille,,,GNSS_TX,
+N8,J7,2,F,+3V3,P18/B
+A9,J4,4,F,GNSS_RX,P23/B
+F9,pastille,,,GND,
+G9,pastille,,,+3V3,
+H9,pastille,,,I2C_SCL,P05/B
+I9,pastille,,,I2C_SDA,P02/B
+J9,pastille,,,I2C_SDA,
+K9,pastille,,,I2C_SDA,
+L9,pastille,,,I2C_SDA,
+M9,pastille,,,I2C_SDA,
+N9,J7,3,F,I2C_SDA,P02/B
+A10,J4,3,F,+3V3,P17/B
+F10,pastille,,,GND,P12/B
+G10,pastille,,,+3V3,
+H10,pastille,,,I2C_SCL,
+I10,pastille,,,I2C_SDA,
+N10,J7,4,F,I2C_SCL,P06/B
+A11,J4,2,F,GND,P11/B
+B11,pastille,,,GND,
+C11,pastille,,,GND,
+D11,pastille,,,GND,
+E11,pastille,,,GND,
+F11,pastille,,,GND,P11/B
+G11,pastille,,,+3V3,
+H11,pastille,,,I2C_SCL,
+I11,pastille,,,I2C_SDA,
+N11,pastille,,,I2C_SCL,
+A12,J4,1,F,GNSS_TX,P22/B
+B12,pastille,,,GNSS_TX,
+C12,pastille,,,GNSS_TX,
+D12,pastille,,,GNSS_TX,
+E12,pastille,,,GNSS_TX,
+F12,pastille,,,GND,
+G12,pastille,,,+3V3,
+H12,pastille,,,I2C_SCL,
+I12,pastille,,,I2C_SDA,
+J12,pastille,,,I2C_SCL,
+K12,pastille,,,I2C_SCL,
+L12,pastille,,,I2C_SCL,P07/B
+M12,pastille,,,I2C_SCL,
+N12,pastille,,,I2C_SCL,
+F13,pastille,,,GND,
+G13,pastille,,,+3V3,
+H13,pastille,,,I2C_SCL,P06/B
+I13,pastille,,,I2C_SDA,
+L13,pastille,,,I2C_SCL,
+N13,J2,6,F,non câblé,
+F14,pastille,,,GND,
+G14,pastille,,,+3V3,
+H14,pastille,,,I2C_SCL,
+I14,pastille,,,I2C_SDA,
+L14,pastille,,,I2C_SCL,
+N14,J2,5,F,non câblé,
+F15,pastille,,,GND,
+G15,pastille,,,+3V3,P19/B
+H15,pastille,,,I2C_SCL,
+I15,pastille,,,I2C_SDA,
+L15,pastille,,,I2C_SCL,
+N15,J2,4,F,I2C_SDA,P03/B
+B16,pastille,,,+3V3,
+C16,pastille,,,+3V3,
+D16,pastille,,,+3V3,
+E16,pastille,,,+3V3,
+F16,pastille,,,GND,
+G16,pastille,,,+3V3,P14/B
+H16,pastille,,,I2C_SCL,
+I16,pastille,,,I2C_SDA,P03/B
+J16,pastille,,,I2C_SDA,
+K16,pastille,,,I2C_SDA,
+L16,pastille,,,I2C_SCL,
+M16,pastille,,,I2C_SCL,
+N16,J2,3,F,I2C_SCL,P07/B
+B17,pastille,,,+3V3,
+C17,pastille,,,GND,
+D17,pastille,,,GND,
+E17,pastille,,,GND,
+F17,pastille,,,GND,P13/B
+H17,pastille,,,I2C_SCL,
+I17,pastille,,,I2C_SDA,
+J17,pastille,,,GND,
+K17,pastille,,,GND,
+L17,pastille,,,GND,
+M17,pastille,,,GND,
+N17,J2,2,F,GND,P13/B
+B18,pastille,,,+3V3,
+C18,pastille,,,GND,
+D18,pastille,,,I2C_SCL,
+E18,pastille,,,I2C_SCL,
+F18,pastille,,,I2C_SCL,
+G18,pastille,,,I2C_SCL,
+H18,pastille,,,I2C_SCL,
+I18,pastille,,,I2C_SDA,
+J18,pastille,,,+3V3,
+K18,pastille,,,+3V3,
+L18,pastille,,,+3V3,
+M18,pastille,,,+3V3,
+N18,J2,1,F,+3V3,P20/B
+B19,pastille,,,+3V3,P20/B
+C19,pastille,,,GND,
+D19,pastille,,,I2C_SCL,
+E19,pastille,,,I2C_SDA,
+F19,pastille,,,I2C_SDA,
+G19,pastille,,,I2C_SDA,
+H19,pastille,,,I2C_SDA,
+I19,pastille,,,I2C_SDA,
+J19,pastille,,,+3V3,
+B20,J1,1,F,+3V3,P19/B
+C20,J1,2,F,GND,P08/B
+D20,J1,3,F,I2C_SCL,P04/B
+E20,J1,4,F,I2C_SDA,P01/B
+F20,J1,5,F,non câblé,
+G20,J1,6,F,non câblé,
+H20,J1,7,F,non câblé,
+I20,J1,8,F,non câblé,
+J20,pastille,,,+3V3,

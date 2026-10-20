@@ -1,0 +1,14 @@
+{
+ "chape_attelage_rover": {
+  "taille_impression_mm": [
+   37.0,
+   147.0,
+   44.0
+  ],
+  "volume_cm3": 101.8,
+  "morceaux": 1
+ },
+ "conges": {
+  "2.5": 16
+ }
+}

@@ -1,0 +1,161 @@
+{
+ "sans_remorque": {
+  "masse_kg": 5.82,
+  "cg_mm": [
+   2.2,
+   220.3,
+   142.5
+  ],
+  "avant_pct": 42.0,
+  "arriere_pct": 58.0,
+  "gauche_pct (+X)": 50.6,
+  "droite_pct (-X)": 49.4
+ },
+ "avec_remorque_sur_attelage": {
+  "masse_kg": 6.02,
+  "cg_mm": [
+   2.1,
+   230.9,
+   142.2
+  ],
+  "avant_pct": 39.2,
+  "arriere_pct": 60.8,
+  "gauche_pct (+X)": 50.5,
+  "droite_pct (-X)": 49.5
+ },
+ "principales_masses": [
+  [
+   "PF_REF_Moteur_arriere",
+   1200,
+   0,
+   380
+  ],
+  [
+   "PF_REF_Roue_arriere",
+   600,
+   0,
+   380
+  ],
+  [
+   "PF_REF_Batterie",
+   600,
+   50,
+   64
+  ],
+  [
+   "PF_IMP_Coque",
+   495,
+   0,
+   195
+  ],
+  [
+   "D4_IMP_Roue",
+   455,
+   0,
+   0
+  ],
+  [
+   "D4_REF_Planche_bois",
+   443,
+   0,
+   191
+  ],
+  [
+   "D4_REF_Webcam_UGREEN",
+   200,
+   0,
+   -43
+  ],
+  [
+   "D4_IMP_Support_lidar",
+   152,
+   0,
+   380
+  ],
+  [
+   "PF_REF_Raspberry_Pi4_boitier",
+   150,
+   -88,
+   153
+  ],
+  [
+   "D4_REF_Profile_40x40_lidar",
+   135,
+   0,
+   380
+  ],
+  [
+   "D4_REF_Profile_40x40_cam",
+   135,
+   0,
+   -35
+  ],
+  [
+   "PF_IMP_Attelage",
+   132,
+   0,
+   514
+  ],
+  [
+   "PF_REF_Controleur_BLDC",
+   120,
+   0,
+   377
+  ],
+  [
+   "D4_REF_Pivot",
+   118,
+   0,
+   0
+  ],
+  [
+   "D4_REF_Lidar_C1",
+   110,
+   3,
+   393
+  ],
+  [
+   "D4_IMP_Barre_stereo",
+   102,
+   0,
+   -33
+  ],
+  [
+   "D4_REF_Support_moteur_arriere",
+   82,
+   0,
+   380
+  ],
+  [
+   "D4_REF_Equerre_40_lidar",
+   80,
+   0,
+   380
+  ],
+  [
+   "D4_REF_Equerre_40_cam",
+   80,
+   0,
+   -35
+  ],
+  [
+   "D4_REF_Servo_DT996",
+   65,
+   0,
+   67
+  ],
+  [
+   "PF_REF_Breadboard_830",
+   60,
+   0,
+   193
+  ],
+  [
+   "D4_IMP_Support_pivot",
+   47,
+   0,
+   -2
+  ]
+ ],
+ "corps_ignores": []
+}

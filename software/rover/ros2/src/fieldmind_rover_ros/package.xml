@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>fieldmind_rover_ros</name>
+  <version>1.0.0</version>
+  <description>Pont ROS 2 du rover FieldMind réel : client de la WebSocket /ws/ros (capteurs vers ROS 2, cmd_vel et buts vers le rover).</description>
+  <maintainer email="maintainer@fieldmind.example">Hugo Prigent</maintainer>
+  <license>Propriétaire</license>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>builtin_interfaces</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>diagnostic_msgs</exec_depend>
+  <exec_depend>tf2_ros_py</exec_depend>
+  <exec_depend>python3-aiohttp</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

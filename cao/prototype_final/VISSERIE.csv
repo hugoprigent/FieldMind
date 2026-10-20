@@ -1,0 +1,38 @@
+﻿famille;reference;taille_filetage;longueur_mm;tete_ou_type;quantite_rover_avec_chape;quantite_remorque;quantite_totale;incluse_dans_totaux;statut;note
+Vis;M2×4;M2;4;Non fraisée;4;0;4;oui;Prévu au plan;Écran OLED sous la coque
+Vis;M2,5×8;M2,5;8;Cylindrique;4;0;4;oui;Prévu au plan;"Lidar C1 ; pénétration maximum 4 mm"
+Vis;M3×6;M3;6;Non fraisée;20;0;20;oui;Prévu au plan;"Bandes de coque ; avec rondelle large"
+Vis;M3×8;M3;8;Non fraisée;20;12;32;oui;Prévu au plan;"12 flasques avant + 4 carte A7 + 4 XL4015 sur leur plaque ; 12 flasques remorque"
+Vis;M3×10;M3;10;Non fraisée;0;6;6;oui;Prévu au plan;Rebords remorque
+Vis;M3×12;M3;12;Cylindrique;16;0;16;oui;Prévu au plan;12 nervures coque + 4 Knob
+Vis;M3×12 tête bombée;M3;12;Bombée;4;0;4;oui;Prévu au plan;"Biellettes ; 8 rondelles étroites métal ou imprimées"
+Vis;M3×16 tête cylindrique;M3;16;Cylindrique;11;0;11;oui;Prévu au plan;"Planche de 10 mm : 4 oreilles servo + 4 berceau + 2 plaque XL4015 ; 1 vis centrale DT996 (longueur à contrôler)"
+Vis;M3×16 tête bombée;M3;16;Bombée (ISO 7380);0;14;14;oui;Prévu au plan;4 boîtiers SG90 + 2 blocs arrière + 8 ferrures de volets
+Vis;M3×20;M3;20;Non fraisée;0;2;2;oui;Prévu au plan;Axes arrière de volets
+Vis;CHC M5×40;M5;40;CHC;0;2;2;oui;Prévu au plan;Axes des roues remorque
+Vis;M6×16 tête bombée;M6;16;Bombée (ISO 7380);0;8;8;oui;Prévu au plan;4 par support de roue remorque
+Vis;M6×25 tête bombée;M6;25;Bombée (ISO 7380);0;4;4;oui;Prévu au plan;Timon remorque, par le dessus, écrou noyé sous le timon
+Vis;M6×20;M6;20;Non fraisée;10;0;10;oui;Prévu au plan;"Coque sur planche de 10 mm ; 4 aux coins suffisent"
+Vis;M6×25;M6;25;Non fraisée;6;0;6;oui;Prévu au plan;"Colliers des supports moteurs (4) ; chape d’attelage sur planche de 10 mm (2)"
+Vis;M8×16;M8;16;Non fraisée;8;0;8;oui;Prévu au plan;"Équerres sur profilés, barre stéréo et support du lidar ; écrous en T rainure 10"
+Vis;H M8×25;M8;25;Hexagonale;8;0;8;oui;Prévu au plan;"Planche de 10 mm : 4 supports de pivot + 4 équerres de mâts"
+Vis;H M8×30;M8;30;Hexagonale;12;0;12;oui;Prévu au plan;"2 pivots + 2 axes de roues avant + 8 supports moteurs (planche de 10 mm)"
+Vis;H M10×55;M10;55;Hexagonale;1;0;1;oui;Prévu au plan;"Axe attelage ; chape comptée côté rover"
+Vis;"Photo 1/4""-20 × 1/2""";"1/4""-20";12,7;Photo;2;0;2;oui;Filetage à confirmer;"Webcams ; M6×12 uniquement si filetage réellement M6, alternative exclusive"
+Écrou;Écrou M3;M3;;Hexagonal;30;20;50;oui;Prévu au plan;
+Écrou;Écrou frein M3;M3;;Frein;0;2;2;oui;Prévu au plan;
+Écrou;Écrou frein M5;M5;;Frein;0;2;2;oui;Prévu au plan;
+Écrou;Écrou M6;M6;;Hexagonal;16;12;28;oui;Prévu au plan;
+Écrou;Écrou M8;M8;;Hexagonal;20;0;20;oui;Prévu au plan;
+Écrou;Écrou en T M8 rainure 10;M8;;En T pour profilé type B rainure 10;8;0;8;oui;Prévu au plan;
+Écrou;Écrou frein M10;M10;;Frein;1;0;1;oui;Prévu au plan;
+Rondelle;Rondelle M2,5;M2,5;;Standard;4;0;4;oui;Prévu au plan;Lidar
+Rondelle;Rondelle M3 standard;M3;;Standard;22;10;32;oui;Prévu au plan;Hors rondelles étroites des biellettes et rondelles larges
+Rondelle;Rondelle M3 étroite;M3;;Appui bague intérieure 3×10×4;8;0;8;oui;Prévu au plan;"Alternative : imprimer 8 rondelles Ø ext. 5 / Ø int. 3,3 / ép. 0,6 mm ; ne pas acheter en doublon"
+Rondelle;Rondelle large M3 DIN 9021;M3;;Large Ø ext. 9 mm;21;0;21;oui;Prévu au plan;20 bandes de coque + 1 vis centrale servo
+Rondelle;Rondelle M5;M5;;Standard;0;2;2;oui;Prévu au plan;
+Rondelle;Rondelle M6;M6;;Standard;12;0;12;oui;Prévu au plan;
+Rondelle;Rondelle M8;M8;;Standard;24;0;24;oui;Prévu au plan;Hors rondelles de pivot et de moyeu imprimées
+Rondelle;Rondelle M10;M10;;Standard;2;0;2;oui;Prévu au plan;
+Insert;Insert à chaud M3;M3;≤5,7;Ø extérieur 4,5 à 4,6 mm;32;12;44;oui;Prévu au plan;"20 coque + 12 roues avant + 12 roues remorque ; vérifier logement et coupon"
+Vis à dimensionner;Fixation moteurs NGP RM24;M3 ou M4 à mesurer;;À définir;8;0;8;non;Diamètre et longueur à confirmer;"4 par moteur selon les supports ; taraudage, profondeur et montage réel non relevés"

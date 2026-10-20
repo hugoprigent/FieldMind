@@ -1,0 +1,190 @@
+# Modèles locaux du rover FieldMind sur l'ASUS Ascent GX10 (NVIDIA GB10, arm64, CUDA 13, 128 Go).
+#
+#   cp .env.exemple .env      # HF_TOKEN, VLLM_API_KEY (voir README.md)
+#   docker compose up -d
+#
+# Deux serveurs vLLM, API compatible OpenAI :
+#   modele         :8000  /v1/chat/completions   Qwen3.6-35B-A3B (NVFP4) : texte + images, appel de fonctions
+#   transcription  :8001  /v1/audio/transcriptions  Qwen3-ASR-1.7B (français compris)
+# Image vllm/vllm-openai v0.31.0 : multi-architecture (arm64), CUDA 13.0 par défaut (GB10).
+# Les deux partagent la mémoire unifiée : somme des MEMOIRE_* sous 0,85 environ.
+
+name: fieldmind-ia
+
+x-vllm: &vllm
+  image: ${VLLM_IMAGE:-vllm/vllm-openai:v0.31.0}
+  restart: unless-stopped
+  ipc: host
+  ulimits:
+    memlock: -1
+    stack: 67108864
+  volumes:
+    - ${HF_CACHE:-~/.cache/huggingface}:/root/.cache/huggingface
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
+
+services:
+  modele:
+    <<: *vllm
+    container_name: fieldmind-modele
+    ports:
+      - "${FIELDMIND_BIND_IP:-127.0.0.1}:8000:8000"
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+      VLLM_API_KEY: ${VLLM_API_KEY:?Set VLLM_API_KEY in .env}
+      MODELE: ${MODELE:-nvidia/Qwen3.6-35B-A3B-NVFP4}
+      LONGUEUR_MAX: ${LONGUEUR_MAX:-32768}
+      MEMOIRE_MODELE: ${MEMOIRE_MODELE:-0.45}
+      ANALYSEUR_OUTILS: ${ANALYSEUR_OUTILS:-qwen3_xml}
+      ANALYSEUR_REFLEXION: ${ANALYSEUR_REFLEXION:-qwen3}
+      OPTIONS_MODELE: ${OPTIONS_MODELE:-}
+    entrypoint: ["/bin/sh", "-c"]
+    # Gabarit de conversation de vLLM pour l'appel de fonctions s'il est fourni dans l'image.
+    command:
+      - |
+        gabarit=/vllm-workspace/examples/tool_chat_template_$${ANALYSEUR_OUTILS}.jinja
+        options=""
+        if [ -f "$$gabarit" ]; then options="--chat-template $$gabarit"; fi
+        exec vllm serve "$$MODELE" --host 0.0.0.0 --port 8000 \
+          --max-model-len "$$LONGUEUR_MAX" --gpu-memory-utilization "$$MEMOIRE_MODELE" \
+          --enable-auto-tool-choice --tool-call-parser "$$ANALYSEUR_OUTILS" \
+          --reasoning-parser "$$ANALYSEUR_REFLEXION" \
+          --limit-mm-per-prompt '{"image": 2}' $$options $$OPTIONS_MODELE
+    healthcheck:
+      test: ["CMD", "python3", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30m   # premier démarrage : téléchargement (≈ 22 Go) et compilation
+
+  transcription:
+    <<: *vllm
+    image: fieldmind-whisper:${VLLM_VERSION:-v0.31.0}
+    build:
+      context: .
+      dockerfile: Dockerfile.whisper
+      args:
+        VLLM_IMAGE: ${VLLM_IMAGE:-vllm/vllm-openai:v0.31.0}
+    container_name: fieldmind-transcription
+    # Démarrages l'un après l'autre : sur la mémoire unifiée du GB10, un serveur qui charge
+    # pendant qu'un autre mesure sa mémoire fausse le calcul (cache négatif, échec au démarrage).
+    depends_on:
+      modele:
+        condition: service_healthy
+    ports:
+      - "${FIELDMIND_BIND_IP:-127.0.0.1}:8001:8001"
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+      VLLM_API_KEY: ${VLLM_API_KEY:?Set VLLM_API_KEY in .env}
+    entrypoint: ["vllm", "serve"]
+    command:
+      - ${MODELE_TRANSCRIPTION:-Qwen/Qwen3-ASR-1.7B}
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8001"
+      - --max-model-len
+      - "4096"           # quelques dizaines de secondes de voix : inutile de réserver plus
+      - --gpu-memory-utilization
+      - ${MEMOIRE_TRANSCRIPTION:-0.08}
+    healthcheck:
+      test: ["CMD", "python3", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10m
+
+  robotique:
+    # Modèle incarné (remplace Gemini Robotics-ER) : pointage, boîtes, trajectoires, en [0, 1000].
+    <<: *vllm
+    container_name: fieldmind-robotique
+    depends_on:
+      transcription:
+        condition: service_healthy
+    ports:
+      - "${FIELDMIND_BIND_IP:-127.0.0.1}:8002:8002"
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+      VLLM_API_KEY: ${VLLM_API_KEY:?Set VLLM_API_KEY in .env}
+    entrypoint: ["vllm", "serve"]
+    command:
+      - ${MODELE_ROBOTIQUE:-BAAI/RoboBrain2.5-4B}
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8002"
+      - --max-model-len
+      - "8192"
+      - --gpu-memory-utilization
+      - ${MEMOIRE_ROBOTIQUE:-0.12}
+      - --limit-mm-per-prompt
+      - '{"image": 1}'
+    healthcheck:
+      test: ["CMD", "python3", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8002/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 15m
+
+  outils:
+    # Détection (D-FINE), profondeur (Depth Anything V2), segmentation (SAM 2.1), empreintes
+    # (Qwen3-VL-Embedding) : une image envoyée une fois sert à toutes les tâches.
+    <<: *vllm
+    image: fieldmind-outils:${VLLM_VERSION:-v0.31.0}
+    build:
+      context: .
+      dockerfile: Dockerfile.outils
+      args:
+        VLLM_IMAGE: ${VLLM_IMAGE:-vllm/vllm-openai:v0.31.0}
+    container_name: fieldmind-outils
+    depends_on:
+      robotique:
+        condition: service_healthy
+    ports:
+      - "${FIELDMIND_BIND_IP:-127.0.0.1}:8003:8003"
+    environment:
+      VLLM_API_KEY: ${VLLM_API_KEY:?Set VLLM_API_KEY in .env}
+      OUTILS_ACTIFS: detection,profondeur,segmentation,empreintes
+    command: ["--port", "8003"]
+    healthcheck:
+      test: ["CMD", "python3", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8003/v1/sante')"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10m
+
+  voix:
+    # Synthèse vocale Qwen3-TTS (image à part : autre version de transformers).
+    <<: *vllm
+    image: fieldmind-voix:${VLLM_VERSION:-v0.31.0}
+    build:
+      context: .
+      dockerfile: Dockerfile.voix
+      args:
+        VLLM_IMAGE: ${VLLM_IMAGE:-vllm/vllm-openai:v0.31.0}
+    container_name: fieldmind-voix
+    depends_on:
+      outils:
+        condition: service_healthy
+    ports:
+      - "${FIELDMIND_BIND_IP:-127.0.0.1}:8004:8004"
+    environment:
+      VLLM_API_KEY: ${VLLM_API_KEY:?Set VLLM_API_KEY in .env}
+      OUTILS_ACTIFS: synthese
+    command: ["--port", "8004"]
+    healthcheck:
+      test: ["CMD", "python3", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8004/v1/sante')"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10m

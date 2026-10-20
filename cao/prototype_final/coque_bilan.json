@@ -1,0 +1,161 @@
+{
+ "pieces": {
+  "coque_C1": {
+   "taille_mm": [
+    100.0,
+    103.0,
+    90.0
+   ],
+   "volume_cm3": 29.4,
+   "morceaux": 1
+  },
+  "coque_C2": {
+   "taille_mm": [
+    100.0,
+    133.0,
+    7.9
+   ],
+   "volume_cm3": 33.2,
+   "morceaux": 1
+  },
+  "coque_C3": {
+   "taille_mm": [
+    100.0,
+    133.0,
+    16.4
+   ],
+   "volume_cm3": 34.3,
+   "morceaux": 1
+  },
+  "coque_C4": {
+   "taille_mm": [
+    100.0,
+    147.0,
+    90.0
+   ],
+   "volume_cm3": 49.6,
+   "morceaux": 1
+  },
+  "coque_D1": {
+   "taille_mm": [
+    114.0,
+    93.0,
+    90.0
+   ],
+   "volume_cm3": 66.6,
+   "morceaux": 1
+  },
+  "coque_D2": {
+   "taille_mm": [
+    114.0,
+    133.0,
+    85.0
+   ],
+   "volume_cm3": 76.5,
+   "morceaux": 1
+  },
+  "coque_D3": {
+   "taille_mm": [
+    114.0,
+    133.0,
+    85.0
+   ],
+   "volume_cm3": 74.8,
+   "morceaux": 1
+  },
+  "coque_D4": {
+   "taille_mm": [
+    114.0,
+    147.0,
+    90.0
+   ],
+   "volume_cm3": 100.9,
+   "morceaux": 1
+  },
+  "coque_G1": {
+   "taille_mm": [
+    114.0,
+    93.0,
+    90.0
+   ],
+   "volume_cm3": 66.6,
+   "morceaux": 1
+  },
+  "coque_G2": {
+   "taille_mm": [
+    114.0,
+    133.0,
+    85.0
+   ],
+   "volume_cm3": 76.5,
+   "morceaux": 1
+  },
+  "coque_G3": {
+   "taille_mm": [
+    114.0,
+    133.0,
+    85.0
+   ],
+   "volume_cm3": 75.0,
+   "morceaux": 1
+  },
+  "coque_G4": {
+   "taille_mm": [
+    114.0,
+    147.0,
+    90.0
+   ],
+   "volume_cm3": 100.9,
+   "morceaux": 1
+  }
+ },
+ "fixations_m6": [
+  [
+   139.6,
+   -40.0
+  ],
+  [
+   139.6,
+   100.0
+  ],
+  [
+   139.6,
+   230.0
+  ],
+  [
+   75.0,
+   -52.6
+  ],
+  [
+   90.0,
+   432.6
+  ],
+  [
+   -139.6,
+   -40.0
+  ],
+  [
+   -139.6,
+   100.0
+  ],
+  [
+   -139.6,
+   230.0
+  ],
+  [
+   -75.0,
+   -52.6
+  ],
+  [
+   -90.0,
+   432.6
+  ]
+ ],
+ "vis_bande": 20,
+ "boulons_nervures": 12,
+ "texte": [
+  "G",
+  "D"
+ ],
+ "bleu": "FM_PLA_bleu"
+}

@@ -1,0 +1,13 @@
+# Caddy : HTTPS automatique (Let's Encrypt) et proxy vers uvicorn. WebSocket pris en charge.
+# Installé en /etc/caddy/Caddyfile par installer.sh, qui remplace __DOMAINE__.
+__DOMAINE__ {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:8000
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+	log {
+		output file /var/log/caddy/fieldmind.log
+	}
+}

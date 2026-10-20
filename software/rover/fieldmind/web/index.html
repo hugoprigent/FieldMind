@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="fr" data-theme="sombre">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d10">
+  <title>FieldMind — poste</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/poste.css">
+  <script>
+    try { const t = JSON.parse(localStorage.getItem('fieldmind.theme')); if (t) document.documentElement.dataset.theme = t; } catch {}
+  </script>
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <header class="barre">
+    <a class="marque" href="#pilotage" aria-label="FieldMind">
+      <svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18 12 4l8 14z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><circle cx="12" cy="14" r="2.2" fill="currentColor"/></svg>
+      <span class="nom">FieldMind</span>
+    </a>
+    <span class="simulation" id="bandeau-simulation" hidden>SIMULATION</span>
+    <div class="indicateurs" id="indicateurs" role="status"></div>
+    <button type="button" class="bouton-rearmer" id="bouton-rearmer" hidden><i data-icone="cadenas"></i><span>Réarmer</span></button>
+    <button type="button" class="bouton-arret" id="bouton-arret" aria-label="Arrêt d’urgence"><i data-icone="arret"></i><span>ARRÊT</span></button>
+  </header>
+
+  <nav class="menu" aria-label="Menus">
+    <a href="#pilotage" data-vue="pilotage"><i data-icone="pilotage"></i><span>Pilotage</span></a>
+    <a href="#mission" data-vue="mission"><i data-icone="mission"></i><span>Mission</span></a>
+    <a href="#carte" data-vue="carte"><i data-icone="carte"></i><span>Carte</span></a>
+    <a href="#capteurs" data-vue="capteurs"><i data-icone="capteurs"></i><span>Capteurs</span></a>
+    <a href="#systeme" data-vue="systeme"><i data-icone="systeme"></i><span>Système</span></a>
+    <a href="#reglages" data-vue="reglages"><i data-icone="reglages"></i><span>Réglages</span></a>
+  </nav>
+
+  <main class="vues">
+    <!-- ============================================================ Pilotage -->
+    <section class="vue vue-pilotage" id="vue-pilotage" data-vue="pilotage" hidden>
+      <div class="p-camera panneau sans-marge" id="p-principale" data-principale="camera">
+        <div class="camera" id="p-camera"></div>
+        <div class="vue-3d" id="p-3d" hidden></div>
+        <div class="camera camera-pip" id="p-camera-pip" title="Cliquer pour échanger la caméra principale (Rover ↔ Drone)">
+          <span class="pip-etiquette" id="p-pip-etiquette">Caméra Drone</span>
+        </div>
+        <div class="minicarte" id="p-minicarte" hidden title="Carte GPS"><canvas aria-label="Mini-carte GPS"></canvas><div class="hud attribution" id="p-minicarte-attribution">© OpenStreetMap</div></div>
+        <div class="hud hud-haut">
+          <div class="segments" role="group" aria-label="Vue" id="p-choix-camera">
+            <button type="button" data-camera="gauche" aria-pressed="true">Gauche</button>
+            <button type="button" data-camera="droite" aria-pressed="false">Droite</button>
+            <button type="button" data-camera="profondeur" aria-pressed="false">Profondeur</button>
+            <button type="button" data-camera="drone" aria-pressed="false">Drone</button>
+            <button type="button" data-camera="3d" aria-pressed="false" hidden>3D</button>
+          </div>
+          <div class="segments" role="group" aria-label="Caméra 3D" id="p-camera-3d" hidden>
+            <button type="button" data-mode3d="suivie" aria-pressed="true">Suivie</button>
+            <button type="button" data-mode3d="dessus" aria-pressed="false">Dessus</button>
+            <button type="button" data-mode3d="libre" aria-pressed="false">Libre</button>
+          </div>
+          <span class="espace"></span>
+          <span class="badge-hud" id="p-badge-arriere" hidden>R</span>
+          <span class="badge-hud badge-auto" id="p-badge-auto" hidden><i data-icone="cible"></i></span>
+          <button type="button" class="bouton-hud" id="p-double-cam" aria-pressed="true" title="Double caméra simultanée (Rover + Drone)">2 Cam</button>
+          <button type="button" class="bouton-hud" id="p-photo" title="Photo"><i data-icone="photo"></i></button>
+        </div>
+      </div>
+
+      <div class="p-infos panneau">
+        <div class="mesures">
+          <div class="mesure"><span class="libelle">Vitesse</span><span class="valeur"><b id="p-vitesse">—</b><small>m/s</small></span></div>
+          <div class="mesure"><span class="libelle">Braquage</span><span class="valeur"><b id="p-braquage">—</b><small>°</small></span></div>
+          <div class="mesure"><span class="libelle">Libre</span><span class="valeur"><b id="p-libre">—</b><small>m</small></span></div>
+          <div class="mesure"><span class="libelle">Limite</span><span class="valeur"><b id="p-limite">—</b><small>m/s</small></span></div>
+        </div>
+        <ul class="raisons" id="p-raisons" aria-label="Sécurité"></ul>
+        <div class="p-remorque" id="p-remorque" hidden>
+          <span class="libelle">Remorque</span>
+          <b id="p-remorque-angle">—</b>
+          <button type="button" class="bouton petit" id="p-remorque-axe" title="La remorque est droite, dans l'axe du rover : l'angle repart de 0 et la marche arrière est permise"><span>Dans l'axe</span></button>
+        </div>
+        <div class="drone-barre" id="p-drone-barre">
+          <details id="p-drone-atelier" class="drone-atelier">
+            <summary>Atelier drone — simulation locale complète</summary>
+            <p>Décollage, tour avec photos, caméra du bas, recentrage et descente par paliers. Les commandes ci-dessous agissent sur un drone simulé.</p>
+            <div class="drone-actions">
+              <label>Scénario <select aria-label="Scénario du drone simulé"><option value="normal">Conditions normales</option><option value="derive">Dérive / vent modéré</option><option value="croix_perdue">Croix perdue pendant la descente</option><option value="video_perdue">Perte vidéo</option><option value="camera_bloquee">Caméra du bas bloquée</option><option value="cap_perdu">Perte de l'estimation de position</option><option value="gx10_retard">Réponse GX10 trop ancienne</option></select></label>
+              <button type="button" class="bouton petit bouton-principal" data-atelier-action="mission">Simuler la mission complète</button>
+              <button type="button" class="bouton petit" data-atelier-action="manuel">Essayer le pilotage manuel</button>
+              <button type="button" class="bouton petit" data-atelier-action="decoller" disabled>Décoller en simulation</button>
+              <button type="button" class="bouton petit" data-atelier-action="camera_bas" disabled>Caméra du bas simulée</button>
+              <button type="button" class="bouton petit bouton-danger" data-atelier-action="interrompre">Interrompre et poser en simulation</button>
+            </div>
+            <div class="drone-actions" role="group" aria-label="Manette du drone simulé : maintenir les boutons">
+              <button type="button" class="bouton petit" data-atelier-axe="monter" disabled>Monter</button>
+              <button type="button" class="bouton petit" data-atelier-axe="descendre" disabled>Descendre</button>
+              <button type="button" class="bouton petit" data-atelier-axe="avant" disabled>Avancer</button>
+              <button type="button" class="bouton petit" data-atelier-axe="arriere" disabled>Reculer</button>
+              <button type="button" class="bouton petit" data-atelier-axe="gauche" disabled>Gauche</button>
+              <button type="button" class="bouton petit" data-atelier-axe="droite" disabled>Droite</button>
+              <button type="button" class="bouton petit" data-atelier-axe="tourner_gauche" disabled>Tourner à gauche</button>
+              <button type="button" class="bouton petit" data-atelier-axe="tourner_droite" disabled>Tourner à droite</button>
+            </div>
+            <p data-atelier-etat role="status" aria-live="polite">Prêt à simuler</p>
+            <p data-atelier-raison></p><p data-atelier-erreur role="alert"></p>
+            <img alt="Vue du drone simulé, distincte du flux réel" width="320" height="240" hidden>
+            <a data-atelier-fichier="montage.jpg" target="_blank" rel="noopener" hidden>Photos simulées</a>
+            <a data-atelier-fichier="rapport.json" target="_blank" rel="noopener" hidden>Rapport de simulation</a>
+          </details>
+          <div class="drone-entete">
+            <span class="pastille" id="p-drone-etat" data-niveau="neutre"><span class="point"></span><span class="libelle">Drone : —</span></span>
+            <span class="drone-detail" id="p-drone-reseau">Liaison : —</span>
+            <span class="drone-detail" id="p-drone-signal">Signal : —</span>
+            <span class="drone-detail" id="p-drone-ip">MAC/IP : —</span>
+            <span class="drone-detail" id="p-drone-flux">Flux : —</span>
+            <span class="drone-detail" id="p-drone-batterie">Batterie : —</span>
+            <span class="drone-detail" id="p-drone-scan">Détectés : —</span>
+            <span class="drone-detail" id="p-drone-recon" role="status" aria-live="polite">Essai sans vol : attente</span>
+            <span class="drone-detail" id="p-drone-croix">Croix : —</span>
+            <span class="drone-detail" id="p-drone-compute">Vision : inactive</span>
+            <a class="drone-detail" id="p-drone-montage" hidden target="_blank" rel="noopener">Ouvrir le montage</a>
+            <a class="drone-detail" id="p-drone-rapport" hidden target="_blank" rel="noopener">Rapport de l'essai</a>
+          </div>
+          <div class="drone-actions" id="p-drone-actions">
+            <input type="text" id="p-drone-ssid" class="drone-saisie-ssid" placeholder="Nom BLE / Wi-Fi (ex: CooleerX)" aria-label="Nom BLE ou Wi-Fi du drone">
+            <button type="button" class="bouton petit bouton-principal" data-drone-action="connecter-ssid" title="Forcer la connexion à ce drone"><i data-icone="wifi"></i><span>Connecter</span></button>
+            <button type="button" class="bouton petit" data-drone-action="voir" title="Afficher le flux vidéo du drone en grand"><i data-icone="camera"></i><span>Flux Drone</span></button>
+            <button type="button" class="bouton petit" data-drone-action="echanger" title="Échanger la caméra Rover et la caméra Drone"><i data-icone="oeil"></i><span>Rover ↔ Drone</span></button>
+            <button type="button" class="bouton petit" data-drone-cmd="camera" title="Basculer entre la caméra avant et la caméra dessous du drone"><i data-icone="camera"></i><span>Cam. drone 1/2</span></button>
+            <button type="button" class="bouton petit" data-drone-action="scan" title="Relancer la détection BLE + Wi-Fi"><i data-icone="wifi"></i><span>Scanner</span></button>
+            <button type="button" class="bouton petit" data-drone-action="auto" title="Connexion automatique BLE CooleerX / Wi-Fi"><i data-icone="liaison"></i><span>Auto</span></button>
+            <button type="button" class="bouton petit bouton-principal" data-drone-cmd="recon_test" title="Six vues prises à la main, puis essai de détection de la croix. Aucune commande moteur."><i data-icone="camera"></i><span>Reconnaissance sans vol</span></button>
+            <button type="button" class="bouton petit" data-drone-cmd="recon_capture" disabled title="Tourner le drone à la main d'environ 60°, puis capturer la vue suivante"><i data-icone="camera"></i><span>Capturer vue</span></button>
+            <button type="button" class="bouton petit" data-drone-cmd="cibler_croix" aria-pressed="false" title="Détection de la croix et écarts dans l'image, sans déplacement"><i data-icone="cible"></i><span>Viser la croix</span></button>
+            <button type="button" class="bouton petit" data-drone-cmd="stop_recon"><span>Arrêter l'essai</span></button>
+            <button type="button" class="bouton petit" data-drone-cmd="decoller" disabled title="Contrôleur de vol et protocole moteur à identifier et valider"><span>Vol indisponible</span></button>
+            <button type="button" class="bouton petit" data-drone-cmd="atterrir" title="Requête expérimentale ; exécution par le drone non confirmée"><i data-icone="reculer"></i><span>Demander atterrissage</span></button>
+            <button type="button" class="bouton petit bouton-danger" data-drone-cmd="stop" title="Requête d'arrêt expérimentale ; ne remplace pas une coupure matérielle"><i data-icone="arret"></i><span>Demander arrêt</span></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-radar panneau sans-marge">
+        <canvas id="p-radar" aria-label="Lidar, vue de dessus"></canvas>
+        <button type="button" class="bouton-hud portee" id="p-portee" title="Portée">4 m</button>
+      </div>
+
+      <div class="p-mode panneau">
+        <div class="segments modes" role="group" aria-label="Mode" id="p-modes">
+          <button type="button" data-mode="arret" aria-pressed="false"><i data-icone="arret"></i><span>Arrêt</span></button>
+          <button type="button" data-mode="manuel" aria-pressed="false"><i data-icone="main"></i><span>Manuel</span></button>
+          <button type="button" data-mode="auto" aria-pressed="false"><i data-icone="auto"></i><span>Auto</span></button>
+          <button type="button" data-mode="banc" aria-pressed="false"><i data-icone="banc"></i><span>Banc</span></button>
+        </div>
+        <button type="button" class="bouton armer" id="p-armer" aria-pressed="false"><i data-icone="arme"></i><span>Armer</span></button>
+      </div>
+
+      <div class="p-joystick panneau">
+        <div class="joystick" id="p-joystick" aria-label="Joystick" data-actif="false">
+          <svg class="repere" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="30"/><path d="M50 4v92M4 50h92"/></svg>
+          <div class="manette"></div>
+        </div>
+        <div class="vmax">
+          <label for="p-vmax">Vmax</label>
+          <input type="range" id="p-vmax" min="10" max="100" step="5" value="50">
+          <output id="p-vmax-valeur" for="p-vmax">—</output>
+        </div>
+        <div class="clavier" aria-hidden="true"><kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd><kbd>Espace</kbd></div>
+      </div>
+
+      <div class="p-voix panneau">
+        <button type="button" class="bouton micro" id="p-voix" aria-pressed="false" title="Mode vocal"><i data-icone="micro"></i><span>Voix</span></button>
+        <div class="niveau" aria-hidden="true"><span id="p-niveau"></span></div>
+        <p class="transcription" id="p-transcription"></p>
+      </div>
+    </section>
+
+    <!-- ============================================================ Mission / IA -->
+    <section class="vue vue-mission" id="vue-mission" data-vue="mission" hidden>
+      <div class="m-chat panneau">
+        <ol class="fil" id="m-fil" aria-live="polite"></ol>
+        <div class="ia-occupee" id="m-occupee" hidden><span></span><span></span><span></span></div>
+        <form class="saisie" id="m-saisie" autocomplete="off">
+          <button type="button" class="bouton micro" id="m-voix" aria-pressed="false" title="Mode vocal"><i data-icone="micro"></i></button>
+          <input id="m-texte" type="text" placeholder="Consigne" enterkeyhint="send" aria-label="Consigne">
+          <button type="submit" class="bouton bouton-principal" title="Envoyer"><i data-icone="envoyer"></i></button>
+        </form>
+      </div>
+
+      <div class="m-mission panneau">
+        <header><h2>Mission</h2><span class="pastille" id="m-etat" data-niveau="neutre"><span class="point"></span><span class="libelle">—</span></span></header>
+        <div class="action-courante">
+          <div class="action" id="m-action">—</div>
+          <div class="progression"><span id="m-barre"></span></div>
+          <div class="detail" id="m-detail"></div>
+        </div>
+        <ol class="file" id="m-file"></ol>
+        <div class="rangee">
+          <button type="button" class="bouton" id="m-pause"><i data-icone="pause"></i><span>Pause</span></button>
+          <button type="button" class="bouton" id="m-reprendre"><i data-icone="lecture"></i><span>Reprendre</span></button>
+          <button type="button" class="bouton bouton-attention" id="m-annuler"><i data-icone="annuler"></i><span>Annuler</span></button>
+        </div>
+        <div class="rapides" id="m-rapides">
+          <button type="button" class="bouton" data-action='{"type":"avancer","distance_m":1}'><i data-icone="avancer"></i><span>1 m</span></button>
+          <button type="button" class="bouton" data-action='{"type":"avancer","distance_m":-0.5}'><i data-icone="reculer"></i><span>0,5 m</span></button>
+          <button type="button" class="bouton" data-action='{"type":"tourner","angle_deg":90}'><i data-icone="gauche90"></i><span>90°</span></button>
+          <button type="button" class="bouton" data-action='{"type":"tourner","angle_deg":-90}'><i data-icone="droite90"></i><span>90°</span></button>
+          <button type="button" class="bouton" data-action='{"type":"retour_depart"}' title="Retour au départ"><i data-icone="maison"></i><span>Départ</span></button>
+        </div>
+      </div>
+
+      <div class="m-vision panneau">
+        <header>
+          <h2>Vision</h2>
+          <div class="segments petit" role="group" aria-label="Caméra" id="m-vision-camera">
+            <button type="button" data-camera="gauche" aria-pressed="true">Gauche</button>
+            <button type="button" data-camera="droite" aria-pressed="false">Droite</button>
+            <button type="button" data-camera="drone" aria-pressed="false">Drone</button>
+          </div>
+        </header>
+        <div class="vision-image" id="m-vision-cadre" data-fige="false">
+          <div class="camera m-direct" id="m-direct"></div>
+          <button type="button" class="bouton petit m-retour-direct" id="m-retour-direct" title="Revenir à l'image en direct"><i data-icone="camera"></i><span>Direct</span></button>
+          <img id="m-vision-img" alt="">
+          <canvas id="m-vision-canvas" aria-hidden="true"></canvas>
+          <div class="sans-image" id="m-vision-vide"><i data-icone="oeil"></i></div>
+        </div>
+        <p class="vision-texte" id="m-vision-texte"></p>
+        <div class="vision-points" id="m-vision-points"></div>
+        <div class="meta" id="m-vision-meta"></div>
+        <form class="saisie" id="m-chercher" autocomplete="off">
+          <button type="button" class="bouton" id="m-decrire"><i data-icone="oeil"></i><span>Que vois-tu ?</span></button>
+          <button type="button" class="bouton" id="m-analyser" title="Détecter les objets (IA + Lidar + Stéréo)"><i data-icone="cible"></i><span>Scanner 3D</span></button>
+          <input id="m-objet" type="text" placeholder="Chercher…" aria-label="Objet à chercher" enterkeyhint="search">
+          <button type="submit" class="bouton" title="Chercher"><i data-icone="loupe"></i></button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ============================================================ Carte -->
+    <section class="vue vue-carte" id="vue-carte" data-vue="carte" hidden>
+      <div class="panneau-carte panneau sans-marge" id="c-panneau" data-fond="locale">
+        <canvas id="c-plan" aria-label="Carte locale : cliquer pour donner un but"></canvas>
+        <canvas id="c-gps" aria-label="Carte GPS" hidden></canvas>
+        <div class="hud hud-carte-gauche">
+          <div class="segments" role="group" aria-label="Carte" id="c-fond">
+            <button type="button" data-fond="locale" aria-pressed="true">Locale</button>
+            <button type="button" data-fond="gps" aria-pressed="false">GPS</button>
+          </div>
+          <div class="segments" role="group" aria-label="Clic sur la carte" id="c-modes-gps" hidden>
+            <button type="button" data-mode="but" aria-pressed="true"><i data-icone="cible"></i><span>But</span></button>
+            <button type="button" data-mode="parcours" aria-pressed="false"><i data-icone="parcours"></i><span>Parcours</span></button>
+            <button type="button" data-mode="zone" aria-pressed="false"><i data-icone="zone"></i><span>Zone</span></button>
+          </div>
+          <dl class="pose-carte" id="c-pose">
+            <div><dt>x</dt><dd id="c-x">—</dd></div>
+            <div><dt>y</dt><dd id="c-y">—</dd></div>
+            <div><dt>cap</dt><dd id="c-cap">—</dd></div>
+            <div><dt>qualité</dt><dd id="c-qualite">—</dd></div>
+            <div class="verite" id="c-verite-bloc" hidden title="Pose vraie (simulation)"><dt>vrai</dt><dd id="c-verite">—</dd></div>
+          </dl>
+          <dl class="pose-carte" id="c-etat-gps" hidden>
+            <div><dt>fix</dt><dd id="c-gps-fix">—</dd></div>
+            <div><dt>sat.</dt><dd id="c-gps-sat">—</dd></div>
+            <div><dt>HDOP</dt><dd id="c-gps-hdop">—</dd></div>
+            <div><dt>précision</dt><dd id="c-gps-precision">—</dd></div>
+            <div class="alignement" id="c-alignement" data-niveau="neutre" title=""><dt>alignement</dt><dd id="c-gps-alignement">—</dd></div>
+          </dl>
+        </div>
+        <div class="hud outils-carte">
+          <button type="button" class="bouton-hud" id="c-plus" title="Zoom avant"><i data-icone="plus"></i></button>
+          <button type="button" class="bouton-hud" id="c-moins" title="Zoom arrière"><i data-icone="moins"></i></button>
+          <button type="button" class="bouton-hud" id="c-suivre" title="Suivre le rover" aria-pressed="true"><i data-icone="suivre"></i></button>
+          <button type="button" class="bouton-hud" id="c-ajuster" title="Tout voir"><i data-icone="ajuster"></i></button>
+          <button type="button" class="bouton-hud seulement-locale" id="c-raz" title="Remise à zéro de l’odométrie"><i data-icone="raz"></i></button>
+          <button type="button" class="bouton-hud seulement-gps" id="c-lieux-bouton" title="Lieux" aria-pressed="false" hidden><i data-icone="gps"></i></button>
+        </div>
+        <div class="hud lieux-gps" id="c-lieux" hidden>
+          <form class="saisie" id="c-lieu-form" autocomplete="off">
+            <input id="c-lieu-nom" type="text" placeholder="Nom" aria-label="Nom du lieu" maxlength="40">
+            <button type="submit" class="bouton petit" title="Mémoriser la position actuelle"><i data-icone="plus"></i><span>Ici</span></button>
+          </form>
+          <ul class="liste-lieux" id="c-lieux-liste"></ul>
+        </div>
+        <div class="hud edition-gps" id="c-edition" hidden>
+          <span class="compte" id="c-edition-compte">0</span>
+          <button type="button" class="bouton petit" id="c-edition-retirer" title="Retirer le dernier point"><i data-icone="raz"></i></button>
+          <button type="button" class="bouton petit" id="c-edition-effacer" title="Effacer le brouillon"><i data-icone="annuler"></i></button>
+          <button type="button" class="bouton petit" id="c-edition-boucle" aria-pressed="false" title="Boucler le parcours"><i data-icone="boucle"></i><span>Boucle</span></button>
+          <button type="button" class="bouton petit bouton-attention" id="c-edition-supprimer" title="Retirer la zone du rover"><i data-icone="annuler"></i><span>Zone</span></button>
+          <button type="button" class="bouton petit bouton-principal" id="c-edition-envoyer"><i data-icone="envoyer"></i><span>Envoyer</span></button>
+        </div>
+        <div class="hud attribution" id="c-attribution" hidden><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a></div>
+        <div class="hud legende-carte seulement-locale">
+          <span><i class="cle libre"></i>libre</span>
+          <span><i class="cle occupe"></i>occupé</span>
+          <span><i class="cle trajet"></i>trajet</span>
+          <span><i class="cle chemin"></i>chemin</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ Capteurs -->
+    <section class="vue vue-capteurs" id="vue-capteurs" data-vue="capteurs" hidden>
+      <article class="panneau k-lidar">
+        <header><h2>Lidar</h2><span class="source" id="k-lidar-info"></span><button type="button" class="bouton petit" id="k-portee">8 m</button></header>
+        <canvas id="k-radar" aria-label="Lidar, vue polaire"></canvas>
+      </article>
+      <article class="panneau k-cameras">
+        <header><h2>Caméras & Drone</h2></header>
+        <div class="trio quatuor">
+          <figure><div class="camera" id="k-cam-gauche"></div><figcaption><span>Gauche</span><span id="k-cam-gauche-info"></span></figcaption></figure>
+          <figure><div class="camera" id="k-cam-droite"></div><figcaption><span>Droite</span><span id="k-cam-droite-info"></span></figcaption></figure>
+          <figure><div class="camera" id="k-cam-profondeur"></div><figcaption><span>Profondeur</span><span id="k-cam-profondeur-info"></span></figcaption></figure>
+          <figure><div class="camera" id="k-cam-drone"></div><figcaption><span>Drone (BLE / Wi-Fi)</span><span id="k-cam-drone-info"></span></figcaption></figure>
+        </div>
+      </article>
+      <article class="panneau k-courbe"><header><h2>Accélération</h2><span class="source">g</span></header><div class="courbe" id="k-accel"></div></article>
+      <article class="panneau k-courbe"><header><h2>Gyroscope</h2><span class="source">°/s</span></header><div class="courbe" id="k-gyro"></div></article>
+      <article class="panneau k-courbe"><header><h2>Cap</h2><span class="source">°</span></header><div class="courbe" id="k-cap"></div></article>
+      <article class="panneau"><header><h2>Centrale</h2><span class="pastille" id="k-imu-etat" data-niveau="neutre"><span class="point"></span><span class="libelle">—</span></span></header><dl class="valeurs" id="k-imu"></dl></article>
+      <article class="panneau"><header><h2>GPS</h2><span class="pastille" id="k-gps-etat" data-niveau="neutre"><span class="point"></span><span class="libelle">—</span></span></header><dl class="valeurs" id="k-gps"></dl></article>
+      <article class="panneau"><header><h2>ESP</h2><span class="pastille" id="k-esp-etat" data-niveau="neutre"><span class="point"></span><span class="libelle">—</span></span></header><dl class="valeurs" id="k-esp"></dl></article>
+      <article class="panneau"><header><h2>Drone (CooleerX / HD-DRONE)</h2><span class="pastille" id="k-drone-etat" data-niveau="neutre"><span class="point"></span><span class="libelle">—</span></span></header><dl class="valeurs" id="k-drone"></dl></article>
+      <article class="panneau"><header><h2>Stéréo</h2><span class="pastille" id="k-stereo-etat" data-niveau="neutre"><span class="point"></span><span class="libelle">—</span></span></header><dl class="valeurs" id="k-stereo"></dl></article>
+      <article class="panneau k-flux"><header><h2>Fréquences</h2></header>
+        <table class="tableau"><thead><tr><th></th><th>État</th><th>Fréq.</th><th>Âge</th></tr></thead><tbody id="k-flux"></tbody></table>
+      </article>
+    </section>
+
+    <!-- ============================================================ Système -->
+    <section class="vue vue-systeme" id="vue-systeme" data-vue="systeme" hidden>
+      <div class="tuiles" id="s-tuiles"></div>
+      <article class="panneau s-journal">
+        <header>
+          <h2>Journal</h2>
+          <div class="filtres" id="s-filtres">
+            <button type="button" class="filtre" data-niveau="info" aria-pressed="true">Info</button>
+            <button type="button" class="filtre" data-niveau="succes" aria-pressed="true">Succès</button>
+            <button type="button" class="filtre" data-niveau="alerte" aria-pressed="true">Alerte</button>
+            <button type="button" class="filtre" data-niveau="erreur" aria-pressed="true">Erreur</button>
+            <select id="s-source" aria-label="Source"><option value="">Toutes</option></select>
+            <input type="search" id="s-recherche" placeholder="Filtrer" aria-label="Filtrer le journal">
+          </div>
+        </header>
+        <ol class="journal" id="s-journal"></ol>
+      </article>
+      <article class="panneau s-console">
+        <header><h2>Console ESP</h2><span class="source" id="s-console-info"></span></header>
+        <pre class="console" id="s-console"></pre>
+        <form class="saisie" id="s-console-form" autocomplete="off">
+          <input id="s-console-texte" type="text" spellcheck="false" placeholder="ligne" aria-label="Ligne vers l’ESP">
+          <button type="submit" class="bouton"><i data-icone="envoyer"></i><span>Envoyer</span></button>
+        </form>
+      </article>
+      <article class="panneau s-materiel">
+        <header><h2>Lidar</h2><button type="button" class="bascule" id="s-lidar" role="switch" aria-checked="false"><span></span></button></header>
+        <h3>Calibration</h3>
+        <ul class="calibrations" id="s-calibrations"></ul>
+        <h3>Banc</h3>
+        <div class="banc" id="s-banc">
+          <label>G <input type="range" id="s-banc-g" min="-15" max="15" step="1" value="0"><output id="s-banc-g-v">0 %</output></label>
+          <label>D <input type="range" id="s-banc-d" min="-15" max="15" step="1" value="0"><output id="s-banc-d-v">0 %</output></label>
+          <label>Servo <input type="range" id="s-banc-s" min="-40" max="40" step="1" value="0"><output id="s-banc-s-v">0°</output></label>
+          <div class="rangee">
+            <button type="button" class="bouton bouton-maintenir" id="s-banc-go"><i data-icone="lecture"></i><span>Maintenir</span></button>
+            <button type="button" class="bouton" id="s-banc-zero"><i data-icone="raz"></i><span>Zéro</span></button>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- ============================================================ Réglages -->
+    <section class="vue vue-reglages" id="vue-reglages" data-vue="reglages" hidden>
+      <article class="panneau" id="r-ia">
+        <header><h2>IA</h2><span class="pastille" id="r-ia-etat" data-niveau="neutre"><span class="point"></span><span class="libelle">—</span></span></header>
+        <div class="segments large" role="group" aria-label="Fournisseur IA" id="r-ia-profils"></div>
+        <dl class="valeurs" id="r-ia-modeles"></dl>
+        <form class="saisie" id="r-ia-cle-form" autocomplete="off">
+          <input id="r-ia-cle" type="password" spellcheck="false" placeholder="Clé API Gemini (GEMINI_API_KEY)" aria-label="Clé API Gemini">
+          <button type="submit" class="bouton"><i data-icone="envoyer"></i><span>Enregistrer</span></button>
+        </form>
+      </article>
+      <article class="panneau" id="r-cameras">
+        <header><h2>Caméras</h2></header>
+        <div class="ligne-reglage"><span>Gauche / droite</span><button type="button" class="bouton petit" id="r-inverser"><i data-icone="stereo"></i><span>Inverser</span></button></div>
+      </article>
+      <article class="panneau" id="r-voix">
+        <header><h2>Voix</h2></header>
+        <div class="ligne-reglage"><span>Mode vocal</span><button type="button" class="bascule" id="r-voix-active" role="switch" aria-checked="false"><span></span></button></div>
+        <div class="ligne-reglage"><span>Lire les réponses</span><button type="button" class="bascule" id="r-voix-lire" role="switch" aria-checked="false"><span></span></button></div>
+        <div class="ligne-reglage"><span>Micro</span><span class="source" id="r-micro">—</span></div>
+      </article>
+      <article class="panneau" id="r-poste">
+        <header><h2>Poste</h2></header>
+        <div class="ligne-reglage"><span>Thème</span>
+          <div class="segments petit" role="group" aria-label="Thème" id="r-theme">
+            <button type="button" data-theme="sombre" aria-pressed="true"><i data-icone="lune"></i><span>Sombre</span></button>
+            <button type="button" data-theme="clair" aria-pressed="false"><i data-icone="soleil"></i><span>Clair</span></button>
+          </div>
+        </div>
+        <form class="ligne-reglage" id="r-jeton-form" autocomplete="off"><label for="r-jeton">Jeton</label><input type="password" id="r-jeton" autocomplete="off"></form>
+        <div class="ligne-reglage"><span>Mini-carte GPS</span><button type="button" class="bascule" id="r-minicarte" role="switch" aria-checked="false"><span></span></button></div>
+        <form class="ligne-reglage" id="r-tuiles-form" autocomplete="off"><label for="r-tuiles">Tuiles</label><input type="text" id="r-tuiles" spellcheck="false" placeholder="aucune"><button type="button" class="bouton petit" id="r-tuiles-osm" title="OpenStreetMap">OSM</button></form>
+        <div class="ligne-reglage"><span>Version</span><span class="source" id="r-version">—</span></div>
+      </article>
+      <div class="groupes-reglages" id="r-groupes"></div>
+    </section>
+  </main>
+</body>
+</html>

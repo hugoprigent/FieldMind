@@ -1,0 +1,28 @@
+# Paramètres du nœud `pont` (fieldmind_rover_ros). L'adresse du rover et le jeton viennent des
+# arguments de lancement (variables FIELDMIND_ROVER et FIELDMIND_JETON) : pas dans ce fichier.
+pont_fieldmind:
+  ros__parameters:
+    images: true                # demander les images des deux webcams (5 Hz, JPEG)
+    # LaserScan uniforme : 400 secteurs de 0,9° (RPLIDAR C1 : ≈ 0,72° entre points à 10 Hz).
+    nb_rayons: 400
+    portee_min: 0.12
+    portee_max: 12.0
+    lidar_x: 0.0                # lidar au-dessus de l'essieu arrière (rover.toml [lidar])
+    lidar_y: 0.0
+    duree_scan: 0.1
+    recaler_horloge: true       # dates du Pi (t, t_envoi) ramenées à l'horloge de cette machine
+    hfov_deg: 78.0              # CameraInfo approchée tant que la stéréo n'est pas calibrée
+    # Bornes des consignes envoyées (le rover applique ensuite les siennes, plus strictes).
+    vitesse_max: 0.5
+    vitesse_arriere_max: 0.3
+    vitesse_lacet_max: 1.0
+    silence_max_s: 3.0          # sans message du rover pendant 3 s : reconnexion
+    publier_tf: true            # odom → base_link
+    sujet_but: /goal_pose
+    cmd_vel_horodate: false     # true : geometry_msgs/TwistStamped
+    repere_odom: odom
+    repere_base: base_link
+    repere_lidar: lidar_link
+    repere_imu: imu_link
+    repere_gnss: gnss_link
+    repere_camera: "camera_{camera}_optical_frame"

@@ -1,0 +1,2 @@
+three.js 0.186.1 (npm), fichiers build/three.module.js, build/three.core.js, examples/jsm/controls/OrbitControls.js. Licence MIT.
+Fichiers additionnels : examples/jsm/loaders/GLTFLoader.js, examples/jsm/libs/meshopt_decoder.module.js, examples/jsm/utils/BufferGeometryUtils.js, examples/jsm/utils/SkeletonUtils.js.

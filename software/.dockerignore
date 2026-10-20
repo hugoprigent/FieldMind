@@ -1,0 +1,14 @@
+.venv
+**/__pycache__
+.pytest_cache
+.mypy_cache
+.ruff_cache
+logs
+rapports
+tests
+outils
+ros2
+deployment
+node_modules
+.env
+.env.*

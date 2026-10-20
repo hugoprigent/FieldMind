@@ -1,0 +1,38 @@
+{
+ "collisions_dans_axe": [],
+ "braquage_max_deg": {
+  "vers_la_gauche": {
+   "libre_jusqu_a": 52,
+   "premier_contact": {
+    "angle_deg": 54,
+    "contact": [
+     {
+      "a": "boitier_servo_D",
+      "b": "pneu_arriere_G",
+      "volume_mm3": 0.169
+     }
+    ]
+   }
+  },
+  "vers_la_droite": {
+   "libre_jusqu_a": 52,
+   "premier_contact": {
+    "angle_deg": 54,
+    "contact": [
+     {
+      "a": "boitier_servo_G",
+      "b": "pneu_arriere_D",
+      "volume_mm3": 0.169
+     }
+    ]
+   }
+  }
+ },
+ "bascule": {
+  "tangage_-10": [],
+  "tangage_+10": [],
+  "roulis_-10": [],
+  "roulis_+10": []
+ },
+ "jeu_timon_rover_hors_attelage_mm": 79.0
+}

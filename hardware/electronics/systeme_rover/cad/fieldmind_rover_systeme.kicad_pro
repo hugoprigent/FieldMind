@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "filename": "fieldmind_rover_systeme.kicad_pro",
+    "version": 3
+  },
+  "sheets": [
+    [
+      "5240d692-794a-56ea-8571-3be3a6fdba67",
+      "Root"
+    ],
+    [
+      "0d9abf60-d442-57e9-b820-2d08718ac540",
+      "Puissance et arrêt"
+    ],
+    [
+      "963dbb8f-bdd7-5256-a9a1-098041add80d",
+      "Raspberry Pi et USB"
+    ],
+    [
+      "ae736f0a-7bf4-5f33-b7ce-b6d5952b34c9",
+      "Carte capteurs et périphériques"
+    ]
+  ]
+}

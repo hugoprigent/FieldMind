@@ -1,0 +1,53 @@
+{
+ "collisions": {
+  "servo_+0_deg": [],
+  "servo_-31_deg": [],
+  "servo_+31_deg": []
+ },
+ "webcams": {
+  "D4_REF_Webcam_UGREEN_D:1": {
+   "centre_optique_mm": [
+    60.0,
+    -62.4,
+    270.2
+   ],
+   "visee": [
+    -0.0,
+    -0.9848,
+    -0.1736
+   ],
+   "inclinaison_deg": 10.0,
+   "rayons": 135,
+   "masquages": []
+  },
+  "D4_REF_Webcam_UGREEN_G:1": {
+   "centre_optique_mm": [
+    -60.0,
+    -62.4,
+    270.2
+   ],
+   "visee": [
+    -0.0,
+    -0.9848,
+    -0.1736
+   ],
+   "inclinaison_deg": 10.0,
+   "rayons": 135,
+   "masquages": []
+  }
+ },
+ "base_stereo_mm": 120.0,
+ "lidar": {
+  "centre_mm": [
+   0.0,
+   380.0,
+   322.3
+  ],
+  "nappes": {
+   "+0.0_deg": [],
+   "-1.5_deg": [],
+   "+1.5_deg": []
+  },
+  "hauteur_plan_sol_mm": 322.3
+ }
+}

@@ -1,0 +1,45 @@
+fil,face,net,type,extremite_1,extremite_2,trajet_coins,longueur_mm
+P01,dessous,I2C_SDA,rail nu,I1,E20,I1 > I19 > E19 > E20,58.4
+P02,dessous,I2C_SDA,nu,N9,I9,N9 > I9,12.7
+P03,dessous,I2C_SDA,isolé,N15,I16,N15 > (14.5;15) > (14.5;16.5) > (11;16.5) > K16 > I16,20.3
+P04,dessous,I2C_SCL,rail nu,H1,D20,H1 > H18 > D18 > D20,58.4
+P05,dessous,I2C_SCL,isolé,K7,H9,K7 > (11.5;7) > (11.5;8.5) > (8.5;8.5) > (8.5;9) > H9,15.2
+P06,dessous,I2C_SCL,isolé,N10,H13,N10 > N12 > (9.5;12) > (9.5;12.5) > (8.5;12.5) > (8.5;13) > H13,22.9
+P07,dessous,I2C_SCL,nu,N16,L12,N16 > L16 > L12,15.2
+P08,dessous,GND,rail nu,F1,C20,F1 > F17 > C17 > C20,55.9
+P09,dessous,GND,nu,E3,F3,E3 > F3,2.5
+P10,dessous,GND,nu,A3,C3,A3 > C3,5.1
+P11,dessous,GND,nu,A11,F11,A11 > F11,12.7
+P12,dessous,GND,isolé,N7,F10,N7 > (13.5;7) > (13.5;8.5) > (14.5;8.5) > (14.5;9.5) > (6.5;9.5) > (6.5;10) > F10,33.0
+P13,dessous,GND,isolé,N17,F17,N17 > (9.5;17) > (9.5;17.5) > (6;17.5) > F17,22.9
+P14,dessous,+3V3,rail nu,G1,G16,G1 > G16,38.1
+P15,dessous,+3V3,isolé,E4,G5,E4 > (5;4.5) > (6.5;4.5) > (6.5;5) > G5,7.6
+P16,dessous,+3V3,nu,A4,C4,A4 > C4,5.1
+P17,dessous,+3V3,isolé,A10,B4,A10 > (0.5;10) > (0.5;4.5) > (2;4.5) > B4,20.3
+P18,dessous,+3V3,isolé,N8,G2,N8 > (14.5;8) > (14.5;1) > (9.5;1) > (9.5;0.5) > (7.5;0.5) > (7.5;2) > G2,43.2
+P19,dessous,+3V3,isolé,B20,G15,B20 > B16 > (5.5;16) > (5.5;15.5) > (6.5;15.5) > (6.5;15) > G15,25.4
+P20,dessous,+3V3,isolé,N18,B19,N18 > J18 > (10;20.5) > (2.5;20.5) > (2.5;19) > B19,40.6
+P21,dessous,VBUS_USB,nu,C2,A2,C2 > A2,5.1
+P22,dessous,GNSS_TX,isolé,K8,A12,K8 > (12.5;8) > (12.5;11.5) > (5;11.5) > E12 > A12,43.2
+P23,dessous,GNSS_RX,nu,C8,A9,C8 > A8 > A9,7.6
+P24,dessous,EXT_D0,nu,N2,K2,N2 > K2,7.6
+P25,dessous,EXT_D1,nu,N3,K3,N3 > K3,7.6
+P26,dessous,EXT_D2,nu,N4,K4,N4 > K4,7.6
+P27,dessous,EXT_D3,nu,N5,K5,N5 > K5,7.6
+P28,dessous,EXT_D8,nu,C7,A7,C7 > A7,5.1
+P29,dessous,EXT_D9,nu,C6,A6,C6 > A6,5.1
+P30,dessous,EXT_D10,nu,C5,A5,C5 > A5,5.1
+S01,dessus,EXT_D0,pont de soudure,J2,K2,J2 > K2,2.5
+S02,dessus,EXT_D1,pont de soudure,J3,K3,J3 > K3,2.5
+S03,dessus,EXT_D2,pont de soudure,J4,K4,J4 > K4,2.5
+S04,dessus,EXT_D3,pont de soudure,J5,K5,J5 > K5,2.5
+S05,dessus,I2C_SDA,pont de soudure,J6,I6,J6 > I6,2.5
+S06,dessus,I2C_SCL,pont de soudure,J7,K7,J7 > K7,2.5
+S07,dessus,GNSS_TX,pont de soudure,J8,K8,J8 > K8,2.5
+S08,dessus,GNSS_RX,pont de soudure,D8,C8,D8 > C8,2.5
+S09,dessus,EXT_D8,pont de soudure,D7,C7,D7 > C7,2.5
+S10,dessus,EXT_D9,pont de soudure,D6,C6,D6 > C6,2.5
+S11,dessus,EXT_D10,pont de soudure,D5,C5,D5 > C5,2.5
+S12,dessus,+3V3,pont de soudure,C4,E4,C4 > E4,5.1
+S13,dessus,GND,pont de soudure,C3,E3,C3 > E3,5.1
+S14,dessus,VBUS_USB,pont de soudure,D2,C2,D2 > C2,2.5

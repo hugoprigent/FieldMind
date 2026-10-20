@@ -1,0 +1,11 @@
+{
+  "ident": "simulation-320x240",
+  "fx": 160.0,
+  "fy": 160.0,
+  "cx": 159.5,
+  "cy": 119.5,
+  "largeur_px": 320,
+  "hauteur_px": 240,
+  "bras_m": 0.20,
+  "epaisseur_m": 0.04
+}

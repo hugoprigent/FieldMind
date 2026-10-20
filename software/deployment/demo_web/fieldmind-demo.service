@@ -1,0 +1,38 @@
+[Unit]
+Description=FieldMind — démo de navigation autonome (cerveau, simulateur, poste opérateur)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=fieldmind
+Group=fieldmind
+WorkingDirectory=/opt/fieldmind/software
+# Clé d'API et réglages : fichier hors du dépôt, lisible par root et fieldmind seulement.
+EnvironmentFile=/etc/fieldmind/demo.env
+Environment=NUMBA_CACHE_DIR=/var/cache/fieldmind
+Environment=PYTHONUNBUFFERED=1
+Environment=MUJOCO_GL=osmesa
+# Un seul processus : les sessions (simulation + cerveau) sont en mémoire.
+ExecStart=/opt/fieldmind/software/.venv/bin/uvicorn services.api.serveur:app \
+    --host 127.0.0.1 --port 8000 --proxy-headers --forwarded-allow-ips 127.0.0.1 \
+    --ws-max-size 1048576 --timeout-graceful-shutdown 5
+Restart=on-failure
+RestartSec=3
+
+# Durcissement
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+ReadWritePaths=/opt/fieldmind/software/logs /var/cache/fieldmind
+CacheDirectory=fieldmind
+MemoryMax=3G
+
+[Install]
+WantedBy=multi-user.target

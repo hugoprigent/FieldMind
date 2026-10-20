@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "filename": "fieldmind_c5_a7.kicad_pro",
+    "version": 3
+  },
+  "board": {
+    "design_settings": {
+      "rule_severities": {
+        "pth_inside_courtyard": "ignore",
+        "npth_inside_courtyard": "ignore"
+      },
+      "rules": {
+        "min_clearance": 0.2,
+        "min_track_width": 0.2,
+        "min_through_hole_diameter": 0.3
+      }
+    }
+  },
+  "sheets": [
+    [
+      "80826cb1-a09b-5238-bcc2-4a64d8e4e878",
+      "Root"
+    ],
+    [
+      "21d3ff21-a340-5beb-9b2d-5f3ad53346ae",
+      "Capteurs I2C et écran"
+    ]
+  ]
+}

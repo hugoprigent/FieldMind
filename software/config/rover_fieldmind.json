@@ -1,0 +1,106 @@
+{
+  "nom": "FieldMind V3",
+  "source": "Paramètres Fusion (hardware/pieces_ensemble.md) ; les valeurs marquées hypothese sont à mesurer sur le rover.",
+  "hypotheses": [
+    "physique.masse_totale : la masse Fusion est fausse (matériau acier par défaut), 15 kg estimés",
+    "geometrie.longueur : 0,70 m par défaut (BRIEF_demo_web.md)",
+    "capteurs.lidar.position : sur la tête capteurs avant, plan de mesure à 0,323 m du sol",
+    "capteurs.gnss.position : antenne ANN-MB sur le rail du toit",
+    "limites.vitesse_braquage_deg_s : servo 35 kg·cm, 90°/s",
+    "physique.moteur : brushless Ø80 piloté en vitesse par le VESC, couple et rendement estimés",
+    "physique.batterie : 10S Li-ion 10 Ah",
+    "capteurs.camera et capteurs.stereo : module stéréo USB synchronisé 2 × OV9732 (≈ 45 €) à la place de la caméra Pi, centré sur son support (position et inclinaison −10° lues dans Robot_V3_rig.blend) ; champ de 90° et base de 60 mm à vérifier sur le module acheté ; images traitées en 640 × 360, rectifiées après étalonnage"
+  ],
+  "geometrie": {
+    "empattement": 0.400,
+    "voie_avant": 0.446,
+    "voie_arriere": 0.438,
+    "rayon_roue": 0.100,
+    "largeur_roue": 0.080,
+    "longueur": 0.70,
+    "largeur": 0.53,
+    "essieu_arriere_x": -0.20,
+    "garde_au_sol": 0.065
+  },
+  "limites": {
+    "braquage_max_deg": 30.0,
+    "vitesse_braquage_deg_s": 90.0,
+    "vitesse_max": 1.5,
+    "vitesse_arriere_max": 0.6,
+    "acceleration_max": 1.0,
+    "deceleration_max": 2.0,
+    "deceleration_urgence": 4.0
+  },
+  "securite": {
+    "distance_arret_avant": 0.40,
+    "secteur_avant_deg": 30.0,
+    "chien_de_garde_s": 0.5
+  },
+  "capteurs": {
+    "lidar": {
+      "modele": "LDROBOT LD14P",
+      "position": [0.18, 0.0, 0.323],
+      "frequence_hz": 6.0,
+      "mesures_par_tour": 360,
+      "portee_min": 0.10,
+      "portee_max": 8.0,
+      "bruit_sigma": 0.01,
+      "taux_pertes": 0.01
+    },
+    "imu": {
+      "modele": "BNO085",
+      "frequence_hz": 50.0,
+      "bruit_gyro": 0.003,
+      "biais_gyro_z": 0.002,
+      "bruit_accel": 0.05,
+      "bruit_cap_absolu_deg": 3.0
+    },
+    "gnss": {
+      "modele": "u-blox ZED-F9P + ANN-MB (RTK)",
+      "position": [-0.05, 0.0, 0.31],
+      "frequence_hz": 10.0,
+      "sigma_rtk_fixe": 0.02,
+      "latence_s": 0.05
+    },
+    "codeurs": {
+      "frequence_hz": 50.0,
+      "impulsions_par_tour": 2048
+    },
+    "camera": {
+      "modele": "Module stéréo USB 2 × OV9732 (œil gauche)",
+      "position": [0.162, 0.018, 0.269],
+      "inclinaison_deg": -10.0,
+      "champ_horizontal_deg": 90.0,
+      "largeur": 640,
+      "hauteur": 360,
+      "frequence_hz": 2.0,
+      "qualite_jpeg": 80
+    },
+    "stereo": {
+      "modele": "Module stéréo USB synchronisé 2 × OV9732, base 60 mm (type ELP / HBV-1780-2)",
+      "base_m": 0.06,
+      "disparites": 64,
+      "portee_max": 8.0
+    }
+  },
+  "physique": {
+    "masse_totale": 15.0,
+    "masse_roue": 0.35,
+    "frottement_pneu": 0.9,
+    "moteur": {
+      "rapport_transmission": 3.0,
+      "couple_max": 2.5,
+      "regime_max_tr_min": 6000,
+      "rendement": 0.85
+    },
+    "servo": {
+      "couple_max": 3.4
+    },
+    "batterie": {
+      "cellules_serie": 10,
+      "capacite_ah": 10.0,
+      "resistance_interne": 0.08,
+      "consommation_repos_w": 90.0
+    }
+  }
+}

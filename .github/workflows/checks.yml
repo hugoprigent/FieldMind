@@ -1,0 +1,53 @@
+name: Tests
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  rover:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: software/rover
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -r requirements-ci.txt
+      - run: ruff check fieldmind tests
+      - run: python -m pytest -q -m "not lent"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/web/*.test.mjs
+  demo:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: software
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends libosmesa6
+      - run: pip install -r requirements-dev.txt
+      - run: python -m pytest -q -m "not lent and not navigateur"
+        env:
+          MUJOCO_GL: osmesa
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test "tests/js/**/*.test.js"
+  firmware:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: software/esp32/esp_c5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install platformio==6.2.0
+      - run: pio run -e esp_c5

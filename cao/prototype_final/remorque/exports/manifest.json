@@ -1,0 +1,314 @@
+{
+ "pieces": [
+  {
+   "stl": "stl/rebord_AV_G.stl",
+   "quantite": 1,
+   "couleur": "bleu",
+   "orientation": "retourné, lèvre contre le plateau",
+   "taille_impression_mm": [
+    146.7,
+    57.3,
+    10.5
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 16.2
+  },
+  {
+   "stl": "stl/rebord_AR_G.stl",
+   "quantite": 1,
+   "couleur": "bleu",
+   "orientation": "retourné, lèvre contre le plateau",
+   "taille_impression_mm": [
+    150.0,
+    16.4,
+    10.5
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 15.1
+  },
+  {
+   "stl": "stl/rebord_AR_D.stl",
+   "quantite": 1,
+   "couleur": "bleu",
+   "orientation": "retourné, lèvre contre le plateau",
+   "taille_impression_mm": [
+    150.0,
+    16.4,
+    10.5
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 15.1
+  },
+  {
+   "stl": "stl/rebord_AV_D.stl",
+   "quantite": 1,
+   "couleur": "bleu",
+   "orientation": "retourné, lèvre contre le plateau",
+   "taille_impression_mm": [
+    146.7,
+    57.3,
+    10.5
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 16.2
+  },
+  {
+   "stl": "stl/joue_M1_G.stl",
+   "quantite": 1,
+   "couleur": "bleu",
+   "orientation": "couchée sur sa face extérieure",
+   "taille_impression_mm": [
+    7.0,
+    172.0,
+    16.4
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 7.6
+  },
+  {
+   "stl": "stl/joue_M2_G.stl",
+   "quantite": 1,
+   "couleur": "bleu",
+   "orientation": "couchée sur sa face extérieure",
+   "taille_impression_mm": [
+    7.0,
+    144.0,
+    16.4
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 6.4
+  },
+  {
+   "stl": "stl/joue_M2_D.stl",
+   "quantite": 1,
+   "couleur": "bleu",
+   "orientation": "couchée sur sa face extérieure",
+   "taille_impression_mm": [
+    7.0,
+    144.0,
+    16.4
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 6.4
+  },
+  {
+   "stl": "stl/joue_M1_D.stl",
+   "quantite": 1,
+   "couleur": "bleu",
+   "orientation": "couchée sur sa face extérieure",
+   "taille_impression_mm": [
+    7.0,
+    172.0,
+    16.4
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 7.6
+  },
+  {
+   "stl": "stl/boitier_servo_G.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "couché sur sa face extérieure (boîtier et butée)",
+   "taille_impression_mm": [
+    39.0,
+    69.5,
+    50.9
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 30.7
+  },
+  {
+   "stl": "stl/charniere_AR_G.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "debout sur sa face arrière",
+   "taille_impression_mm": [
+    50.9,
+    17.0,
+    34.4
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 15.8
+  },
+  {
+   "stl": "stl/boitier_servo_D.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "couché sur sa face extérieure (boîtier et butée)",
+   "taille_impression_mm": [
+    39.0,
+    69.5,
+    50.9
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 30.7
+  },
+  {
+   "stl": "stl/charniere_AR_D.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "debout sur sa face arrière",
+   "taille_impression_mm": [
+    50.9,
+    17.0,
+    34.4
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 15.8
+  },
+  {
+   "stl": "stl/ferrure_AV_G.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "debout sur la face du palonnier",
+   "taille_impression_mm": [
+    49.6,
+    18.0,
+    31.5
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 5.9
+  },
+  {
+   "stl": "stl/ferrure_AR_G.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "debout, noeud vertical",
+   "taille_impression_mm": [
+    49.6,
+    18.0,
+    26.0
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 4.4
+  },
+  {
+   "stl": "stl/ferrure_AV_D.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "debout sur la face du palonnier",
+   "taille_impression_mm": [
+    49.6,
+    18.0,
+    31.5
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 5.9
+  },
+  {
+   "stl": "stl/ferrure_AR_D.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "debout, noeud vertical",
+   "taille_impression_mm": [
+    49.6,
+    18.0,
+    26.0
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 4.4
+  },
+  {
+   "stl": "stl/timon.stl",
+   "quantite": 1,
+   "couleur": "bleu",
+   "orientation": "à plat, dessous contre le plateau",
+   "taille_impression_mm": [
+    168.0,
+    168.0,
+    25.5
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 243.2
+  },
+  {
+   "stl": "stl/support_roue_G.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "couché sur la face extérieure de la jambe",
+   "taille_impression_mm": [
+    94.5,
+    120.0,
+    77.5
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 136.8
+  },
+  {
+   "stl": "stl/bague_625_dans_logement_608.stl",
+   "quantite": 4,
+   "couleur": "blanc",
+   "orientation": "lèvre contre le plateau",
+   "taille_impression_mm": [
+    22.0,
+    22.0,
+    7.0
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 1.4
+  },
+  {
+   "stl": "stl/entretoise_625_6.2mm.stl",
+   "quantite": 2,
+   "couleur": "blanc",
+   "orientation": "à plat",
+   "taille_impression_mm": [
+    7.5,
+    7.5,
+    6.2
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 0.1
+  },
+  {
+   "stl": "stl/rondelle_tete_M5_2mm.stl",
+   "quantite": 2,
+   "couleur": "blanc",
+   "orientation": "à plat",
+   "taille_impression_mm": [
+    7.5,
+    7.5,
+    2.0
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 0.0
+  },
+  {
+   "stl": "stl/cale_jambe_3mm.stl",
+   "quantite": 2,
+   "couleur": "blanc",
+   "orientation": "à plat",
+   "taille_impression_mm": [
+    7.5,
+    7.5,
+    3.0
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 0.1
+  },
+  {
+   "stl": "stl/support_roue_D.stl",
+   "quantite": 1,
+   "couleur": "blanc",
+   "orientation": "couché sur la face extérieure de la jambe",
+   "taille_impression_mm": [
+    94.5,
+    120.0,
+    77.5
+   ],
+   "tient_sur_A1_mini": true,
+   "volume_cm3": 136.8
+  }
+ ],
+ "plateau_mm": 180.0,
+ "chape": "exportée par 00_chape_rover.py (document du rover)",
+ "roues_identiques_a_l_avant": {
+  "quantite_par_stl": 2,
+  "stl": [
+   "../../mounts/prototype/direction_v04_servo_traversant/exports/stl/jante_608ZZ.stl",
+   "../../mounts/prototype/direction_v04_servo_traversant/exports/stl/pneu_TPU.stl",
+   "../../mounts/prototype/direction_v04_servo_traversant/exports/stl/flasque_pneu.stl"
+  ],
+  "note": "mêmes fichiers que les roues avant de la direction V04 (2 de plus)"
+ }
+}

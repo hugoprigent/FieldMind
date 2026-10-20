@@ -1,0 +1,14 @@
+# Dépendances d'exécution de la démo (cerveau, simulateur, serveur).
+# Installées dans software/.venv : pip install -r requirements-demo.txt
+fastapi==0.142.0
+uvicorn[standard]==0.54.0
+pydantic==2.13.5
+pydantic-settings==2.15.0
+numpy==2.5.3
+scipy==1.18.1
+mujoco==3.14.0
+anthropic==1.9.0
+httpx==0.28.1
+numba==0.67.0
+pillow==12.3.0
+opencv-python-headless==4.14.0.94

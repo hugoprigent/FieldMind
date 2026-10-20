@@ -1,0 +1,106 @@
+{
+ "_note": "Masses en grammes. Pièces imprimées : volume × densité × remplissage. Le reste : estimations à remplacer par une pesée (champ 'pese': true une fois pesé). Utilisé par scripts/13_centre_de_gravite.py.",
+ "imprime": {
+  "densite_g_cm3": 1.27,
+  "remplissage": 0.5,
+  "prefixes": [
+   "PF_IMP_",
+   "D4_IMP_",
+   "D4_REF_Support_moteur_arriere"
+  ]
+ },
+ "bois": {
+  "densite_g_cm3": 0.6,
+  "prefixes": [
+   "D4_REF_Planche_bois"
+  ]
+ },
+ "profile_g_par_mm": 1.5,
+ "metal_densite_g_cm3": 7.85,
+ "metal_mots": [
+  "vis",
+  "ecrou",
+  "rondelle",
+  "608",
+  "625",
+  "3x10x4",
+  "tige",
+  "axe"
+ ],
+ "composants": {
+  "PF_REF_Batterie": {
+   "g": 600,
+   "pese": false,
+   "note": "82 × 68 × 51 : estimation, à peser"
+  },
+  "PF_REF_Moteur_arriere_": {
+   "g": 600,
+   "pese": false,
+   "note": "NGP RM24 avec réducteur, chacun"
+  },
+  "PF_REF_Roue_arriere_": {
+   "g": 300,
+   "pese": false,
+   "note": "roue de tondeuse Ø200, chacune"
+  },
+  "PF_REF_Raspberry_Pi4_boitier": {
+   "g": 150,
+   "pese": false
+  },
+  "PF_REF_Controleur_BLDC_": {
+   "g": 60,
+   "pese": false,
+   "note": "ZS-X11H, chacun"
+  },
+  "PF_REF_XL4015_": {
+   "g": 30,
+   "pese": false,
+   "note": "chacun"
+  },
+  "PF_REF_Breadboard_830": {
+   "g": 60,
+   "pese": false
+  },
+  "PF_REF_GPS_ATGM336H": {
+   "g": 10,
+   "pese": false
+  },
+  "PF_REF_Antenne_GNSS": {
+   "g": 20,
+   "pese": false
+  },
+  "PF_REF_Carte_capteurs_A7": {
+   "g": 40,
+   "pese": false
+  },
+  "PF_REF_Modulino_Knob": {
+   "g": 10,
+   "pese": false
+  },
+  "PF_REF_Adaptateur_USB_C1": {
+   "g": 10,
+   "pese": false
+  },
+  "D4_REF_Lidar_C1": {
+   "g": 110,
+   "pese": false,
+   "note": "fiche Slamtec : environ 110 g"
+  },
+  "D4_REF_Webcam_UGREEN_": {
+   "g": 100,
+   "pese": false,
+   "note": "chacune, pied compris"
+  },
+  "D4_REF_Servo_DT996": {
+   "g": 65,
+   "pese": false
+  },
+  "D4_REF_Equerre_40_": {
+   "g": 40,
+   "pese": false,
+   "note": "chacune"
+  }
+ },
+ "remorque_sur_attelage_g": 200,
+ "_remorque": "charge verticale estimée de la remorque chargée (drone compris) sur la boule d'attelage, à Y = 540"
+}

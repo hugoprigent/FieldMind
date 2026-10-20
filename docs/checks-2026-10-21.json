@@ -1,0 +1,60 @@
+{
+  "date_local": "2026-10-21",
+  "platform": "macOS",
+  "clean_install": true,
+  "checks": [
+    {
+      "name": "rover Python",
+      "command": "python -m pytest -q -m \"not lent\"",
+      "passed": 425,
+      "deselected": 2
+    },
+    {
+      "name": "rover JavaScript",
+      "command": "node --test tests/web/*.test.mjs",
+      "passed": 22
+    },
+    {
+      "name": "legacy demo Python",
+      "command": "python -m pytest -q -m \"not lent and not navigateur\"",
+      "passed": 98,
+      "deselected": 4
+    },
+    {
+      "name": "legacy demo JavaScript",
+      "command": "node --test \"tests/js/**/*.test.js\"",
+      "passed": 3
+    },
+    {
+      "name": "rover lint",
+      "command": "ruff check fieldmind tests",
+      "status": "passed"
+    },
+    {
+      "name": "rover simulation HTTP",
+      "status": "passed",
+      "routes": [
+        "/",
+        "/api/sante",
+        "/api/etat",
+        "/js/main.js",
+        "/js/vues/mission.js",
+        "/photo/gauche"
+      ]
+    },
+    {
+      "name": "ESP32-C5 firmware",
+      "command": "pio run -e esp_c5",
+      "status": "passed",
+      "platformio": "6.2.0",
+      "flash_used_bytes": 1129971,
+      "ram_used_bytes": 95344,
+      "uploaded_to_hardware": false
+    }
+  ],
+  "limitations": [
+    "Simulation and software tests; no autonomous physical mission validated by these checks.",
+    "GX10 supplementary services were not built or modified during the public repository checks.",
+    "Firmware build passed; no hardware flashing or CAD fabrication was performed during these checks."
+  ]
+}

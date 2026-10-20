@@ -1,0 +1,184 @@
+{
+ "d4_E_mm": 310.0,
+ "d4_planche_ep_mm": 5.0,
+ "d4_biellette_L_mm": 140.76,
+ "d4_axe_av_sous_planche_mm": 55.0,
+ "pieces": [
+  {
+   "stl": "stl/support_pivot_D.stl",
+   "quantite": 1,
+   "corps_cao": "support_pivot_D",
+   "encombrement_mm": [
+    96.0,
+    48.0,
+    19.0
+   ],
+   "volume_cm3": 37.1
+  },
+  {
+   "stl": "stl/fusee_D.stl",
+   "quantite": 1,
+   "corps_cao": "fusee_D",
+   "encombrement_mm": [
+    49.5,
+    52.3,
+    56.0
+   ],
+   "volume_cm3": 23.3
+  },
+  {
+   "stl": "stl/rondelle_2mm.stl",
+   "quantite": 4,
+   "corps_cao": "rondelle_2",
+   "encombrement_mm": [
+    12.0,
+    12.0,
+    2.0
+   ],
+   "volume_cm3": 0.1
+  },
+  {
+   "stl": "stl/support_pivot_G.stl",
+   "quantite": 1,
+   "corps_cao": "support_pivot_G",
+   "encombrement_mm": [
+    96.0,
+    48.0,
+    19.0
+   ],
+   "volume_cm3": 37.1
+  },
+  {
+   "stl": "stl/fusee_G.stl",
+   "quantite": 1,
+   "corps_cao": "fusee_G",
+   "encombrement_mm": [
+    49.5,
+    52.3,
+    56.0
+   ],
+   "volume_cm3": 23.3
+  },
+  {
+   "stl": "stl/palonnier.stl",
+   "quantite": 1,
+   "corps_cao": "palonnier",
+   "encombrement_mm": [
+    37.0,
+    53.5,
+    9.0
+   ],
+   "volume_cm3": 11.2
+  },
+  {
+   "stl": "stl/biellette.stl",
+   "quantite": 2,
+   "corps_cao": "biellette_D",
+   "encombrement_mm": [
+    154.8,
+    14.0,
+    6.0
+   ],
+   "volume_cm3": 6.7
+  },
+  {
+   "stl": "stl/jante_608ZZ.stl",
+   "quantite": 2,
+   "corps_cao": "jante_D",
+   "encombrement_mm": [
+    33.0,
+    124.0,
+    124.0
+   ],
+   "volume_cm3": 91.1
+  },
+  {
+   "stl": "stl/pneu_TPU.stl",
+   "quantite": 2,
+   "corps_cao": "pneu_TPU_D",
+   "encombrement_mm": [
+    30.6,
+    150.0,
+    150.0
+   ],
+   "volume_cm3": 168.3
+  },
+  {
+   "stl": "stl/flasque_pneu.stl",
+   "quantite": 2,
+   "corps_cao": "flasque_pneu_D",
+   "encombrement_mm": [
+    3.0,
+    124.0,
+    124.0
+   ],
+   "volume_cm3": 14.4
+  },
+  {
+   "stl": "stl/support_lidar_C1.stl",
+   "quantite": 1,
+   "corps_cao": "support_lidar",
+   "encombrement_mm": [
+    56.0,
+    56.0,
+    27.5
+   ],
+   "volume_cm3": 44.0
+  },
+  {
+   "stl": "stl/barre_stereo.stl",
+   "quantite": 1,
+   "corps_cao": "barre_stereo",
+   "encombrement_mm": [
+    170.0,
+    57.9,
+    36.4
+   ],
+   "volume_cm3": 161.8
+  },
+  {
+   "stl": "stl/rondelle_M3_0.6mm.stl",
+   "quantite": 8,
+   "corps_cao": null,
+   "encombrement_mm": [
+    5.0,
+    5.0,
+    0.6
+   ],
+   "note": "anneau Ã5 x Ã3,3 : appui sur la bague intÃ©rieure des 3x10x4 seulement (remplace les rondelles M3 mÃ©tal)"
+  },
+  {
+   "stl": "stl/rondelle_precharge_1.8mm.stl",
+   "quantite": 2,
+   "corps_cao": null,
+   "encombrement_mm": [
+    12.0,
+    12.0,
+    1.8
+   ],
+   "note": "anneau Ã12 x Ã8,4 entre les 608ZZ des fusÃ©es"
+  },
+  {
+   "stl": "stl/rondelle_precharge_1.9mm.stl",
+   "quantite": 2,
+   "corps_cao": null,
+   "encombrement_mm": [
+    12.0,
+    12.0,
+    1.9
+   ],
+   "note": "anneau Ã12 x Ã8,4 entre les 608ZZ des fusÃ©es"
+  },
+  {
+   "stl": "stl/entretoise_roue_2.2mm.stl",
+   "quantite": 2,
+   "corps_cao": null,
+   "encombrement_mm": [
+    12.0,
+    12.0,
+    2.2
+   ],
+   "note": "anneau Ã12 x Ã8,4 entre les bagues intÃ©rieures des 608ZZ de chaque roue, 0,2 de plus que l arÃªte de la jante"
+  }
+ ]
+}

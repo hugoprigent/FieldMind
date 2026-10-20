@@ -1,0 +1,9 @@
+# Dépendances des tests du rover sur GitHub (le Pi les prend dans apt) ; versions vérifiées sur le Mac.
+numpy==2.5.4
+scipy==1.18.1
+opencv-python-headless==5.0.0.93
+pyserial==3.5
+aiohttp==3.14.5
+pytest==9.1.1
+pytest-asyncio==1.4.0
+ruff==0.16.9

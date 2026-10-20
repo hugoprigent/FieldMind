@@ -1,0 +1,121 @@
+{
+ "collisions": {
+  "servo_+0": [],
+  "servo_-31": [],
+  "servo_+31": []
+ },
+ "jeux_mini_mm": {
+  "pneu_TPU_D_servo_+0": 40.7,
+  "pneu_TPU_G_servo_+0": 40.7,
+  "jante_D_servo_+0": 38.62,
+  "jante_G_servo_+0": 38.62,
+  "pneu_TPU_D_servo_-31": 11.7,
+  "pneu_TPU_G_servo_-31": 20.24,
+  "jante_D_servo_-31": 18.18,
+  "jante_G_servo_-31": 24.71,
+  "pneu_TPU_D_servo_+31": 20.24,
+  "pneu_TPU_G_servo_+31": 11.7,
+  "jante_D_servo_+31": 24.71,
+  "jante_G_servo_+31": 18.18,
+  "PF_REF_Roue_arriere_D/pneu_arriere_D": 3.0,
+  "PF_REF_Roue_arriere_G/pneu_arriere_G": 3.0,
+  "PF_REF_Roue_arriere_D/jante_arriere_D": 3.0,
+  "PF_REF_Roue_arriere_G/jante_arriere_G": 3.0,
+  "D4_IMP_Barre_stereo/barre_stereo": 3.27,
+  "D4_IMP_Support_lidar/support_lidar": 2.5,
+  "D4_REF_Webcam_UGREEN_D/REF_webcam_pied": 37.78,
+  "D4_REF_Webcam_UGREEN_G/REF_webcam_pied": 37.78
+ },
+ "webcams": {
+  "D4_REF_Webcam_UGREEN_D": [],
+  "D4_REF_Webcam_UGREEN_G": []
+ },
+ "lidar": {
+  "+0.0_deg": [],
+  "-1.5_deg": [],
+  "+1.5_deg": []
+ },
+ "pieces": {
+  "coque_D1": [
+   90.0,
+   93.0,
+   114.0
+  ],
+  "coque_G1": [
+   90.0,
+   93.0,
+   114.0
+  ],
+  "coque_C1": [
+   90.0,
+   100.0,
+   103.0
+  ],
+  "coque_D2": [
+   85.0,
+   114.0,
+   133.0
+  ],
+  "coque_G2": [
+   85.0,
+   114.0,
+   133.0
+  ],
+  "coque_C2": [
+   7.9,
+   100.0,
+   133.0
+  ],
+  "coque_D3": [
+   85.0,
+   114.0,
+   133.0
+  ],
+  "coque_G3": [
+   85.0,
+   114.0,
+   133.0
+  ],
+  "coque_C3": [
+   16.4,
+   100.0,
+   133.0
+  ],
+  "coque_D4": [
+   90.0,
+   114.0,
+   147.0
+  ],
+  "coque_G4": [
+   90.0,
+   114.0,
+   147.0
+  ],
+  "coque_C4": [
+   90.0,
+   100.0,
+   147.0
+  ],
+  "berceau_batterie": [
+   30.0,
+   75.0,
+   89.0
+  ]
+ },
+ "morceaux": {
+  "coque_D1": 1,
+  "coque_G1": 1,
+  "coque_C1": 1,
+  "coque_D2": 1,
+  "coque_G2": 1,
+  "coque_C2": 1,
+  "coque_D3": 1,
+  "coque_G3": 1,
+  "coque_C3": 1,
+  "coque_D4": 1,
+  "coque_G4": 1,
+  "coque_C4": 1,
+  "berceau_batterie": 1
+ },
+ "pieces_en_plusieurs_morceaux": []
+}

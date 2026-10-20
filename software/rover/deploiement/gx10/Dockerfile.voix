@@ -1,0 +1,13 @@
+# Synthèse vocale Qwen3-TTS. qwen-tts 0.1.1 vise transformers 4.57 (incompatible avec la 5.x de
+# vLLM) : environnement Python à part (/opt/voix) qui réutilise PyTorch (CUDA 13, arm64) de
+# l'image vLLM, figé pour garder le GPU.
+ARG VLLM_IMAGE=vllm/vllm-openai:v0.31.0
+FROM ${VLLM_IMAGE}
+RUN python3 -m pip freeze | grep -iE "^(torch|torchaudio|torchvision|numpy|triton)==" > /tmp/figes.txt \
+ && python3 -m venv --system-site-packages /opt/voix \
+ && /opt/voix/bin/pip install --no-cache-dir -c /tmp/figes.txt transformers==4.57.3 \
+      accelerate==1.12.0 "huggingface_hub<1.0" librosa soundfile sox onnxruntime \
+ && /opt/voix/bin/pip install --no-cache-dir --no-deps qwen-tts==0.1.1
+COPY outils/serveur.py /app/serveur.py
+WORKDIR /app
+ENTRYPOINT ["/opt/voix/bin/python", "-m", "uvicorn", "serveur:app", "--host", "0.0.0.0"]
