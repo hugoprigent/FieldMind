@@ -1,6 +1,6 @@
 # Provenance de cette édition
 
-Cette édition est un instantané sélectionné du dépôt de travail FieldMind. La première édition (21 octobre 2026) reprenait l'arbre de travail, modifications locales comprises. La mise à jour du 23 octobre 2026 reprend le logiciel du rover, le firmware ESP32-C5 et la CAO imprimable depuis un commit du dépôt source, sans modification locale non commitée. Elle ne reprend pas l'historique du dépôt de travail privé.
+Cette édition est un instantané sélectionné du dépôt de travail FieldMind. La première édition (21 octobre 2026) reprenait l'arbre de travail, modifications locales comprises. La mise à jour du 23 octobre 2026 reprend le logiciel du rover, le firmware ESP32-C5 et la CAO imprimable depuis un commit du dépôt source, sans modification locale non commitée. Un test de sécurité dont l'obstacle tombait exactement sur la distance d'arrêt absolu (résultat dépendant de l'arrondi flottant sous Linux) a été rapproché à 0,62 m. Elle ne reprend pas l'historique du dépôt de travail privé.
 
 Le manifeste [`snapshot-source.json`](snapshot-source.json) indique le commit source de référence, l'heure de capture et les empreintes des fichiers source copiés avant les adaptations de publication. Les empreintes de source ne sont donc pas celles de tous les fichiers publiés : les paramètres réseau, le profil IA du démarrage rapide, les chemins CAO et la documentation ont été adaptés dans cette édition.
 

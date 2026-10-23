@@ -82,8 +82,9 @@ def test_obstacle_sur_le_cote_compte_seulement_en_virage(profil: Profil) -> None
 def test_obstacle_bas_vu_par_la_stereo(profil: Profil) -> None:
     profil.regler("securite.stereo_bloquante", True)
     bus = bus_sain()
+    # 0,62 m : nettement sous la distance d'arrêt absolu (0,7 m tombait sur la limite flottante)
     bus.publier(S.OBSTACLES_STEREO, Obstacles(t=time.monotonic(), source="stereo",
-                                              points=np.array([[0.7, 0.0]], np.float32)))
+                                              points=np.array([[0.62, 0.0]], np.float32)))
     sortie, etat = evaluer(bus, profil, 0.4)
     assert sortie.vitesse == 0.0 and "obstacle_bas" in etat.raisons
 
