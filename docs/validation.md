@@ -44,6 +44,15 @@ Le firmware **ESP32-C5** compile également dans cette copie avec PlatformIO 6.2
 
 ## Vérification sur GitHub Actions
 
+Édition du 23 octobre : les jobs **`rover`**, **`demo`** et **`firmware`** du
+[run 39937600059](https://github.com/hugoprigent/FieldMind/actions/runs/39937600059) ont terminé
+avec succès pour le
+[commit `22076d5`](https://github.com/hugoprigent/FieldMind/commit/22076d5d3b8932f53c0528f37da80ed26bfc1338).
+Comme pour l'édition précédente, ce run vérifie le code et la compilation sous Linux ; il ne
+constitue pas un essai du rover physique.
+
+Édition du 21 octobre :
+
 Les trois jobs **`rover`**, **`demo`** et **`firmware`** du
 [run GitHub Actions 39510932511](https://github.com/hugoprigent/FieldMind/actions/runs/39510932511)
 ont terminé avec succès pour le
