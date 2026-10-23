@@ -15,7 +15,7 @@ L'objectif : aider un opérateur à explorer et documenter une zone difficile d'
 > - Le rover roule, avec son châssis et son électronique visibles ; la coque n'est pas montée. Il tourne par le différentiel des roues arrière depuis la panne du servo de direction.
 > - Navigation autonome testée en intérieur le 21 octobre avec le GX10 : exploration sur la consigne « explore la pièce » et trajet autonome aller-retour sur la carte lidar.
 > - La remorque porte-drone est fabriquée ; ses volets sont commandés par servos (firmware ESP32-C5 ROVER_4). Le tractage autonome n'est pas validé.
-> - Drone : flux vidéo reçu sur le Pi et batterie reçue ; le vol autonome n'est pas validé.
+> - Drone : flux vidéo reçu sur le Pi ; niveau de batterie pas encore lu de façon fiable ; le vol autonome n’est pas validé.
 > - Huit modèles servis sur le GX10 : Qwen3.6-35B-A3B NVFP4, RoboBrain 2.5, D-FINE, Depth Anything V2, SAM 2.1, Qwen3-ASR, Qwen3-TTS, Qwen3-VL-Embedding.
 
 ![Vue CAO du prototype FieldMind](docs/images/prototype-cao.png)
