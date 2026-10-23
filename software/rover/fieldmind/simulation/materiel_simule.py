@@ -326,6 +326,12 @@ class MaterielSimule:
         self._hasard = random.Random(graine)
         self._stats = {"lidar_hz": 0.0, "cam_ips": 0.0}
         self.vitesse_temps = 1.0
+        from fieldmind.simulation.camera_navigateur import CamerasNavigateur
+
+        self._numeros_images = iter(range(1, 2**63))
+        self.cameras_navigateur = CamerasNavigateur(
+            bus, profil, self.monde, numeroter=lambda: next(self._numeros_images),
+            ips=vitesse_rendu_ips)
 
     def _depart(self) -> Pose2D:
         depart = getattr(self.monde, "depart", None)
@@ -444,21 +450,29 @@ class MaterielSimule:
             time.sleep(max(0.0, periode - (time.monotonic() - debut)))
 
     def _cameras(self) -> None:
-        numero = 0
         while self._actif:
+            if self.cameras_navigateur.actif():
+                self._stats["cam_ips"] = self.cameras_navigateur.ips_recues()
+                time.sleep(0.1)
+                continue
             debut = time.monotonic()
             pose = self.physique.pose
             for role in ("gauche", "droite"):
                 if not bool(self.profil.valeur(f"capteurs.camera_{role}", True)):
                     continue
                 camera = role if not self._inverse else ("droite" if role == "gauche" else "gauche")
-                image = self.monde.rendre_camera(pose, camera, 640, 360, self.profil)
+                largeur = int(self.profil.valeur("simulation.camera_repli_largeur", 640))
+                largeur = max(160, min(640, largeur))
+                image = self.monde.rendre_camera(pose, camera, largeur,
+                                                round(largeur * 360 / 640), self.profil)
+                if largeur != 640:
+                    image = cv2.resize(image, (640, 360), interpolation=cv2.INTER_LINEAR)
                 ok, jpeg = cv2.imencode(".jpg", image, [cv2.IMWRITE_JPEG_QUALITY, 85])
                 if ok:
-                    numero += 1
                     self.bus.publier(S.IMAGE_GAUCHE if role == "gauche" else S.IMAGE_DROITE,
                                      ImageCamera(t=debut, camera=role, jpeg=jpeg.tobytes(),
-                                                 largeur=640, hauteur=360, numero=numero))
+                                                 largeur=640, hauteur=360,
+                                                 numero=next(self._numeros_images)))
             duree = time.monotonic() - debut
             self._stats["cam_ips"] = 1 / max(duree, 1 / self.ips_rendu)
             time.sleep(max(0.0, 1 / self.ips_rendu - duree))

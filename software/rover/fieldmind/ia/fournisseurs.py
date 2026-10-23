@@ -182,9 +182,10 @@ def _attente_429(retry_after: str | None, corps: Any) -> float | None:
 
 
 class _ClientHttp:
-    def __init__(self, nom: str, reprises: int = 1) -> None:
+    def __init__(self, nom: str, reprises: int = 1, *, proxy: str | None = None) -> None:
         self.nom = nom
         self.reprises = reprises
+        self.proxy = proxy
         self._session: aiohttp.ClientSession | None = None
         self._boucle: asyncio.AbstractEventLoop | None = None
 
@@ -230,7 +231,7 @@ class _ClientHttp:
         donnees = formulaire() if formulaire is not None else None
         try:
             async with session.post(url, json=json_corps if donnees is None else None,
-                                    data=donnees, headers=entetes,
+                                    data=donnees, headers=entetes, proxy=self.proxy,
                                     timeout=aiohttp.ClientTimeout(total=delai_s)) as reponse:
                 texte = await reponse.text()
                 statut = reponse.status
@@ -281,9 +282,9 @@ class ClientOpenAI(_ClientHttp):
     """Serveur compatible OpenAI : Gemini (`api="gemini"`), vLLM ou autre (`api="openai"`)."""
 
     def __init__(self, url: str, cle: str | None, *, api: str = "openai", reprises: int = 1,
-                 nom: str | None = None) -> None:
+                 nom: str | None = None, proxy: str | None = None) -> None:
         super().__init__(nom or ("Gemini" if api == "gemini" else "serveur de modèles"),
-                         reprises)
+                         reprises, proxy=proxy)
         self.url = url.rstrip("/")
         self.api = api
         self._entetes = {"Authorization": f"Bearer {cle}"} if cle else {}
@@ -404,8 +405,9 @@ class ClientOpenAI(_ClientHttp):
 class ClientGeminiNatif(_ClientHttp):
     """generateContent de l'API Gemini (seulement pour ce que l'API compatible ne couvre pas)."""
 
-    def __init__(self, url: str, cle: str | None, reprises: int = 1) -> None:
-        super().__init__("Gemini", reprises)
+    def __init__(self, url: str, cle: str | None, reprises: int = 1, *,
+                 proxy: str | None = None) -> None:
+        super().__init__("Gemini", reprises, proxy=proxy)
         self.url = url.rstrip("/")
         self._entetes = {"x-goog-api-key": cle} if cle else {}
         self._config_minimale: set[str] = set()
@@ -527,13 +529,16 @@ class Passerelle:
         if client is None:
             client = ClientOpenAI(config_role.url, cle, api=profil.api, reprises=profil.reprises,
                                   nom="Gemini" if profil.api == "gemini" else
-                                  f"serveur {profil.nom}")
+                                  f"serveur {profil.nom}",
+                                  proxy=self.config.proxy_gemini
+                                  if profil.api == "gemini" else None)
             self._clients[cle_client] = client
         natif = None
         if profil.api == "gemini" and profil.url_natif:
             natif = self._natifs.get((profil.url_natif, cle))
             if natif is None:
-                natif = ClientGeminiNatif(profil.url_natif, cle, profil.reprises)
+                natif = ClientGeminiNatif(profil.url_natif, cle, profil.reprises,
+                                         proxy=self.config.proxy_gemini)
                 self._natifs[(profil.url_natif, cle)] = natif
         quota = self._quotas.get((profil.nom, role))
         if quota is None:

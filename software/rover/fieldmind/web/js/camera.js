@@ -1,3 +1,4 @@
+import { tr } from './langue.js';
 // Vue d'une caméra : flux MJPEG (ou image simulée), ouvert seulement quand la vue est visible,
 // avec en surimpression l'arc prévu projeté par le modèle sténopé et le point visé.
 
@@ -153,12 +154,12 @@ export class VueCamera {
       ? `suivi${Number.isFinite(c.distance_m) ? ` · ${nombre(c.distance_m, 1)} m` : ''}`
       : 'perdu de vue';
     ctx.font = '600 12px system-ui, sans-serif';
-    const largeur = ctx.measureText(texte).width + 10;
+    const largeur = ctx.measureText(tr(texte)).width + 10;
     ctx.fillStyle = teinte;
     ctx.fillRect(x, Math.max(cadre.y, y - 18), largeur, 18);
     ctx.fillStyle = '#fff';
     ctx.textBaseline = 'middle';
-    ctx.fillText(texte, x + 5, Math.max(cadre.y, y - 18) + 9);
+    ctx.fillText(tr(texte), x + 5, Math.max(cadre.y, y - 18) + 9);
   }
 
   _dessinerArc(ctx, cadre, dims) {
@@ -209,7 +210,7 @@ export class VueCamera {
         ctx.fillRect(x - 36, y - 9, 32, 18);
         ctx.fillStyle = '#fff';
         ctx.textAlign = 'right';
-        ctx.fillText(`${s} m`, x - 8, y);
+        ctx.fillText(tr(`${s} m`), x - 8, y);
       }
     }
     const libre = this.donnees.etat?.securite?.libre_avant_m;
@@ -223,7 +224,7 @@ export class VueCamera {
         ctx.fillRect(x + 6, y - 10, 58, 20);
         ctx.fillStyle = '#fff';
         ctx.textAlign = 'left';
-        ctx.fillText(`${nombre(libre, 1)} m`, x + 12, y);
+        ctx.fillText(tr(`${nombre(libre, 1)} m`), x + 12, y);
       }
     }
     ctx.textAlign = 'left';

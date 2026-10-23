@@ -138,6 +138,13 @@ export class ConnexionWeb extends ConnexionBase {
     return true;
   }
 
+  /** JPEG simulé : transport binaire borné, sans toucher aux commandes JSON. */
+  envoyerImage(entete, jpeg) {
+    if (this.ws?.readyState !== WebSocket.OPEN || this.ws.bufferedAmount > 800000) return false;
+    this.ws.send(new Blob([JSON.stringify(entete) + '\n', jpeg]));
+    return true;
+  }
+
   /** Changement de jeton : on rouvre la liaison avec le nouveau. */
   definirJeton(jeton) {
     this.jeton = jeton;

@@ -14,6 +14,7 @@ import { VueCarte } from './vues/carte.js';
 import { VueCapteurs } from './vues/capteurs.js';
 import { VueSysteme } from './vues/systeme.js';
 import { VueReglages } from './vues/reglages.js';
+import { initialiserLangue } from './langue.js';
 
 const parametres = new URLSearchParams(location.search);
 const jeton = lireJeton();
@@ -87,6 +88,7 @@ const ctx = {
 };
 
 poserIcones();
+initialiserLangue(() => ctx.toutArreter());
 new Barre(ctx);
 const vues = {
   pilotage: new VuePilotage(ctx),
@@ -123,7 +125,17 @@ window.addEventListener('hashchange', () => afficher(location.hash.slice(1)));
 afficher(location.hash.slice(1) || lireLocal('vue', 'pilotage'));
 
 // ------------------------------------------------------------------ liaison
+let camerasSimulees = null;
+let camerasChargement = null;
 connexion.surMessage = (message) => {
+  if (message.type === 'bienvenue' && message.cameras_navigateur && connexion.envoyerImage) {
+    if (camerasSimulees) camerasSimulees.visibilite();
+    else if (!camerasChargement) camerasChargement = import('./camera_simulee.js').then(({ CamerasSimulees }) => {
+      camerasSimulees = new CamerasSimulees(connexion);
+    }).catch(e => console.warn('[simulation cameras] Software fallback:', e));
+  }
+  if (message.type === 'monde_simule') camerasSimulees?.monde(message);
+  if (message.type === 'camera_simulee') camerasSimulees?.rendre(message);
   donnees.recevoir(message);
   if (message.type === 'etat') teleop.definirAutorisation(message.mode === 'manuel' && !message.arret_urgence);
 };

@@ -160,7 +160,8 @@ l'opérateur dit « ensuite », « après ça », « ajoute ».
 - Pour regarder (« que vois-tu ? », « y a-t-il quelqu'un ? ») appelle decrire ; pour trouver ou \
 rejoindre un objet appelle chercher (aller=false s'il demande seulement où il est). Ne prétends \
 jamais avoir vu quelque chose.
-- Une question sur le rover (position, état, mission) : réponds en une phrase courte en français \
+- Une question sur le rover (position, état, mission) : réponds en une phrase courte dans la \
+langue de la dernière consigne de l'opérateur (français ou anglais) \
 à partir de l'état ci-dessous, sans appeler de fonction.
 - « Mémorise cet endroit comme le garage » : memoriser_lieu(nom="garage"). Pour aller à un \
 lieu mémorisé (« retourne au garage ») : aller_lieu, seulement vers un lieu de la liste `lieux` \

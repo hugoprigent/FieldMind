@@ -118,3 +118,11 @@ Avant un essai réel, lire le [guide rover](software/rover/README.md) et les [co
 Cette édition sélectionne les sources utiles à la démonstration, sans les fichiers d'accès, secrets, journaux privés, rushes ni historique de travail. [Provenance](docs/publication.md).
 
 Le code et les conceptions originaux sont présentés pour consultation ; aucune licence libre globale n'est accordée à ce stade. Les composants tiers conservent leurs licences. Voir [droits](RIGHTS.md) et [crédits](THIRD_PARTY_NOTICES.md).
+
+## Langues et vidéos
+
+Le poste et la page projet sont disponibles en français et en anglais : sélecteur **FR / EN** en haut à droite, détection de la langue du navigateur et choix mémorisé.
+
+- [Présentation et essais en français](https://hugoprigent.com/media/fieldmind/presentation-20261023c.mp4)
+- [Presentation and tests in English](https://hugoprigent.com/media/fieldmind/presentation-20261023-en.mp4)
+- [Page projet en français](https://hugoprigent.com/projets/fieldmind?lang=fr) · [Project page in English](https://hugoprigent.com/projets/fieldmind?lang=en)

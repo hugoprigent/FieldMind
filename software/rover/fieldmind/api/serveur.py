@@ -24,6 +24,7 @@ import numpy as np
 from aiohttp import WSMsgType, web
 
 from fieldmind import __version__
+from fieldmind.api import camera_simulee
 from fieldmind.api import diffusion as D
 from fieldmind.bus import S
 from fieldmind.config import REGLABLES, TEXTES_REGLABLES, braquage_max, details_reglables
@@ -223,12 +224,14 @@ class Serveur:
     # ------------------------------------------------------------------ WebSocket du poste
 
     async def _ws_poste(self, requete: web.Request) -> web.WebSocketResponse:
-        ws = web.WebSocketResponse(heartbeat=5.0, max_msg_size=1 << 20)
+        ws = web.WebSocketResponse(heartbeat=20.0, max_msg_size=1 << 20)
         await ws.prepare(requete)
         poste = Poste(ws)
+        poste.cameras_pretes = False
         self.postes[poste.ident] = poste
         self.rover.superviseur.operateurs = len(self.postes)
         envoi = asyncio.create_task(self._envoyer_au_poste(poste))
+        rendu = asyncio.create_task(camera_simulee.diffuser(self, poste))
         poste.envoyer({**self._bienvenue(), "poste": poste.ident})
         for evenement in list(self._journal)[-100:]:
             poste.envoyer({"type": "journal", **evenement})
@@ -238,10 +241,15 @@ class Serveur:
             async for message in ws:
                 if message.type == WSMsgType.TEXT:
                     await self._recevoir(poste, message.data)
+                elif message.type == WSMsgType.BINARY:
+                    camera_simulee.recevoir(self, poste, message.data)
                 elif message.type in (WSMsgType.ERROR, WSMsgType.CLOSE):
                     break
         finally:
             envoi.cancel()
+            rendu.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await rendu
             del self.postes[poste.ident]
             self.rover.superviseur.operateurs = len(self.postes)
             if self.rover.conduite.pilote == poste.ident:
@@ -264,6 +272,7 @@ class Serveur:
             "reglages": profil.reglages(),
             "reglables_details": details_reglables(),
             "cameras": ["gauche", "droite", "drone"],
+            "cameras_navigateur": hasattr(self.rover.materiel, "cameras_navigateur"),
             "ia": self.rover.ia.resume() if self.rover.ia is not None else {
                 "profil": "aucun", "disponible": False, "modeles": {}, "profils": [],
                 "raison": "module IA non chargé"},
@@ -370,6 +379,11 @@ class Serveur:
         c = r.conduite
         p = r.profil
         t = m["type"]
+        if t == "camera_simulee_prete":
+            poste.cameras_pretes = bool(m.get("prete"))
+            if not poste.cameras_pretes and getattr(self, "_poste_camera", None) is poste:
+                self._poste_camera = None
+            return None
         if t == "drone_atelier":
             try:
                 self.atelier_drone.commander(str(m.get("action", "")), m)
@@ -702,7 +716,7 @@ class Serveur:
     # ------------------------------------------------------------------ pont ROS 2
 
     async def _ws_ros(self, requete: web.Request) -> web.WebSocketResponse:
-        ws = web.WebSocketResponse(heartbeat=5.0, max_msg_size=1 << 20)
+        ws = web.WebSocketResponse(heartbeat=20.0, max_msg_size=1 << 20)
         await ws.prepare(requete)
         ws["images"] = False
         self.ponts_ros.add(ws)

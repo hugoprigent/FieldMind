@@ -878,7 +878,7 @@ class _AllerLieu:
 class _Photo:
     action: Action
     bus: Bus
-    dossier: Path | None = None  # None : DOSSIER_PHOTOS lu à l’appel
+    dossier: Path | None = None
 
     def pas(self, ctx: Contexte) -> Pas:
         if enregistrer_photo(self.bus, self.action.get("camera", "gauche"), self.dossier) is None:

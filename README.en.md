@@ -16,7 +16,7 @@ FieldMind connects a Raspberry Pi / ESP32 rover, a web operator station and mode
 
 The goal: help an operator explore and document a hard-to-reach area, then share the observations between robots. The prototype is designed to work in the field without any external AI API; this deployment autonomy has yet to be validated.
 
-[**Public simulation of the station**](https://hugoprigent.com/fieldmind/) · [Project page](https://hugoprigent.com/projets/fieldmind) · [Application pitch](https://youtu.be/ZIIjRc_pI_E) · [Architecture](docs/architecture.en.md) · [Status on 23 October](docs/status-2026-10-23.en.md) · [Validation](docs/validation.en.md)
+[**Public simulation of the station**](https://hugoprigent.com/fieldmind/?lang=en) · [Project page](https://hugoprigent.com/projets/fieldmind?lang=en) · [Application pitch](https://youtu.be/ZIIjRc_pI_E) · [Architecture](docs/architecture.en.md) · [Status on 23 October](docs/status-2026-10-23.en.md) · [Validation](docs/validation.en.md)
 
 > **Status on 23 October 2026.**
 > - The rover drives, with its chassis and electronics exposed; the shell is not fitted. It steers with the rear-wheel differential since the steering servo failed.
@@ -61,9 +61,9 @@ FIELDMIND_IA_PROFIL=aucun .venv/bin/python -m fieldmind \
   --materiel simulation --scenario jardin --hote 127.0.0.1
 ```
 
-Open **http://127.0.0.1:8080/**. The hardware is simulated; navigation, missions, safety and the interface are the rover's own code. This startup needs no API key and drives no real hardware. The interface is in French.
+Open **http://127.0.0.1:8080/**. The hardware is simulated; navigation, missions, safety and the interface are the rover's own code. This startup needs no API key and drives no real hardware. Use the FR / EN buttons in the top bar to switch languages. The first visit follows your browser language; the choice is saved.
 
-The [public simulation](https://hugoprigent.com/fieldmind/) serves this same web station: each browser gets its own simulated rover, with no access to the hardware. Its server is [`software/rover/fieldmind/public_demo.py`](software/rover/fieldmind/public_demo.py); it can be run locally with `.venv/bin/python -m fieldmind.public_demo --hote 127.0.0.1 --port 8085`. Its deployment and keys are not in this repository. The [first MuJoCo demo](software/README.en.md) is still available.
+The [public simulation](https://hugoprigent.com/fieldmind/?lang=en) serves this same web station: each browser gets its own simulated rover, with no access to the hardware. Its server is [`software/rover/fieldmind/public_demo.py`](software/rover/fieldmind/public_demo.py); it can be run locally with `.venv/bin/python -m fieldmind.public_demo --hote 127.0.0.1 --port 8085`. Its deployment and keys are not in this repository. The [first MuJoCo demo](software/README.en.md) is still available.
 
 ## How it works
 
@@ -120,3 +120,11 @@ Before a real test, read the [rover guide](software/rover/README.en.md) and the 
 This edition selects the sources useful for the demonstration, without access files, secrets, private logs, raw footage or work history. [Provenance](docs/publication.en.md).
 
 The original code and designs are published for review; no general open license is granted at this stage. Third-party components keep their licenses. See [rights](RIGHTS.md) and [credits](THIRD_PARTY_NOTICES.md) (in French).
+
+## Languages and videos
+
+The control station and project page are available in French and English: **FR / EN** in the top right, browser language detection and a saved manual choice.
+
+- [Presentation and tests in English](https://hugoprigent.com/media/fieldmind/presentation-20261023-en.mp4)
+- [Présentation et essais en français](https://hugoprigent.com/media/fieldmind/presentation-20261023c.mp4)
+- [Project page in English](https://hugoprigent.com/projets/fieldmind?lang=en) · [Page projet en français](https://hugoprigent.com/projets/fieldmind?lang=fr)

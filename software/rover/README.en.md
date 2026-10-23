@@ -11,7 +11,7 @@ cameras). Architecture and interfaces: [ARCHITECTURE.md](ARCHITECTURE.md); stati
 Prototype status on 23 October: [recent changes and limits](../../docs/status-2026-10-23.en.md).
 Next test: [red box mission, photo and return to base](TEST_TERRAIN_2026-10-22.md) (in French).
 
-The web station interface is in French; the labels below are quoted as they appear on screen.
+The web station is available in French and English (FR / EN, top right). It detects the preferred browser language and remembers a manual choice. Protocol identifiers remain unchanged.
 
 ## Trying it on a PC, without the rover
 

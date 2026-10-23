@@ -1,3 +1,4 @@
+import { tr } from './langue.js';
 // Carte GPS sur canvas : tuiles raster (OpenStreetMap par défaut, en Web Mercator) sous un
 // quadrillage métrique toujours lisible sans Internet, et par-dessus : zone autorisée, trace,
 // parcours, but, lieux, point GPS brut et rover (cercle de précision, flèche selon le cap vrai).
@@ -340,7 +341,7 @@ export class CarteGPS {
       ctx.fillStyle = couleur('--texte-3');
       ctx.font = '600 13px system-ui, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('Pas de position GPS', l / 2, h / 2);
+      ctx.fillText(tr('Pas de position GPS'), l / 2, h / 2);
       ctx.textAlign = 'left';
     }
     this._calques(ctx, vue, rover);
@@ -475,7 +476,7 @@ export class CarteGPS {
         ctx.fillStyle = teinte;
         ctx.beginPath(); ctx.arc(x, y, this.mini ? 4 : 9, 0, Math.PI * 2); ctx.fill();
         ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
-        if (!this.mini) { ctx.fillStyle = '#fff'; ctx.fillText(String(i + 1), x, y + 0.5); }
+        if (!this.mini) { ctx.fillStyle = '#fff'; ctx.fillText(tr(String(i + 1)), x, y + 0.5); }
       });
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
@@ -552,12 +553,12 @@ export class CarteGPS {
   }
 
   _etiquette(ctx, x, y, texte) {
-    const largeur = ctx.measureText(texte).width + 10;
+    const largeur = ctx.measureText(tr(texte)).width + 10;
     ctx.fillStyle = 'rgba(0,0,0,0.6)';
     ctx.fillRect(x, y - 9, largeur, 18);
     ctx.fillStyle = '#fff';
     ctx.textBaseline = 'middle';
-    ctx.fillText(texte, x + 5, y);
+    ctx.fillText(tr(texte), x + 5, y);
     ctx.textBaseline = 'alphabetic';
   }
 
@@ -574,7 +575,7 @@ export class CarteGPS {
     ctx.fillRect(x + largeur - 2, y - 7, 2, 9);
     ctx.font = '600 11px system-ui, sans-serif';
     ctx.textBaseline = 'bottom';
-    ctx.fillText(metres >= 1000 ? `${nombre(metres / 1000, 0)} km` : `${metres} m`, x, y - 8);
+    ctx.fillText(tr(metres >= 1000 ? `${nombre(metres / 1000, 0)} km` : `${metres} m`), x, y - 8);
     ctx.textBaseline = 'alphabetic';
   }
 }

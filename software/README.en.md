@@ -8,7 +8,7 @@ The software used with the prototype is in [`rover/`](rover/README.en.md): Raspb
 
 ## First web demo — MuJoCo
 
-This stack is the project's first MuJoCo demo. It illustrates navigation in a simulated forest and has its own services and interface. It is separate from the current rover stack; the [public simulation](https://hugoprigent.com/fieldmind/) now serves the rover's station (`software/rover/fieldmind/public_demo.py`).
+This stack is the project's first MuJoCo demo. It illustrates navigation in a simulated forest and has its own services and interface. It is separate from the current rover stack; the [public simulation](https://hugoprigent.com/fieldmind/?lang=en) now serves the rover's station (`software/rover/fieldmind/public_demo.py`).
 
 Python 3.12 and, on Linux, OSMesa (`sudo apt install libosmesa6`):
 

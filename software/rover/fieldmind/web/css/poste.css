@@ -820,3 +820,8 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 28px
 /* Manuel sans anticollision : bouton bien visible quand il est coupé */
 .bouton.anticollision { width: 100%; justify-content: center; }
 .bouton.anticollision[aria-pressed="true"] { background: var(--alerte); border-color: var(--alerte); color: #1a1300; font-weight: 750; }
+/* FR / EN : toujours accessible dans la barre du poste, sans rechargement. */
+.choix-langue{display:flex;align-items:center;gap:2px;flex-shrink:0}
+.choix-langue button{border:1px solid var(--bordure,#434852);border-radius:5px;background:transparent;color:inherit;font:inherit;font-size:11px;padding:5px;cursor:pointer;min-height:30px}
+.choix-langue button[aria-pressed=true]{background:var(--accent,#3878ba);color:#fff}
+.choix-langue button:focus-visible{outline:2px solid currentColor;outline-offset:2px}

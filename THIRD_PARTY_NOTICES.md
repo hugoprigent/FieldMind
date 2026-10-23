@@ -1,3 +1,5 @@
+**Français** · [English](THIRD_PARTY_NOTICES.en.md)
+
 # Crédits et composants tiers
 
 ## Code web embarqué

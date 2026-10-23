@@ -35,8 +35,8 @@ from fieldmind.mission.actions import ActionRefusee
 
 JOURNAL = logging.getLogger("fieldmind.public_demo")
 NOM_COOKIE = "fieldmind_public_session"
-MAX_SESSIONS = 2
-DUREE_INACTIVITE_S = 300
+MAX_SESSIONS = 4
+DUREE_INACTIVITE_S = 120
 
 
 @dataclass(slots=True)
@@ -172,7 +172,7 @@ class ServeurPublic:
             except RuntimeError:
                 reponse = web.Response(
                     status=503,
-                    text=("Les deux simulations sont occupées. Réessaie dans 15 secondes ou "
+                    text=("Toutes les simulations sont occupées. Réessaie dans 15 secondes ou "
                           "recharge cette page."),
                     content_type="text/plain",
                     headers={"Retry-After": "15"},
@@ -205,6 +205,12 @@ class ServeurPublic:
                         base = tomllib.load(fichier)
                     base.setdefault("cameras", {})["calibration"] = str(dossier / "stereo.npz")
                     base.setdefault("enregistrement", {})["actif"] = False
+                    # caméras simulées allégées : rendu logiciel partagé entre les visiteurs
+                    base["cameras"].update(ips=5)
+                    base.setdefault("simulation", {})["camera_repli_largeur"] = 384
+                    base.setdefault("ia", {}).update(detection_continue=False,
+                                                     gx10_periode_s=8.0, veille=False)
+                    base.setdefault("perception", {}).update(stereo_largeur=320, stereo_ips=2)
                     profil = Profil(base, {}, dossier / "reglages.json")
                     return Rover(profil, simulation=True, scenario=self.scenario, graine=0,
                                  version_esp="ROVER_3", enregistrer=False,
@@ -262,21 +268,28 @@ class ServeurPublic:
             for nom in ("agent", "vision", "transcription"):
                 role = profil.role(nom)
                 if role is not None:
-                    roles[nom] = replace(role, requetes_par_heure=min(role.requetes_par_heure, 30),
-                                          requetes_par_jour=min(role.requetes_par_jour, 120))
+                    roles[nom] = role  # pas de plafond supplémentaire (demande de Hugo, 23/10)
             profil = replace(profil, **roles)
             config.profils[self.profil_ia_public] = profil
+        if self.profil_ia_public == "gemini":
+            proxy = os.environ.get("FIELDMIND_PUBLIC_GEMINI_PROXY")
+            if proxy not in (None, "http://127.0.0.1:3139"):
+                raise ValueError("proxy Gemini public non autorisé")
+            config.proxy_gemini = proxy
         # Les visiteurs peuvent couper l'IA, mais pas envoyer les requêtes à un autre fournisseur.
+        aucun = config.profil("aucun")  # à lire avant de restreindre la liste des profils
         config.profils = {self.profil_ia_public: profil}
         if self.profil_ia_public != "aucun":
-            config.profils["aucun"] = config.profil("aucun")
+            config.profils["aucun"] = aucun
         return config
 
     async def _choisir_profil_ia(self) -> str:
         """Préfère le GX10 réellement joignable ; utilise Gemini seulement en secours."""
         config = ConfigIA.charger(fichier_env=None, fichier_choix=None, env=self._env_ia)
-        if await self._gx10_disponible(config):
-            return "gx10"
+        for _essai in range(3):  # le GX10 peut répondre lentement quand il est chargé
+            if await self._gx10_disponible(config):
+                return "gx10"
+            await asyncio.sleep(2)
         if config.disponibilite("agent", "gemini")[0]:
             return "gemini"
         return "aucun"
@@ -289,11 +302,10 @@ class ServeurPublic:
         cle = config.cle("gx10")
         entetes = {"Authorization": f"Bearer {cle}"} if cle else {}
         try:
-            delai = aiohttp.ClientTimeout(total=4)
-            async with (
-                aiohttp.ClientSession(timeout=delai) as session,
-                session.get(f"{role.url.rstrip('/')}/models", headers=entetes) as reponse,
-            ):
+            delai = aiohttp.ClientTimeout(total=10)
+            async with (aiohttp.ClientSession(timeout=delai) as session,
+                        session.get(f"{role.url.rstrip('/')}/models",
+                                    headers=entetes) as reponse):
                 if reponse.status != 200:
                     return False
                 donnees = await reponse.json(content_type=None)

@@ -1,3 +1,4 @@
+import { tr } from './langue.js';
 // Courbe temporelle en direct (Canvas 2D) : séries en couleurs fixes, un seul axe, réticule
 // et valeurs au survol.
 
@@ -94,13 +95,13 @@ export class Courbe {
     for (let v = Math.ceil(min / pas) * pas; v <= max + 1e-9; v += pas) {
       const py = Math.round(Y(v)) + 0.5;
       ctx.beginPath(); ctx.moveTo(marge.g, py); ctx.lineTo(l - marge.d, py); ctx.stroke();
-      ctx.fillText(nombre(Math.abs(v) < pas / 1e6 ? 0 : v, decimalesAxe), marge.g - 5, py);
+      ctx.fillText(tr(nombre(Math.abs(v) < pas / 1e6 ? 0 : v, decimalesAxe)), marge.g - 5, py);
     }
     ctx.textBaseline = 'top';
     ctx.textAlign = 'left';
-    ctx.fillText(`−${this.o.fenetre} s`, marge.g, h - marge.b + 3);
+    ctx.fillText(tr(`−${this.o.fenetre} s`), marge.g, h - marge.b + 3);
     ctx.textAlign = 'right';
-    ctx.fillText('0', l - marge.d, h - marge.b + 3);
+    ctx.fillText(tr('0'), l - marge.d, h - marge.b + 3);
 
     ctx.save();
     ctx.beginPath();
@@ -137,7 +138,7 @@ export class Courbe {
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
       const textes = lignes.map((p) => (p && p[1] !== null ? `${nombre(p[1], this.o.decimales)} ${this.o.unite}` : '—'));
-      const largeur = Math.max(...textes.map((s) => ctx.measureText(s).width)) + 26;
+      const largeur = Math.max(...textes.map((s) => ctx.measureText(tr(s)).width)) + 26;
       const bx = px + 8 + largeur > l ? px - 8 - largeur : px + 8;
       ctx.fillStyle = couleur('--surface-3');
       ctx.fillRect(bx, 4, largeur, textes.length * 16 + 6);
@@ -145,7 +146,7 @@ export class Courbe {
         ctx.fillStyle = couleur(COULEURS[i]);
         ctx.fillRect(bx + 6, 10 + i * 16, 8, 3);
         ctx.fillStyle = couleur('--texte-1');
-        ctx.fillText(s, bx + 18, 11 + i * 16);
+        ctx.fillText(tr(s), bx + 18, 11 + i * 16);
       });
     }
   }

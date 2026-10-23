@@ -1,6 +1,8 @@
 // Petits outils du poste : DOM, nombres à la française, couleurs du thème, icônes,
 // notifications et confirmation légère.
 
+import { langue, poserTexte } from './langue.js';
+
 export const $ = (selecteur, racine = document) => racine.querySelector(selecteur);
 export const $$ = (selecteur, racine = document) => [...racine.querySelectorAll(selecteur)];
 
@@ -9,7 +11,7 @@ export function el(balise, attributs = {}, ...enfants) {
   for (const [cle, valeur] of Object.entries(attributs || {})) {
     if (valeur === null || valeur === undefined || valeur === false) continue;
     if (cle === 'class') e.className = valeur;
-    else if (cle === 'text') e.textContent = valeur;
+    else if (cle === 'text') poserTexte(e, valeur);
     else if (cle === 'dataset') Object.assign(e.dataset, valeur);
     else if (cle.startsWith('on') && typeof valeur === 'function') e.addEventListener(cle.slice(2), valeur);
     else e.setAttribute(cle, valeur === true ? '' : valeur);
@@ -23,7 +25,7 @@ export function el(balise, attributs = {}, ...enfants) {
 
 /** Ne touche au DOM que si le texte change. */
 export function texte(element, valeur) {
-  if (element && element.textContent !== valeur) element.textContent = valeur;
+  poserTexte(element, valeur);
 }
 
 export function attribut(element, nom, valeur) {
@@ -46,10 +48,11 @@ export function estNombre(v) {
 /** Nombre à la française (virgule), « — » si absent. Signe moins typographique. */
 export function nombre(v, decimales = 1) {
   if (!estNombre(v)) return '—';
-  let f = formats.get(decimales);
+  const cle = `${langue}.${decimales}`;
+  let f = formats.get(cle);
   if (!f) {
-    f = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: decimales, maximumFractionDigits: decimales });
-    formats.set(decimales, f);
+    f = new Intl.NumberFormat(langue === 'en' ? 'en-GB' : 'fr-FR', { minimumFractionDigits: decimales, maximumFractionDigits: decimales });
+    formats.set(cle, f);
   }
   const s = f.format(v);
   return s === '-0' || /^-0[,]0+$/.test(s) ? s.slice(1) : s.replace('-', '−');
@@ -61,7 +64,7 @@ export function unite(v, decimales, u) {
 
 export function heure(tMurale) {
   if (!estNombre(tMurale)) return '';
-  return new Date(tMurale * 1000).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  return new Date(tMurale * 1000).toLocaleTimeString(langue === 'en' ? 'en-GB' : 'fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 }
 
 export function duree(secondes) {

@@ -1,3 +1,5 @@
+**Français** · [English](RIGHTS.en.md)
+
 # Droits
 
 © 2026 Hugo Prigent pour le code, les textes et les conceptions originaux de FieldMind.

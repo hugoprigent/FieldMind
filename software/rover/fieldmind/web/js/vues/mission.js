@@ -1,3 +1,4 @@
+import { tr, langue } from '../langue.js';
 // Menu Mission / IA : conversation (texte et voix), plan et file d'actions, commandes de la
 // mission, actions rapides et panneau vision.
 
@@ -109,7 +110,7 @@ export class VueMission {
       el('span', { text: heure(m.t) }));
     const li = el('li', { dataset: { role: m.role || 'systeme', local: m.local ? 'true' : null } });
     if (m.role !== 'systeme') li.append(entete);
-    li.append(el('div', { class: 'texte', text: m.texte || '' }));
+    li.append(el('div', { class: 'texte', ...(m.role === 'operateur' ? { translate: 'no' } : {}), text: m.texte || '' }));
     const actions = m.plan?.actions;
     if (Array.isArray(actions) && actions.length) {
       li.append(el('ol', { class: 'plan' }, actions.map((a) => el('li', { text: decrireAction(a) }))));
@@ -144,7 +145,7 @@ export class VueMission {
     if (m.role !== 'rover' || !m.texte || !lireLocal('lire', false) || !('speechSynthesis' in window)) return;
     if (Number.isFinite(m.t) && Math.abs(Date.now() / 1000 - m.t) > 20) return; // historique
     const enonce = new SpeechSynthesisUtterance(m.texte);
-    enonce.lang = 'fr-FR';
+    enonce.lang = langue === 'en' ? 'en-GB' : 'fr-FR';
     speechSynthesis.speak(enonce);
   }
 
@@ -262,12 +263,12 @@ export class VueMission {
     ctx.textBaseline = 'bottom';
     const etiquette = (x, y, libelle, teinte) => {
       if (!libelle) return;
-      const largeur = ctx.measureText(libelle).width + 10;
+      const largeur = ctx.measureText(tr(libelle)).width + 10;
       const bx = Math.min(Math.max(0, x), l - largeur), by = Math.max(18, y);
       ctx.fillStyle = teinte;
       ctx.fillRect(bx, by - 18, largeur, 18);
       ctx.fillStyle = '#fff';
-      ctx.fillText(libelle, bx + 5, by - 3);
+      ctx.fillText(tr(libelle), bx + 5, by - 3);
     };
     for (const b of v.boites || []) {
       ctx.strokeStyle = 'rgba(0,0,0,0.5)';

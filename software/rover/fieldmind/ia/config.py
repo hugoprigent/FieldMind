@@ -335,6 +335,7 @@ class ConfigIA:
     env: Mapping[str, str] = field(default_factory=dict)
     fichier_choix: Path | None = None
     fichier_env: Path | None = None
+    proxy_gemini: str | None = None  # explicite, réservé au serveur public
 
     def __post_init__(self) -> None:
         if self.nom_defaut not in self.profils:

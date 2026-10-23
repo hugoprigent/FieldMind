@@ -1,3 +1,4 @@
+import { tr } from './langue.js';
 // Vue de dessus du lidar dans base_link (avant vers le haut) : points du scan, obstacles de la
 // stéréo, emprise du rover et couloir de sécurité le long de l'arc prévu.
 
@@ -70,8 +71,8 @@ export class Radar {
       ctx.stroke();
       const libelle = `${nombre(rayon, rayon < 1 ? 1 : 0)} m`;
       // Mini-radar : sur l'axe, au-dessus ; grand radar : sur la diagonale avant droite.
-      if (this.mini) ctx.fillText(libelle, cx + 4, cy - rayon * echelle - 3);
-      else ctx.fillText(libelle, cx + rayon * echelle * 0.74 + 3, cy - rayon * echelle * 0.67 - 3);
+      if (this.mini) ctx.fillText(tr(libelle), cx + 4, cy - rayon * echelle - 3);
+      else ctx.fillText(tr(libelle), cx + rayon * echelle * 0.74 + 3, cy - rayon * echelle * 0.67 - 3);
     }
     if (!this.mini) {
       ctx.textAlign = 'center';
@@ -84,7 +85,7 @@ export class Radar {
         ctx.lineTo(cx - Math.sin(ar) * r, cy - Math.cos(ar) * r);
         ctx.stroke();
         const libelle = a <= 180 ? a : a - 360;
-        ctx.fillText(`${libelle}°`, cx - Math.sin(ar) * (r + 10), cy - Math.cos(ar) * (r + 10));
+        ctx.fillText(tr(`${libelle}°`), cx - Math.sin(ar) * (r + 10), cy - Math.cos(ar) * (r + 10));
       }
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
@@ -180,13 +181,13 @@ export class Radar {
     ctx.stroke();
     const texte = `${nombre(Math.hypot(x, y), 2)} m · ${nombre(Math.atan2(y, x) / DEG, 0)}°`;
     ctx.font = '600 12px system-ui, sans-serif';
-    const largeur = ctx.measureText(texte).width + 12;
+    const largeur = ctx.measureText(tr(texte)).width + 12;
     const bx = Math.min(u + 10, l - largeur - 4), by = Math.max(v - 28, 4);
     ctx.fillStyle = couleur('--surface-3');
     ctx.fillRect(bx, by, largeur, 20);
     ctx.fillStyle = couleur('--texte-1');
     ctx.textBaseline = 'middle';
-    ctx.fillText(texte, bx + 6, by + 10);
+    ctx.fillText(tr(texte), bx + 6, by + 10);
     ctx.textBaseline = 'alphabetic';
   }
 }

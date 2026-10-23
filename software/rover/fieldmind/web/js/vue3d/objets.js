@@ -1,3 +1,4 @@
+import { tr } from '../langue.js';
 // Objets du monde reconstruit (message `scene`) : murs, prolongements extrapolés, arbres
 // (poteaux), blocs, obstacles bas, personnes, animaux et étiquettes. Chaque type est une couche
 // de maillages instanciés (un appel de dessin par couche, quel que soit le nombre d'objets) ;
@@ -382,7 +383,7 @@ export class Objets {
     const echelle = 2, police = 13 * echelle, marge = 9 * echelle, hauteur = 24 * echelle;
     const famille = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
     this.canvasMesure.font = `600 ${police}px ${famille}`;
-    const largeur = Math.ceil(this.canvasMesure.measureText(texte).width + 2 * marge);
+    const largeur = Math.ceil(this.canvasMesure.measureText(tr(texte)).width + 2 * marge);
     const canvas = document.createElement('canvas');
     canvas.width = largeur;
     canvas.height = hauteur;
@@ -399,7 +400,7 @@ export class Objets {
     g.fillStyle = PALETTE.etiquetteTexte;
     g.textBaseline = 'middle';
     g.textAlign = 'center';
-    g.fillText(texte, largeur / 2, hauteur / 2 + 1);
+    g.fillText(tr(texte), largeur / 2, hauteur / 2 + 1);
     e.matSprite.map?.dispose();
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;

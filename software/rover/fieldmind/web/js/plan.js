@@ -1,3 +1,4 @@
+import { tr } from './langue.js';
 // Carte du repère odom : grille d'occupation (PNG du message `carte`), trajectoire, chemin,
 // but, dernier scan et rover à l'échelle. Molette / pincement = zoom, glisser = déplacer,
 // clic = nouveau but (le rappel décide de la confirmation).
@@ -243,7 +244,7 @@ export class Plan {
       ctx.fillStyle = couleur(p.etat === 'visite' ? '--ok' : p.etat === 'inaccessible' ? '--alerte' : '--accent');
       ctx.beginPath(); ctx.arc(u, v, 7, 0, Math.PI * 2); ctx.fill();
       ctx.font = '11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillStyle = couleur('--carte-fond'); ctx.fillText(String(i + 1), u, v);
+      ctx.fillStyle = couleur('--carte-fond'); ctx.fillText(tr(String(i + 1)), u, v);
     });
     ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
     for (const o of this.donnees.etat?.monde?.objets || []) {
@@ -254,7 +255,7 @@ export class Plan {
       if (confirme) ctx.fillRect(u - 2, v - 2, 4, 4);
       else { ctx.strokeStyle = ctx.fillStyle; ctx.strokeRect(u - 3, v - 3, 6, 6); }
       ctx.font = '11px sans-serif'; ctx.fillStyle = couleur('--texte-1');
-      ctx.fillText(`${o.label.slice(0, 32)}${confirme ? '' : ' ?'}`, u + 6, v - 5);
+      ctx.fillText(tr(`${o.label.slice(0, 32)}${confirme ? '' : ' ?'}`), u + 6, v - 5);
     }
     for (const piece of this.donnees.etat?.monde?.pieces || []) {
       const preuves = piece.preuves || [];
@@ -264,7 +265,7 @@ export class Plan {
       const [u, v] = this.versEcran(x, y);
       ctx.font = 'bold 12px sans-serif';
       ctx.fillStyle = couleur(piece.statut === 'confirmee' ? '--ok' : '--texte-3');
-      ctx.fillText(`${piece.nom}${piece.statut === 'confirmee' ? '' : ' ?'}`, u + 8, v + 16);
+      ctx.fillText(tr(`${piece.nom}${piece.statut === 'confirmee' ? '' : ' ?'}`), u + 8, v + 16);
     }
 
     if (odom) {
@@ -332,7 +333,7 @@ export class Plan {
     ctx.fillRect(14 + largeur - 2, h - 24, 2, 9);
     ctx.font = '600 11px system-ui, sans-serif';
     ctx.textBaseline = 'bottom';
-    ctx.fillText(`${nombre(metres, metres < 1 ? 1 : 0)} m`, 14, h - 26);
+    ctx.fillText(tr(`${nombre(metres, metres < 1 ? 1 : 0)} m`), 14, h - 26);
   }
 
   _cible(ctx, x, y, teinte) {
