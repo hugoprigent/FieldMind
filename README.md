@@ -40,9 +40,6 @@ L'objectif : aider un opérateur à explorer et documenter une zone difficile d'
 ![Vue Pilotage de la simulation publique](docs/images/poste-pilotage-simulation.jpg)
 *Pilotage (simulation publique) : caméra gauche avec le couloir projeté devant le rover, vue 3D en incrustation, lidar et modes à droite.*
 
-![Onglet Mission de la simulation publique](docs/images/poste-mission-simulation.jpg)
-*Mission (simulation publique) : la consigne « explore la pièce » est refusée tant que le rover n'est pas armé.*
-
 ![Carte lidar pendant un essai réel](docs/images/poste-carte-essai-reel.jpg)
 *Carte (essai réel du 21 octobre) : carte d'occupation lidar, trajet parcouru et chemin prévu en mode auto.*
 
