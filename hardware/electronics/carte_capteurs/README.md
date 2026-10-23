@@ -1,3 +1,5 @@
+**Français** · [English](README.en.md)
+
 # Carte capteurs FieldMind
 
 L'édition publique conserve la révision **A7**, étudiée sur une plaque à pastilles 40 × 60 mm. Les révisions précédentes restent dans l'espace de travail privé.

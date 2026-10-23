@@ -4,9 +4,9 @@
 
 The current prototype uses a 10 mm plywood base, steering by a central servo, printed front wheels with rigid rims and lugged TPU tires, and rear gear motors salvaged from a robotic lawn mower.
 
-- [`prototype_final/`](prototype_final/README.md): shell, mounts, reinforcements, drawings, fasteners and current parts. The printable parts are in [`exports/stl/`](prototype_final/exports/stl/).
-- [`direction V04`](mounts/prototype/direction_v04_servo_traversant/README.md): steering principle, wheels and the history of its adjustments. The final prototype brings later changes, including the 10 mm board and the reinforcements; use its updated parts first.
-- [`remorque`](prototype_final/remorque/README.md): design of the trailer, still being prepared physically.
+- [`prototype_final/`](prototype_final/README.en.md): shell, mounts, reinforcements, drawings, fasteners and current parts. The printable parts are in [`exports/stl/`](prototype_final/exports/stl/).
+- [`direction V04`](mounts/prototype/direction_v04_servo_traversant/README.en.md): steering principle, wheels and the history of its adjustments. The final prototype brings later changes, including the 10 mm board and the reinforcements; use its updated parts first.
+- [`remorque`](prototype_final/remorque/README.en.md): design of the trailer, still being prepared physically.
 
 These three documents are in French.
 

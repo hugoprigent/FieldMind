@@ -1,3 +1,5 @@
+**Français** · [English](README.en.md)
+
 # FieldMind — schéma électrique complet du rover prototype
 
 Schéma de câblage de tout le rover, en complément de la carte capteurs A7. Il est fait au **format KiCad 10**, sans routage ni PCB, et a été contrôlé par l'ERC (0 erreur, 0 avertissement).

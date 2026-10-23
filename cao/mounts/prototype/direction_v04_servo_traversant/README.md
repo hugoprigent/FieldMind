@@ -1,3 +1,5 @@
+**Français** · [English](README.en.md)
+
 # FieldMind — direction V04 : tout sous la planche, servo traversant
 
 Étude du 14 octobre 2026, document Fusion **`systeme de direction simple v1`**, groupe

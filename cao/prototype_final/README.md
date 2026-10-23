@@ -1,3 +1,5 @@
+**Français** · [English](README.en.md)
+
 # FieldMind — prototype final
 
 > **Statut, 23 octobre 2026.** Cette page décrit la conception en CAO et ses contrôles

@@ -16,7 +16,7 @@ FieldMind connects a Raspberry Pi / ESP32 rover, a web operator station and mode
 
 The goal: help an operator explore and document a hard-to-reach area, then share the observations between robots. The prototype is designed to work in the field without any external AI API; this deployment autonomy has yet to be validated.
 
-[**Public simulation of the station**](https://hugoprigent.com/fieldmind/?lang=en) · [Project page](https://hugoprigent.com/projets/fieldmind?lang=en) · [Application pitch](https://youtu.be/ZIIjRc_pI_E) · [Architecture](docs/architecture.en.md) · [Status on 23 October](docs/status-2026-10-23.en.md) · [Validation](docs/validation.en.md)
+[**Public simulation of the station**](https://hugoprigent.com/fieldmind/?lang=en) · [Project page](https://hugoprigent.com/projets/fieldmind?lang=en) · [Presentation and tests](https://hugoprigent.com/media/fieldmind/presentation-20261023-en.mp4) · [Architecture](docs/architecture.en.md) · [Status on 23 October](docs/status-2026-10-23.en.md) · [Validation](docs/validation.en.md)
 
 > **Status on 23 October 2026.**
 > - The rover drives, with its chassis and electronics exposed; the shell is not fitted. It steers with the rear-wheel differential since the steering servo failed.
@@ -81,7 +81,7 @@ flowchart LR
 
 - **Rover**: C1 lidar, stereo, odometry, occupancy map, navigation and test log.
 - **AI and missions**: written or spoken instructions, progressive exploration, spatial memory, confirmation of an object over several images. The GX10 chooses among points computed by the Pi; the Pi re-validates the choice, navigates and keeps control of safety. The model does not drive the motors directly.
-- **GX10**: agent and vision (Qwen3.6-35B-A3B NVFP4), pointing (RoboBrain 2.5), detection (D-FINE), depth (Depth Anything V2), segmentation (SAM 2.1), speech (Qwen3-ASR, Qwen3-TTS), image embeddings (Qwen3-VL-Embedding). A scene analysis took about 6 to 9 s during the real tests. [Configuration](software/rover/deploiement/gx10/README.en.md) and [status by role](software/rover/MODELES.md) (in French).
+- **GX10**: agent and vision (Qwen3.6-35B-A3B NVFP4), pointing (RoboBrain 2.5), detection (D-FINE), depth (Depth Anything V2), segmentation (SAM 2.1), speech (Qwen3-ASR, Qwen3-TTS), image embeddings (Qwen3-VL-Embedding). A scene analysis took about 6 to 9 s during the real tests. [Configuration](software/rover/deploiement/gx10/README.en.md) and [status by role](software/rover/MODELES.en.md).
 - **Electronics**: XIAO ESP32-C5 firmware, watchdog, OLED display, I²C sensors and USB link with the Pi. Version ROVER_4 drives the two servos of the trailer flaps.
 - **Mechanics**: TPU tires, wooden chassis, current steering by rear-wheel differential; drone-carrier trailer printed and assembled. The shell is designed but not fitted; an SG90 servo mount for steering is designed, not validated under load.
 
@@ -100,7 +100,7 @@ During the ASUS session, the GX10 was remote and reached over a private network.
 | [`docs/status-2026-10-23.en.md`](docs/status-2026-10-23.en.md) | Status of the rover, trailer, drone and GX10 on 23 October |
 | [`docs/validation.en.md`](docs/validation.en.md) | What is measured, what is simulated, what remains to be checked |
 
-Folder and file names, the code and most detailed documents are in French.
+Folder names, protocol identifiers and source-code comments retain their original names. Every project Markdown document has a French and English version, linked at the top.
 
 ## Checking
 
@@ -115,11 +115,11 @@ The tests cover the controllers, safety, navigation, AI contracts and simulated 
 
 ## Hardware and rights
 
-Before a real test, read the [rover guide](software/rover/README.en.md) and the [wiring](hardware/electronics/CONNEXIONS.md) (in French), calibrate the assembly and provide a traction cut-off. The KiCad documents include studies that predate some of the current connections: their status is given in [hardware/README.en.md](hardware/README.en.md).
+Before a real test, read the [rover guide](software/rover/README.en.md) and the [wiring](hardware/electronics/CONNEXIONS.en.md), calibrate the assembly and provide a traction cut-off. The KiCad documents include studies that predate some of the current connections: their status is given in [hardware/README.en.md](hardware/README.en.md).
 
 This edition selects the sources useful for the demonstration, without access files, secrets, private logs, raw footage or work history. [Provenance](docs/publication.en.md).
 
-The original code and designs are published for review; no general open license is granted at this stage. Third-party components keep their licenses. See [rights](RIGHTS.md) and [credits](THIRD_PARTY_NOTICES.md) (in French).
+The original code and designs are published for review; no general open license is granted at this stage. Third-party components keep their licenses. See [rights](RIGHTS.en.md) and [credits](THIRD_PARTY_NOTICES.en.md).
 
 ## Languages and videos
 

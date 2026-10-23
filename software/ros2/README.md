@@ -1,3 +1,5 @@
+**Français** · [English](README.en.md)
+
 > **Étude antérieure.** Le logiciel courant du prototype est dans [`../rover/`](../rover/README.md). Les résultats Gazebo ci-dessous sont simulés ; ils ne valident pas un rover autonome réel.
 
 # Pile ROS 2 du rover FieldMind

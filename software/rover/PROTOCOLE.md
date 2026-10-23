@@ -1,3 +1,5 @@
+**Français** · [English](PROTOCOLE.en.md)
+
 # Protocole du poste opérateur
 
 Le rover sert le poste (`fieldmind/web/`) et son API sur `http://<rover>:8080`. Tout passe par
@@ -265,3 +267,15 @@ du poste : `/api/drone/atelier/montage.jpg` et `rapport.json`.
 - Une demande refusée (action impossible, réglage hors liste, console pendant le roulage) reçoit
   une `reponse` avec `ok: false` et une `erreur` lisible.
 - La fermeture de la WebSocket du pilote en mode `manuel` arrête le rover dans les 0,5 s.
+
+## Langues et caméras simulées dans le navigateur
+
+Le poste accepte `?lang=fr` et `?lang=en`. Le sélecteur FR / EN mémorise le choix dans le navigateur. La traduction concerne l'affichage ; les noms de messages, valeurs de mode, identifiants de capteurs et paramètres du protocole restent identiques.
+
+En matériel simulé uniquement, `bienvenue.cameras_navigateur` annonce le transport WebGL. Le poste volontaire envoie `{"type":"camera_simulee_prete","prete":true}` ; `false` libère le rendu, notamment quand la page passe en arrière-plan. Un seul poste fournit les images d'un rover simulé.
+
+Le serveur envoie d'abord `monde_simule` (version, obstacles, couleurs, pièce et damier), puis des demandes `camera_simulee` : numéro `id`, date monotone `t`, pose vraie `[x,y,cap]`, vues, intrinsèques et extrinsèques, largeur 640 et hauteur 360. Les deux images d'une demande portent la même date de pose, même si elles arrivent séparément.
+
+Chaque réponse est une trame WebSocket **binaire** : en-tête JSON `{"id":123,"camera":"gauche"}`, saut de ligne LF, puis le JPEG. L'en-tête est borné à 255 octets ; le JPEG à 400 000 octets. Seules les vues demandées pour le numéro courant sont acceptées, une fois par vue. Les images sont publiées sur le même bus que les caméras physiques et alimentent la stéréo, la vision, les photos et l'IA.
+
+Une page sans WebGL conserve le rendu logiciel. Si aucune image du navigateur n'arrive pendant deux secondes, le matériel simulé reprend ce rendu. Ce transport ne reçoit jamais d'images sur le matériel réel et ne modifie aucune commande de conduite.

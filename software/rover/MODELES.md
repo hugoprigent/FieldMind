@@ -1,3 +1,5 @@
+**Français** · [English](MODELES.en.md)
+
 # Modèles d'IA du rover : Gemini maintenant, open source ensuite
 
 Chaque fonction d'IA est un **rôle** avec une interface fixe. Le profil choisi dans le poste

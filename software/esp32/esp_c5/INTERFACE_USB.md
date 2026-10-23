@@ -1,3 +1,5 @@
+**Français** · [English](INTERFACE_USB.en.md)
+
 # Pilotage depuis le navigateur, par USB
 
 Lancer dans ce dossier :

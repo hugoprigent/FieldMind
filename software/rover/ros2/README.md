@@ -1,3 +1,5 @@
+**Français** · [English](README.en.md)
+
 # Pile ROS 2 du rover FieldMind
 
 Le rover n'exécute pas ROS : son programme Python (`python -m fieldmind`, sur le Pi) expose la

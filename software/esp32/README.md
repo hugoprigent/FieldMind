@@ -1,3 +1,5 @@
+**Français** · [English](README.en.md)
+
 # Logiciels ESP32 du rover
 
 Projet du XIAO ESP32-C5 : [esp_c5/](esp_c5/README.md).

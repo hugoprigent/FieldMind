@@ -1,3 +1,5 @@
+**Français** · [English](README.en.md)
+
 # Pont ROS 2 du rover FieldMind
 
 Relie les topics ROS 2 du rover réel au cerveau FieldMind, qui tourne sur le GX10 (serveur

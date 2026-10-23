@@ -5,11 +5,11 @@
 The software that runs **on the rover's Raspberry Pi**: hardware drivers, safety,
 driving, lidar odometry, stereo, navigation, missions, AI agent with voice control, and the
 web operator station. It replaces the `software/embarque` supervision (same ports, same
-cameras). Architecture and interfaces: [ARCHITECTURE.md](ARCHITECTURE.md); station messages:
-[PROTOCOLE.md](PROTOCOLE.md) (both in French).
+cameras). Architecture and interfaces: [ARCHITECTURE.md](ARCHITECTURE.en.md); station messages:
+[PROTOCOLE.md](PROTOCOLE.en.md).
 
 Prototype status on 23 October: [recent changes and limits](../../docs/status-2026-10-23.en.md).
-Next test: [red box mission, photo and return to base](TEST_TERRAIN_2026-10-22.md) (in French).
+Next test: [red box mission, photo and return to base](TEST_TERRAIN_2026-10-22.en.md).
 
 The web station is available in French and English (FR / EN, top right). It detects the preferred browser language and remembers a manual choice. Protocol identifiers remain unchanged.
 
@@ -45,13 +45,13 @@ before any public exposure. Its deployment configuration is not included here.
 
 ## What the software does
 
-- **Drone**: [reconnaissance without flying and aiming at the cross](DRONE.md), six captures,
+- **Drone**: [reconnaissance without flying and aiming at the cross](DRONE.en.md), six captures,
   downloadable mosaic and report. Autonomous flight stays blocked until the
   motor protocol of the CooleerX variant is validated.
   Offline analysis of the original app made it possible to identify a command frame,
   but the RC stream is neither connected nor validated on the bench; no real command is enabled.
-  [Local workshop for the complete mission](DRONE_MISSION.md): take-off and lap with
-  photos, bottom camera and simulated stepwise descent, gamepad and GX10 preparation (both documents in French).
+  [Local workshop for the complete mission](DRONE_MISSION.en.md): take-off and lap with
+  photos, bottom camera and simulated stepwise descent, gamepad and GX10 preparation.
 
 - **Safe driving**: safety at 20 Hz on the Pi (corridor along the planned arc, lidar +
   stereo + memory of low obstacles, stale sensors, tilt, impact, stall, dead man's switch,
@@ -72,7 +72,7 @@ before any public exposure. Its deployment configuration is not included here.
   slow reversing, in manual mode only, refused if the trailer would jackknife
   or if its angle is uncertain (drive 1 m straight ahead, or *Dans l'axe* (in line) in *Pilotage*).
 - **AI**: written or spoken instructions (webcam microphone), vision, Gemini / GX10 / Mac profiles
-  ([MODELES.md](MODELES.md), in French). On the GX10: Qwen3.6 agent, RoboBrain 2.5 pointing, continuous
+  ([MODELES.md](MODELES.en.md)). On the GX10: Qwen3.6 agent, RoboBrain 2.5 pointing, continuous
   detection, depth, outlines, rover voice, memory of places, and a **watch agent** that
   analyzes the situation continuously (you can talk to it: « qu'est-ce qui se passe ? », "what's going on?").
 - **Web station**: driving, Tesla-style 3D view, local map and OpenStreetMap GPS map,
@@ -188,7 +188,7 @@ for the time needed to cover `remorque.volets_angle_deg` (90°), computed from
 moves if the requested state is already the known state. The direction of each flap can be inverted in
 *Réglages > Remorque*. *Pilotage* > **Déplier / Replier les volets** (unfold / fold the flaps), or *Drone* panel > **Prêt au
 décollage** (ready for take-off; no command is sent to the drone, whose motor protocol has yet to be
-identified: [DRONE.md](DRONE.md)). When unfolded, the trailer outline used by safety
+identified: [DRONE.md](DRONE.en.md)). When unfolded, the trailer outline used by safety
 widens. D2/D3 then no longer read the wheel speed sensors.
 
 ## IMU mounted at an angle
@@ -223,3 +223,9 @@ tilted axis of the sensor) is no longer used, the Pi integrates the yaw rate.
   stop.
 - **There is no hardware emergency stop yet** (cutting the traction battery):
   it must be wired before driving near anyone.
+
+### French / English and simulated cameras
+
+The **FR / EN** buttons in the top right switch the interface without losing settings or the mission. The first visit uses the preferred browser language; `?lang=en` or `?lang=fr` overrides it. Protocol codes remain unchanged.
+
+In simulation, the browser can render both cameras in WebGL and return their images to the simulated rover. The renderer uses the ground-truth pose and camera geometry, with a shared timestamp for each stereo pair. Software rendering remains available if WebGL fails or no browser supplies images. This channel never controls real hardware. See [PROTOCOLE.md](PROTOCOLE.en.md).

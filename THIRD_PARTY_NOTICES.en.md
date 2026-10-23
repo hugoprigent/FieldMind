@@ -9,7 +9,7 @@
 
 ## Simulation and mapping
 
-- The ROS 2 worlds reference **Open Robotics** Gazebo Fuel assets downloaded at runtime. Credits and CC0 / CC BY 4.0 licenses are detailed in [`CREDITS.md`](software/ros2/src/fieldmind_simulation/CREDITS.md).
+- The ROS 2 worlds reference **Open Robotics** Gazebo Fuel assets downloaded at runtime. Credits and CC0 / CC BY 4.0 licenses are detailed in [`CREDITS.md`](software/ros2/src/fieldmind_simulation/CREDITS.en.md).
 - The station can display **OpenStreetMap** maps, with attribution shown in the interface. These basemaps require an Internet connection.
 - The `software/interface/web/modeles/rover_v3.glb` model is the earlier FieldMind concept, exported for the demo and distinct from the current physical prototype.
 

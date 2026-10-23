@@ -1,3 +1,5 @@
+**Français** · [English](CREDITS.en.md)
+
 # Crédits des modèles 3D
 
 Les mondes générés par `generer_monde` référencent des modèles de

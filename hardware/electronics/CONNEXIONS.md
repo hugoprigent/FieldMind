@@ -1,3 +1,5 @@
+**Français** · [English](CONNEXIONS.en.md)
+
 # FieldMind — qui est branché sur quoi
 
 **Fichier de référence des connexions du rover prototype.** Toute modification de câblage

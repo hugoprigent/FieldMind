@@ -1,3 +1,5 @@
+**Français** · [English](TEST_TOUT_MOTEUR.en.md)
+
 # Test manuel : traction et servo
 
 Source : `src/test_tout_moteur.cpp`. Environnement PlatformIO

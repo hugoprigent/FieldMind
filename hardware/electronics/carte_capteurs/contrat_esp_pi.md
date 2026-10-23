@@ -1,3 +1,5 @@
+**Français** · [English](contrat_esp_pi.en.md)
+
 # Contrat USB ESP–Pi proposé — version 1
 
 **Spécification à implémenter**, pas un firmware existant. ESP retenu : XIAO ESP32C5. USB natif Serial/JTAG du XIAO vers le Pi ; UART GPS séparé sur D6/D7, configuré comme UART applicatif sans logs. Aucun micro-ROS physique n'est supposé déjà disponible. Le protocole des services du dépôt reste un contrat réseau différent.

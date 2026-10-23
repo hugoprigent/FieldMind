@@ -7,7 +7,7 @@ The default program is **esp_c5**, identifier **ROVER_4** (ROVER_3 plus the trai
 servo, IMU, barometer, display and optional Knob. ROVER_3 keeps all the
 ROVER_2 commands and adds driving by the Raspberry Pi (see below).
 
-**For the connection to the Raspberry Pi: [current guide and pinout](CONNEXION_RASPBERRY.md) (in French).**
+**For the connection to the Raspberry Pi: [current guide and pinout](CONNEXION_RASPBERRY.en.md).**
 
 - Left motor: speed D0/GPIO1, D/R D1/GPIO0 inverted in software.
 - Right motor: speed D9/GPIO9, D/R D4/GPIO23.
@@ -57,16 +57,16 @@ The motor setpoint persists until another command, stop or a detected USB loss.
 Bare numbers and the old avance/armer/test commands are not
 commands of the new main. The Pi console simply uses the lines above.
 
-The [local USB page on a PC](INTERFACE_USB.md) accepts ROVER_3, ROVER_2 and TOUT_MOTEUR_4.
-The [combined test](TEST_TOUT_MOTEUR.md) keeps its separate console.
-The [servo-only test settings](TEST_SERVO.md) concern D0, not D7.
-The [motor diagnosis](DIAGNOSTIC_MOTEUR.md) mainly concerns the single-motor test.
+The [local USB page on a PC](INTERFACE_USB.en.md) accepts ROVER_3, ROVER_2 and TOUT_MOTEUR_4.
+The [combined test](TEST_TOUT_MOTEUR.en.md) keeps its separate console.
+The [servo-only test settings](TEST_SERVO.en.md) concern D0, not D7.
+The [motor diagnosis](DIAGNOSTIC_MOTEUR.en.md) mainly concerns the single-motor test.
 These pages are in French.
 
 ## ROVER_3 extension: driving by the Raspberry Pi
 
 Added commands, all off at startup (details and formats in the
-[Raspberry Pi guide](CONNEXION_RASPBERRY.md#extension-rover_3)):
+[Raspberry Pi guide](CONNEXION_RASPBERRY.en.md#extension-rover_3)):
 
 ```text
 wd 400        watchdog: without p or hb for 400 ms, traction to zero
@@ -87,7 +87,7 @@ Optional: `roues 1` reads the `SC` output (speed pulses) of each
 driver on D2 / GPIO25 (left) and D3 / GPIO7 (right), and appends `<hz_g> <hz_d>`
 to the end of the T line. By default (`roues 0`), these pins are not touched.
 The electrical level of SC is not documented: measure it and adapt the
-signal before connecting it ([proposed wiring](CONNEXION_RASPBERRY.md#sorties-sc-des-drivers-facultatif)).
+signal before connecting it ([proposed wiring](CONNEXION_RASPBERRY.en.md#sorties-sc-des-drivers-facultatif)).
 
 ## Sources and verification
 
@@ -129,7 +129,7 @@ Builds do not prove the mechanical behavior or autonomous navigation.
 The sections about the display and sensors apply to the
 `esp_c5`, `esp_c5_complet` and `esp_c5_capteurs` environments.
 
-PlatformIO program for the **XIAO ESP32C5** of the [A7 sensor board](../../../hardware/electronics/carte_capteurs/perfboard_une_plaque_c5_a7.md) (in French). It reads the **GY-521** (MPU-6050) and the **BMP280**, and displays them on the **OLED display**. If a **Modulino Knob** is connected, the display becomes the rover's home desktop, browsed with the Knob. Without the Knob, the display continuously shows the sensor readings. All are on the I2C bus, with SDA on D5 (GPIO24) and SCL on D6 (GPIO11).
+PlatformIO program for the **XIAO ESP32C5** of the [A7 sensor board](../../../hardware/electronics/carte_capteurs/perfboard_une_plaque_c5_a7.en.md). It reads the **GY-521** (MPU-6050) and the **BMP280**, and displays them on the **OLED display**. If a **Modulino Knob** is connected, the display becomes the rover's home desktop, browsed with the Knob. Without the Knob, the display continuously shows the sensor readings. All are on the I2C bus, with SDA on D5 (GPIO24) and SCL on D6 (GPIO11).
 
 ## Running
 

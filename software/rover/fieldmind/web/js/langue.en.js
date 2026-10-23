@@ -516,4 +516,41 @@ Connexion…|Connecting…
 Capturer vue|Capture view
 fréquence|rate
 Actions|Actions
+
+j'avance de|I move forward
+je recule de|I reverse
+je tourne de|I turn
+je vais au point|I go to the point
+je m'oriente au cap|I turn to heading
+j'attends|I wait
+je mémorise cet endroit comme|I save this place as
+je vais à|I go to
+je recherche les indices de|I look for evidence of
+pour la rejoindre|to reach it
+je cherche|I look for
+sans y aller|without approaching it
+j'explore progressivement et je cartographie ce que je vois|I explore progressively and map what I see
+pour trouver|to find
+je regarde et je décris ce que je vois|I look and describe what I see
+je prends une photo|I take a photo
+je m'arrête|I stop
+puis|then
+devant|ahead
+derrière|behind
+Refusé|Refused
+Je n'ai pas compris la consigne.|I did not understand the instruction.
+J'annule la mission en cours.|I cancel the current mission.
+Ensuite|Next
+L'agent est occupé|The agent is busy
+Analyse…|Analyzing…
+Recherche|Search
 `.trim().split('\n').map(ligne => ligne.split('|')));
+
+// Accepter les deux apostrophes utilisées par le firmware et les messages du serveur.
+for (const [fr, en] of Object.entries(anglais)) {
+  for (const variante of [fr, fr.replaceAll('’', "'"), fr.replaceAll("'", '’')]) {
+    if (!Object.hasOwn(anglais, variante)) anglais[variante] = en;
+    const capitale = variante.charAt(0).toUpperCase() + variante.slice(1);
+    if (!Object.hasOwn(anglais, capitale)) anglais[capitale] = en.charAt(0).toUpperCase() + en.slice(1);
+  }
+}

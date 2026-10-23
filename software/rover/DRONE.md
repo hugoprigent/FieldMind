@@ -1,3 +1,5 @@
+**Français** · [English](DRONE.en.md)
+
 # Drone : reconnaissance et statut du pilotage
 
 État public au 23 octobre 2026. La mission complète existe dans le [simulateur](DRONE_MISSION.md),

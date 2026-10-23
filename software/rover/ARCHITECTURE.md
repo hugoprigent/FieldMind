@@ -1,3 +1,5 @@
+**Français** · [English](ARCHITECTURE.en.md)
+
 # Architecture du logiciel du rover
 
 Logiciel final du rover réel. Il tourne **sur le Raspberry Pi 4** (Raspberry Pi OS, Debian 13,

@@ -1,3 +1,5 @@
+**Français** · [English](CONNEXION_RASPBERRY.en.md)
+
 # Firmware du rover et liaison Raspberry Pi
 
 Programme a televerser : **esp_c5**, selectionne par defaut dans PlatformIO.

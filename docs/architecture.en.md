@@ -12,4 +12,4 @@ The current simulation replaces the hardware drivers: a fake ESP using the same 
 
 The drone and the trailer are experimental extensions. The drone scenarios are simulated; a video protocol or a simulation report does not prove a real autonomous flight.
 
-For the detailed interfaces: [rover architecture](../software/rover/ARCHITECTURE.md), [web protocol](../software/rover/PROTOCOLE.md) (both in French), [firmware](../software/esp32/esp_c5/README.en.md), [AI deployment](../software/rover/deploiement/gx10/README.en.md).
+For the detailed interfaces: [rover architecture](../software/rover/ARCHITECTURE.en.md), [web protocol](../software/rover/PROTOCOLE.en.md), [firmware](../software/esp32/esp_c5/README.en.md), [AI deployment](../software/rover/deploiement/gx10/README.en.md).

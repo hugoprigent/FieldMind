@@ -1,3 +1,5 @@
+**Français** · [English](README.en.md)
+
 # Mise en ligne de la démo
 
 Architecture : Caddy (HTTPS automatique, WebSocket) → uvicorn (un seul processus, sessions en

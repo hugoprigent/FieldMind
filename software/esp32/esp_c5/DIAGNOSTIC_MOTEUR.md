@@ -1,3 +1,5 @@
+**Français** · [English](DIAGNOSTIC_MOTEUR.en.md)
+
 # Le moteur tourne au potentiomètre mais ignore l'ESP
 
 Conserver la combinaison phases/Hall qui permet actuellement la rotation.

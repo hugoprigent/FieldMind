@@ -1,3 +1,5 @@
+**Français** · [English](README.en.md)
+
 # FieldMind — remorque porte-drone
 
 > **État, 23 octobre 2026.** La remorque a été fabriquée à partir de ces

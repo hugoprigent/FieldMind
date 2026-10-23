@@ -1,3 +1,5 @@
+**Français** · [English](TEST_TERRAIN_2026-10-22.en.md)
+
 # Mission du 22 octobre : retrouver un colis et revenir à la base
 
 But : le rover mémorise le départ, cherche une caisse rouge au milieu de quelques

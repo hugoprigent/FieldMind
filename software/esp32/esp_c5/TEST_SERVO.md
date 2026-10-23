@@ -1,3 +1,5 @@
+**Français** · [English](TEST_SERVO.en.md)
+
 # Test servo simple avec ESP32Servo
 
 Environnement PlatformIO **test_servo**, a selectionner explicitement.

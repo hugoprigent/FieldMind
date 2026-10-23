@@ -1,3 +1,5 @@
+**Français** · [English](alimentation_arret.en.md)
+
 # Alimentation et arrêt — A0
 
 La petite carte ne distribue que le 3,3 V des petits modules et les signaux. Batterie, fusibles, conversions, coupure de traction et alimentation servo sont hors carte. Le schéma fonctionnel matérialise ces branches ; ce document fixe les conditions de raccordement.

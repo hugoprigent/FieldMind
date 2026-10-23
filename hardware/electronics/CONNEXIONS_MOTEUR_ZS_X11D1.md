@@ -1,3 +1,5 @@
+**Français** · [English](CONNEXIONS_MOTEUR_ZS_X11D1.en.md)
+
 # Connexions moteur — Fowecry ZS-X11D1 et XIAO ESP32-C5
 
 > Une version parallèle (relevés des moteurs NGP, sortie 5 V du driver, surveillance batterie) est

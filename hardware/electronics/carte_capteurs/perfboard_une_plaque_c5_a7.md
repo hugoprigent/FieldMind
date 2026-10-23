@@ -1,3 +1,5 @@
+**Français** · [English](perfboard_une_plaque_c5_a7.en.md)
+
 # FieldMind — XIAO ESP32C5 et capteurs sur une perfboard 4 × 6 cm, tous les fils dessous (révision A7)
 
 **A7 est la révision courante.** Elle reprend A6 : mêmes liaisons, aucune résistance ni condensateur, et toutes les broches du XIAO accessibles. Le câblage est refait pour que **la face de l'écran ne porte aucun fil**. A0 à A6 sont conservés. Rien n'a été acheté.

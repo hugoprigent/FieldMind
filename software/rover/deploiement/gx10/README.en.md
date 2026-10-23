@@ -2,7 +2,7 @@
 
 # FieldMind inference on the ASUS Ascent GX10
 
-These files configure the AI services of the rover's `gx10` profile. As of 23 October 2026, eight models are served on the GX10's GB10. Qwen3.6, Qwen3-ASR and RoboBrain 2.5 have been checked with real calls; the others are connected to the rover and checked in simulation (detailed status in [MODELES.md](../../MODELES.md), in French). This file describes their configuration; it is not a benchmark.
+These files configure the AI services of the rover's `gx10` profile. As of 23 October 2026, eight models are served on the GX10's GB10. Qwen3.6, Qwen3-ASR and RoboBrain 2.5 have been checked with real calls; the others are connected to the rover and checked in simulation (detailed status in [MODELES.md](../../MODELES.en.md)). This file describes their configuration; it is not a benchmark.
 
 | Service | Port | Model | Role |
 | --- | --- | --- | --- |

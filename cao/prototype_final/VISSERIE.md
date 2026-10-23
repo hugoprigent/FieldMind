@@ -1,3 +1,5 @@
+**Français** · [English](VISSERIE.en.md)
+
 # FieldMind — toute la visserie du prototype final
 
 Mise à jour et recomptage documentaire : **18 octobre 2026**. Quantités

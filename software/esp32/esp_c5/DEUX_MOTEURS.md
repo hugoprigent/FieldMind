@@ -1,3 +1,5 @@
+**Français** · [English](DEUX_MOTEURS.en.md)
+
 # Main : deux moteurs, servo et capteurs
 
 Le programme actuel est **esp_c5 / ROVER_3** (commandes ROVER_2 conservees), selectionne par defaut.

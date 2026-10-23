@@ -1,3 +1,5 @@
+**Français** · [English](connexions_gpio.en.md)
+
 # Connexions et budget GPIO — A0
 
 **Le montage retenu est maintenant le C5 sur perfboard A1 (référence de travail non incluse), avec boutons sur ADC.** Les affectations C5 de ce plan sont documentées par Seeed, pas testées physiquement. Ce document A0 conserve la proposition générique à quatre entrées boutons et ses réservations ; ne pas câbler ses 22 fonctions simultanément sur les 11 GPIO du XIAO.

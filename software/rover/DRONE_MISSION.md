@@ -1,3 +1,5 @@
+**Français** · [English](DRONE_MISSION.en.md)
+
 # Préparation locale de la mission drone
 
 Le drone peut être éteint et le Pi débranché : l'atelier tourne sur ce Mac. Aucun

@@ -1,3 +1,5 @@
+**Français** · [English](README.en.md)
+
 # Projet courant A7 — une perfboard 4 × 6 cm, tous les fils dessous
 
 Ouvrir `fieldmind_c5_a7.kicad_pro` dans KiCad 10. Toutes les sources ont été enregistrées par KiCad 10.0.6.

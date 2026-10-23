@@ -219,3 +219,9 @@ l'axe penché du capteur) n'est plus utilisé, le Pi intègre la vitesse de lace
   immédiat.
 - **Il n'y a pas encore d'arrêt d'urgence matériel** (coupure de la batterie de traction) :
   c'est à câbler avant de rouler près de quelqu'un.
+
+### Français / English et rendu des caméras simulées
+
+Le bouton **FR / EN**, en haut à droite, traduit le poste sans perdre les réglages ou la mission. Au premier passage, la langue préférée du navigateur est utilisée ; un lien `?lang=en` ou `?lang=fr` force la langue. Les codes du protocole restent identiques.
+
+En simulation, les deux caméras peuvent être rendues en WebGL dans le navigateur puis renvoyées au rover simulé. Elles utilisent la pose vraie et la géométrie des caméras, avec une date commune à chaque paire stéréo. Le rendu logiciel reste disponible si WebGL échoue ou si aucun navigateur ne fournit d'images. Aucun matériel réel n'est commandé par ce canal. Voir [PROTOCOLE.md](PROTOCOLE.md).

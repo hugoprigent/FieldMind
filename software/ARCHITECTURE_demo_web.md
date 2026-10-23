@@ -1,3 +1,5 @@
+**Français** · [English](ARCHITECTURE_demo_web.en.md)
+
 # Architecture de la démo de navigation autonome
 
 Rédigé le 29 septembre 2026, à partir du brief (référence de travail non incluse) et de la consigne de Hugo :
