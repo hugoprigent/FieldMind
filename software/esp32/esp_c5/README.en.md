@@ -3,7 +3,7 @@
 # Rover ESP32 software - ESP C5
 
 Open `software/esp32/esp_c5/` in VS Code with PlatformIO.
-The default program is **esp_c5**, identifier **ROVER_3**: two motors,
+The default program is **esp_c5**, identifier **ROVER_4** (ROVER_3 plus the trailer flap servos on D2/D3): two motors,
 servo, IMU, barometer, display and optional Knob. ROVER_3 keeps all the
 ROVER_2 commands and adds driving by the Raspberry Pi (see below).
 

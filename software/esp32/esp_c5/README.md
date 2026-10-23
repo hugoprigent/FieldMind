@@ -3,7 +3,7 @@
 # Logiciel ESP32 du rover - ESP C5
 
 Ouvrir `software/esp32/esp_c5/` dans VS Code avec PlatformIO.
-Le programme par defaut est **esp_c5**, identifiant **ROVER_3** : deux moteurs,
+Le programme par defaut est **esp_c5**, identifiant **ROVER_4** (ROVER_3 plus les servos des volets de la remorque sur D2/D3) : deux moteurs,
 servo, IMU, barometre, ecran et Knob facultatif. ROVER_3 garde toutes les
 commandes de ROVER_2 et ajoute le pilotage par le Raspberry Pi (voir plus bas).
 
