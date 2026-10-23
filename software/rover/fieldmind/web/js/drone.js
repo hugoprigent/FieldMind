@@ -82,7 +82,7 @@ export class AtelierDroneVue {
       img.hidden = true;
     }
     if (d && !img.dataset.actif) {
-      const url = new URL('/flux/drone_simule', location.href);
+      const url = new URL('flux/drone_simule', location.href);
       if (this.ctx.connexion.jeton) url.searchParams.set('jeton', this.ctx.connexion.jeton);
       img.src = url.href;
       img.dataset.actif = '1';
@@ -90,7 +90,7 @@ export class AtelierDroneVue {
     }
     for (const lien of this.racine.querySelectorAll('[data-atelier-fichier]')) {
       lien.hidden = !d?.archive;
-      const url = new URL(`/api/drone/atelier/${lien.dataset.atelierFichier}`, location.href);
+      const url = new URL(`api/drone/atelier/${lien.dataset.atelierFichier}`, location.href);
       if (this.ctx.connexion.jeton) url.searchParams.set('jeton', this.ctx.connexion.jeton);
       lien.href = url.href;
     }

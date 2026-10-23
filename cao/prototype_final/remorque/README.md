@@ -1,9 +1,9 @@
 # FieldMind — remorque porte-drone
 
-> **Conception en CAO, 21 octobre 2026.** La remorque n'est pas encore disponible
-> physiquement. Les images et les contrôles ci-dessous concernent le modèle ;
-> aucun transport ni atterrissage réel du drone sur cette remorque n'est validé.
-> Les [pièces imprimables](exports/stl/) sont fournies pour préparer la fabrication.
+> **État, 23 octobre 2026.** La remorque a été fabriquée à partir de ces
+> [pièces imprimables](exports/stl/) ; ses volets sont commandés par servos (firmware ROVER_4).
+> Les images et les contrôles ci-dessous concernent le modèle. Aucun transport ni
+> atterrissage réel du drone sur cette remorque n'est validé.
 
 La remorque a son propre document Fusion, **`remorque fieldmind`**, inséré par référence dans le
 document du rover **`prtotype final fieldmind`** (voir [Documents Fusion et scripts](#documents-fusion-et-scripts)).
@@ -76,6 +76,11 @@ d'atterrissage.
 - **Charnière** : l'axe longe le bord du plateau, juste à l'extérieur de la joue.
   - **À l'avant : le SG90**, dans le coin coupé de la planche, arbre dans l'axe de la charnière. Son
     palonnier 1 bras est vissé sur la ferrure avant du volet. Le câble est ainsi tout près du timon.
+  - La ferrure avant porte l'**empreinte du palonnier 1 bras** standard du SG90 : une plaque de 1,5 mm
+    devant sa face, creusée de la forme du palonnier (4 % plus grande pour le jeu). Le palonnier s'y
+    encastre à fleur, sans picots, et la forme l'empêche de glisser. On le serre avec **la vis M2,5 du
+    servo**, passée par le **trou Ø3 dans l'axe**, à travers la ferrure et le moyeu du palonnier.
+    `10_empreinte_palonnier.py`.
   - **À l'arrière : un bloc de charnière** vissé sous la planche, avec une joue au ras du plateau.
     Une **vis M3×20 sert d'axe** : elle traverse librement le bloc et la ferrure arrière (Ø3,4),
     avec une rondelle de chaque côté et un écrou frein. Rien n'est vissé dans le plastique.

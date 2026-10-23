@@ -43,7 +43,18 @@ pour trier les phrases entendues). Les noms sont dans [config/ia.toml](config/ia
 
 | Rôle | Gemini | Open source |
 |---|---|---|
-| agent, vision, transcription | branchés, testés avec un faux serveur, pas encore avec une vraie clé | profils `gx10` (vLLM) prêts ; `mac` à écrire |
-| synthèse, détection, profondeur, parole, éveil, mémoire | à écrire | à écrire |
+| agent, vision, transcription | branchés et vérifiés avec la vraie clé | GX10 : servis et vérifiés (Qwen3.6, Qwen3-ASR) |
+| pointage incarné | Robotics ER 2 (rôle vision) | GX10 : RoboBrain 2.5, vérifié |
+| synthèse, détection, profondeur, segmentation, mémoire | — | GX10 : servis, branchés, vérifiés en simulation (21/10/2026) |
+| parole, éveil | détecteur intégré | à écrire |
+
+**Agent de veille** (`ia.veille`) : toutes les 8 s, le modèle de vision regarde la caméra avec
+les mesures du rover et résume la situation ; l'agent de conversation s'en sert pour répondre,
+et une alerte (« attention », « danger ») est dite à voix haute. Gratuit et actif par défaut sur
+le GX10 ; avec Gemini, seulement si `ia.vigilance` est activée (une requête payante par image).
+
+**Qwen appelle une fonction à la fois** : avec `appels_successifs = true` (profil gx10), l'agent
+relance le modèle jusqu'à ce que la consigne soit complète (« avance puis tourne » : 12 sur 12
+contre 5 sur 10 sans relance, ≈ 1,9 s par consigne).
 
 Disque du Mac : 2,4 Go libres au 19 octobre 2026 : aucun modèle local n'est téléchargé.

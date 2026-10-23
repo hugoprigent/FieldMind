@@ -48,13 +48,14 @@ class Contexte:
     odom: Odometrie
     securite: EtatSecurite | None
     carte: CarteOccupation | None
-    obstacles: np.ndarray  # (N, 2) base_link : lidar + stéréo
+    obstacles: np.ndarray  # (N, 2) base_link : bloquants (lidar, + stéréo si bloquante)
     vitesse_max: float  # m/s du mode auto
     vitesse_defaut: float
     braquage_max: float  # rad
     empattement: float
     navigation: Any = None  # fieldmind.mission.executeur.Navigation
     ia: Any = None
+    indicatifs: np.ndarray | None = None  # (N, 2) base_link : obstacles bas non bloquants
 
 
 @dataclass
@@ -131,6 +132,12 @@ def valider(action: Action) -> Action:
         if t == "decrire" and isinstance(action.get("question"), str):
             propre["question"] = action["question"][:200]
         return propre
+    if t == "rejoindre_piece":
+        nom = action.get("nom")
+        if (not isinstance(nom, str) or not 1 <= len(nom.strip()) <= 80
+                or set(action) - {"type", "nom"}):
+            raise ActionRefusee("rejoindre_piece : nom seul requis, aucune coordonnée")
+        return {"type": t, "nom": " ".join(nom.split())}
     if t == "chercher":
         objet = action.get("objet")
         if not isinstance(objet, str) or not 1 <= len(objet.strip()) <= 80:
@@ -139,6 +146,42 @@ def valider(action: Action) -> Action:
                   "approcher": bool(action.get("approcher", action.get("aller", True)))}
         if action.get("camera") in ("gauche", "droite"):
             propre["camera"] = action["camera"]
+        return propre
+    if t == "explorer":
+        propre = {"type": t, "rayon_m": _nombre(action, "rayon_m", 1, 30, 8),
+                  "duree_s": _nombre(action, "duree_s", 10, 1800, 600)}
+        points = _nombre(action, "points_max", 1, 60, 20)
+        if not points.is_integer():
+            raise ActionRefusee("explorer : points_max doit être entier")
+        propre["points_max"] = int(points)
+        camera = action.get("camera", "gauche")
+        if camera not in ("gauche", "droite"):
+            raise ActionRefusee("explorer : caméra inconnue")
+        propre["camera"] = camera
+        approcher = action.get("approcher", True)
+        if not isinstance(approcher, bool):
+            raise ActionRefusee("explorer : approcher doit être vrai ou faux")
+        propre["approcher"] = approcher
+        if action.get("objet") is not None:
+            objet = action["objet"]
+            if not isinstance(objet, str) or not 1 <= len(objet.strip()) <= 80:
+                raise ActionRefusee("explorer : objet invalide")
+            propre["objet"] = objet.strip()
+        return propre
+    if t == "suivre":
+        description = action.get("description")
+        propre = {"type": t, "distance_m": _nombre(action, "distance_m", 0.8, 5.0, 1.5)}
+        if isinstance(description, str) and description.strip():
+            propre["description"] = " ".join(description.split())[:80]
+        elif action.get("u") is not None and action.get("v") is not None:
+            propre["u"] = _nombre(action, "u", 0.0, 1.0)
+            propre["v"] = _nombre(action, "v", 0.0, 1.0)
+        else:
+            raise ActionRefusee("suivre : décrire la personne ou la désigner sur l'image")
+        if action.get("duree_s") is not None:
+            propre["duree_s"] = _nombre(action, "duree_s", 5, 3600)
+        propre["camera"] = action.get("camera") if action.get("camera") in ("gauche", "droite") \
+            else "gauche"
         return propre
     if t == "photo":
         camera = action.get("camera", "gauche")
@@ -183,6 +226,14 @@ def decrire_action(action: Action) -> str:
         return f"attendre {action['duree_s']:.0f} s"
     if t == "chercher":
         return f"chercher « {action['objet']} »"
+    if t == "rejoindre_piece":
+        return f"rejoindre « {action['nom']} » à partir des observations"
+    if t == "explorer":
+        return "explorer la pièce" + (f" pour trouver « {action['objet']} »"
+                                       if action.get("objet") else "")
+    if t == "suivre":
+        qui = action.get("description") or "la personne désignée"
+        return f"suivre {qui} à {action['distance_m']:.1f} m".replace(".", ",")
     if t == "aller_gps":
         return f"aller au point GPS {action['lat']:.6f}, {action['lon']:.6f}"
     if t == "memoriser_lieu":
@@ -382,7 +433,8 @@ class AllerA:
                 self.chemin = chemin
         if self.chemin is None:
             return Pas(etat="bloque", detail="calcul du chemin", progression=progression)
-        commande = nav.commande(ctx.odom, self.chemin, ctx.obstacles, ctx.vitesse_max)
+        commande = nav.commande(ctx.odom, self.chemin, ctx.obstacles, ctx.vitesse_max,
+                                ctx.indicatifs)
         if commande.arrive:
             return Pas(etat="termine", progression=1.0, detail="arrivé")
         attente = self._attente.suivre(commande.bloque or (

@@ -1138,7 +1138,7 @@ export class ConnexionSimulee extends ConnexionBase {
     this._emettre({
       type: 'systeme', cpu_pct: Math.round(cpu), temperature_c: round(56 + cpu / 8 + bruit(0.4), 1), memoire_pct: 42, disque_pct: 31,
       sous_tension: false, ralenti: false, throttled: '0x50000',
-      wifi: { ssid: 'FieldMind-Lab', signal_pct: Math.round(68 + bruit(5)), ip: 'rover.local' },
+      wifi: { ssid: 'reseau-atelier', signal_pct: Math.round(68 + bruit(5)), ip: 'rover.local' },
       charge: [round(1.2 + bruit(0.1), 2), 1.1, 0.9], uptime_s: Math.round(5321 + (performance.now() - this.debut) / 1000), processus_cpu_pct: Math.round(cpu * 1.4),
     });
   }

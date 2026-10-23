@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 # État du Pi avant installation — LECTURE SEULE, ne modifie rien.
-# Usage, depuis software/rover/deploiement : ./verifier_pi.sh [hôte ssh, défaut pi-wifi]
+# Usage, depuis software/rover/deploiement : ./verifier_pi.sh utilisateur@adresse-du-pi
 set -uo pipefail
-hote="${1:-pi-wifi}"
+if [ "$#" -ne 1 ]; then
+  echo "Usage : $0 utilisateur@adresse-du-pi" >&2
+  exit 2
+fi
+hote="$1"
 ssh -o ConnectTimeout=8 "$hote" bash -s <<'DISTANT'
 titre() { printf '\n== %s\n' "$1"; }
 titre "Système"

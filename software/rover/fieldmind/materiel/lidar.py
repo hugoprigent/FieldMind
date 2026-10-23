@@ -78,8 +78,13 @@ class FiltreRover:
         g = profil.geometrie
         # Le lidar est au-dessus de tout le rover sauf le haut du mât des caméras, à l'avant :
         # on retire ce qui tombe dans l'emprise, agrandie de 2 cm.
-        self.boite = (g.emprise_arriere_m - 0.02, g.emprise_avant_m + 0.02,
-                      g.emprise_demi_largeur_m + 0.02)
+        self.geometrie = g
+        self.boite = self._boite(0.05)
+
+    def _boite(self, marge: float) -> tuple[float, float, float]:
+        g = self.geometrie
+        return (g.emprise_arriere_m - marge, g.emprise_avant_m + marge,
+                g.emprise_demi_largeur_m + marge)
 
     def convertir(self, angles_deg: np.ndarray, distances_mm: np.ndarray
                   ) -> tuple[np.ndarray, np.ndarray]:
@@ -92,6 +97,8 @@ class FiltreRover:
         d, a = d[garde], a[garde]
         x = self.x_l + d * np.cos(a)
         y = self.y_l + d * np.sin(a)
+        if self.profil is not None:  # marge réglable : le support des caméras dépasse parfois
+            self.boite = self._boite(float(self.profil.valeur("lidar.masque_marge_m", 0.05)))
         xmin, xmax, demi = self.boite
         dedans = (x > xmin) & (x < xmax) & (np.abs(y) < demi)
         x, y = x[~dedans], y[~dedans]

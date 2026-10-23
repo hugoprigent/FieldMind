@@ -163,11 +163,11 @@
    "orientation": "debout sur la face du palonnier",
    "taille_impression_mm": [
     49.6,
-    18.0,
-    31.5
+    19.5,
+    33.0
    ],
    "tient_sur_A1_mini": true,
-   "volume_cm3": 5.9
+   "volume_cm3": 6.0
   },
   {
    "stl": "stl/ferrure_AR_G.stl",
@@ -189,11 +189,11 @@
    "orientation": "debout sur la face du palonnier",
    "taille_impression_mm": [
     49.6,
-    18.0,
-    31.5
+    19.5,
+    33.0
    ],
    "tient_sur_A1_mini": true,
-   "volume_cm3": 5.9
+   "volume_cm3": 6.0
   },
   {
    "stl": "stl/ferrure_AR_D.stl",

@@ -93,7 +93,7 @@ les traduit) : `arret_urgence`, `non_arme`, `mode_arret`, `obstacle_avant`, `obs
 ```json
 {"type": "systeme", "cpu_pct": 38, "temperature_c": 61.5, "memoire_pct": 42, "disque_pct": 31,
  "sous_tension": false, "ralenti": false, "throttled": "0x0",
- "wifi": {"ssid": "FieldMind-Lab", "signal_pct": 71, "ip": "rover.local"}, "charge": [1.2, 1.1, 0.9],
+ "wifi": {"ssid": "reseau-atelier", "signal_pct": 71, "ip": "rover.local"}, "charge": [1.2, 1.1, 0.9],
  "uptime_s": 5321, "processus_cpu_pct": 55}
 ```
 
@@ -211,6 +211,7 @@ Toute demande peut porter un `id` numérique ; le serveur répond alors par `rep
 | `{"type": "armer"}` / `{"type": "desarmer"}` | Autorise / interdit la traction. Le rover démarre désarmé. |
 | `{"type": "arret_urgence"}` | Arrêt immédiat, verrouillé jusqu'à `{"type": "rearmer"}`. |
 | `{"type": "action", "action": {"type": "avancer", "distance_m": 2}}` | Ajoute une action à la file (types dans `types.py`, `Action`). `"remplacer": true` vide d'abord la file. Passe en mode `auto` si le rover est armé. |
+| `{"type":"action","action":{"type":"explorer","rayon_m":8,"points_max":20,"duree_s":600}}` | Exploration progressive : candidats connus accessibles calculés sur le Pi, choix de l'index sur GX10, observation et nouveau choix à chaque arrivée. `objet` facultatif, `approcher:false` pour repérer sans rejoindre. |
 | `{"type": "annuler"}` | Vide la file et arrête l'action en cours. |
 | `{"type": "pause"}` / `{"type": "reprendre"}` | Suspend / reprend l'action en cours. |
 | `{"type": "chat", "texte": "avance de 5 mètres puis tourne à gauche"}` | Consigne à l'agent IA ; réponse en `chat`. |
@@ -227,6 +228,7 @@ Toute demande peut porter un `id` numérique ; le serveur répond alors par `rep
 | `{"type": "banc", "pwm_g": 5, "pwm_d": 0, "servo_deg": 0}` | Mode `banc` seulement : pourcentages signés bruts (plafond `traction.pwm_max_banc`), à renvoyer à 5 Hz (homme mort 0,5 s). |
 | `{"type": "reglage", "cle": "vitesses.max_manuel_m_s", "valeur": 0.6}` | Modifie un réglage de `reglables` ; réponse avec la valeur retenue (bornée). |
 | `{"type": "ia_profil", "profil": "gx10"}` | Change de fournisseur de modèles (`gemini`, `gx10`, `aucun`). |
+| `{"type": "action", "action": {"type": "suivre", "u": 0.52, "v": 0.6, "camera": "gauche", "distance_m": 1.5}}` | Suivre la personne cliquée (ou `"description": "la personne en t-shirt rouge"`). `etat.cible` = `{"etat": "suivi"|"perdu", "boite": [u0, v0, u1, v1], "distance_m", "source_distance": "lidar"|"taille", "traqueur", "hz"}` ou `null`. |
 | (serveur → poste) `{"type": "parole", "id": "m12", "texte": "...", "audio": "<WAV base64>", "format": "wav", "modele": "..."}` | Voix du rover pour la réponse `chat` de même `id` (profil avec un rôle `synthese`) ; le poste la joue si la lecture à voix haute est active. |
 | `{"type": "remorque_alignee"}` | La remorque est dans l'axe du rover : l'angle estimé repart de 0 avec une petite incertitude (marche arrière permise). Refusé sans remorque ou si le rover roule. |
 | `{"type": "cameras_inverser"}` | Échange les caméras gauche et droite (mémorisé par port USB). |

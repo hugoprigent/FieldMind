@@ -13,6 +13,7 @@ import pytest
 from budget import dans_le_budget
 
 from fieldmind.config import FICHIER_PROFIL, Profil
+from fieldmind.estimation.cartographie import VALEUR_INDICATIVE
 from fieldmind.navigation.planificateur import Planificateur
 from fieldmind.types import CarteOccupation, Pose2D
 
@@ -87,6 +88,23 @@ def test_inconnu_traversable_mais_penalise(profil: Profil) -> None:
     traversee = planificateur.planifier(carte, Pose2D(1.0, -0.5, 0.0), (1.0, 5.0))
     assert traversee is not None  # l'inconnu ne bloque pas
     assert traversee.longueur_m < 7.0
+
+
+@pytest.mark.parametrize("numba", [False, True])
+def test_indicatifs_evites_apres_lissage_mais_traversables(profil: Profil, numba: bool) -> None:
+    carte = carte_vide(taille=8)
+    remplir(carte, 2, 1.5, 3, 2.5, VALEUR_INDICATIVE)
+    planificateur = Planificateur(profil)
+    planificateur.utiliser_numba = numba
+    chemin = planificateur.planifier(carte, Pose2D(0, 2, 0), (6, 2))
+    assert chemin is not None
+    valeurs = [int(carte.cellules[carte.indice(x, y)]) for x, y in chemin.points]
+    assert VALEUR_INDICATIVE not in valeurs  # le lissage préserve le détour
+    # Si toute la carte est indicative, le but reste atteignable et n'est pas déplacé.
+    carte.cellules[:] = VALEUR_INDICATIVE
+    chemin = planificateur.planifier(carte, Pose2D(0, 2, 0), (6, 2))
+    assert chemin is not None and chemin.but == (6, 2)
+    assert chemin.longueur_m == pytest.approx(6, abs=0.1)
 
 
 def test_but_dans_un_obstacle_et_sans_issue(profil: Profil) -> None:

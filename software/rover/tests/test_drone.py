@@ -88,8 +88,10 @@ def test_camera_acceptee_sans_trame_de_vol(pilote):
     pilote._ble_connecte = True
     pilote.etat_drone = replace(pilote.etat_drone, connecte=True)
     assert pilote.commander_drone("cmd camera")
-    assert list(pilote._ble_cmd_file) == [bytes([0x43, 2, 0, 0, 0, 0]), bytes([6, 2])]
-    assert all(p[0] != 0x66 for p in pilote._ble_cmd_file)
+    assert list(pilote._ble_cmd_file) == [bytes.fromhex("01 02")]
+    assert pilote.commander_drone("cmd camera")
+    assert list(pilote._ble_cmd_file)[-1] == bytes.fromhex("01 01")
+    assert all(p[0] == 0x01 for p in pilote._ble_cmd_file)
     for _ in range(20):
         pilote.commander_drone("cmd camera")
     assert len(pilote._ble_cmd_file) <= 8
@@ -99,6 +101,17 @@ def test_aucune_commande_differree_si_deconnecte(pilote):
     assert not pilote.commander_drone("cmd camera")
     assert not pilote._ble_cmd_file
     assert "déconnecté" in pilote.drone_erreur
+
+
+@pytest.mark.parametrize(
+    ("action", "hexadecimal"),
+    [("atterrir", "02 66 80 80 80 80 02 02 99"), ("stop", "02 66 80 80 80 80 04 04 99")],
+)
+def test_requetes_experimentales_utilisent_enveloppe_ble_apk(pilote, action, hexadecimal):
+    pilote._ble_connecte = True
+    pilote.etat_drone = replace(pilote.etat_drone, connecte=True)
+    assert pilote.commander_drone(f"cmd {action}")
+    assert list(pilote._ble_cmd_file) == [bytes.fromhex(hexadecimal)]
 
 
 def test_mire_ne_permet_pas_de_demarrer(pilote):

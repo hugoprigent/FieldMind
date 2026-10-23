@@ -83,6 +83,9 @@ class Stereo:
     def __init__(self, profil: Profil) -> None:
         v = profil.valeur
         self.profil = profil
+        # SGBM est parallèle : sur le Pi, au-delà de 2 fils il prend le processeur aux autres
+        # boucles (conduite, lidar) pour peu de gain
+        cv2.setNumThreads(int(v("perception.opencv_fils", 2)))
         self.largeur = int(v("perception.stereo_largeur", 640))
         self.hauteur_min = float(v("perception.obstacle_hauteur_min_m", 0.06))
         self.hauteur_max = float(v("perception.obstacle_hauteur_max_m", 0.60))

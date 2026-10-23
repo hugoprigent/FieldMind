@@ -25,9 +25,10 @@ from typing import TYPE_CHECKING, Any
 
 from fieldmind.bus import Bus
 from fieldmind.ia.config import ConfigIA
-from fieldmind.ia.fournisseurs import ErreurIA, IAIndisponible
+from fieldmind.ia.fournisseurs import AppelFonction, ErreurIA, IAIndisponible, ReponseModele
 from fieldmind.ia.messages import plan_pour_chat, publier_chat, publier_voix
 from fieldmind.ia.outils import (
+    FONCTIONS_CONTROLE,
     ActionInvalide,
     ActionRefusee,
     ContexteValidation,
@@ -44,6 +45,9 @@ if TYPE_CHECKING:
     from fieldmind.ia.vision import Vision
 
 journal = logging.getLogger("fieldmind.ia.agent")
+
+APPELS_SUCCESSIFS_MAX = 5
+"""Relances au plus pour un modèle qui appelle une fonction à la fois."""
 
 # ------------------------------------------------------------------ arrêt sans modèle
 
@@ -127,8 +131,26 @@ action, dans l'ordre d'exécution. Le programme du rover valide chaque action, l
 évite seule les obstacles et la sécurité peut ralentir ou refuser.
 
 Règles :
+- Pour « explore la pièce », « fais le tour », « cartographie les environs », appelle explorer. \
+Ne réponds pas seulement par une promesse et n'invente pas de points de passage : l'exécuteur \
+les choisit dans la carte réelle, observe chaque étape et poursuit jusqu'aux limites demandées. \
+Pour explorer afin de trouver quelque chose, renseigne l'objet d'explorer.
+- L'état `monde` contient les objets et murs déjà observés, leurs coordonnées odom, leur source \
+et leur âge. Utilise cette mémoire pour comprendre la scène et les missions. Une projection \
+au sol est une estimation, pas une mesure 3D complète. Pour rejoindre un objet nommé, appelle \
+chercher ; n'invente jamais sa position ni une pièce ou un passage qui n'a pas été observé.
+- Une pièce (cuisine, salon, chambre...) est une zone, pas un objet : appelle rejoindre_piece \
+avec son nom. L'exécuteur la reconnaît grâce aux objets réellement observés (par exemple four \
+et micro-ondes pour la cuisine), vérifie les preuves et les passages. Ne remplace jamais cet \
+outil par aller_a, chercher("cuisine") ou memoriser_lieu. Si l'opérateur a explicitement \
+mémorisé ce nom dans `lieux`, aller_lieu reste possible. Une question « où est la cuisine ? » \
+ne donne pas l'autorisation d'y aller. Une négation n'est pas un ordre de déplacement.
 - Une consigne composée (« avance de 5 m puis tourne à gauche et cherche la chaise ») donne \
 plusieurs appels, dans l'ordre.
+- explorer, chercher et rejoindre_piece sont des missions autonomes complètes. N'ajoute \
+aucune avance, rotation, coordonnée ou autre étape pour les réaliser : l'exécuteur s'en charge. \
+Une étape supplémentaire n'est autorisée que si l'opérateur l'a demandée explicitement. \
+Ne mémorise un lieu que sur demande explicite de mémorisation.
 - Distances en mètres (50 cm = 0.5), angles en degrés, positifs vers la gauche : « à gauche » = \
 90, « à droite » = -90, « demi-tour » = 180. Reculer : avancer avec une distance négative.
 - N'invente pas de valeur. « Tourne à gauche » = 90°. Si une distance manque (« avance »), \
@@ -156,6 +178,7 @@ paroles qui ne lui sont pas adressées."""
 
 
 @dataclass(slots=True)
+
 class ResultatConsigne:
     """statut : plan | reponse | arret | annule | ignore | refus | indisponible | erreur |
     abandonne | vision."""
@@ -188,6 +211,186 @@ def _valeur_profil(profil: Any, chemin: str, defaut: float) -> float:
         return float(valeur) if valeur is not None else defaut
     except (AttributeError, TypeError, ValueError):
         return defaut
+
+
+# L'ancrage est une politique de permissions sur la consigne originale. Les sorties des
+# modèles (y compris les relances « action suivante ») ne sont jamais une nouvelle consigne.
+_PIECES = {
+    "cuisine": "cuisine", "salon": "salon", "sejour": "salon", "chambre": "chambre",
+    "salle de bain": "salle de bain", "salle de bains": "salle de bain",
+    "salle a manger": "salle à manger", "entree": "entrée", "bureau": "bureau",
+    "garage": "garage", "toilettes": "toilettes", "wc": "toilettes",
+    "couloir": "couloir", "buanderie": "buanderie",
+}
+_NOM_PIECE = "(?:" + "|".join(sorted(_PIECES, key=len, reverse=True)) + ")"
+_AUTONOMES = frozenset({"explorer", "chercher", "rejoindre_piece"})
+_VERBES_ETAPE = (r"va\b|vas\b|aller\b|rejoins\b|rejoindre\b|retourne\b|rends\b|"
+                 r"avance\b|recule\b|tourne\b|cherche\b|trouve\b|explore\b|"
+                 r"cartographie\b|prends\b|photographie\b|fais\b|reviens\b|"
+                 r"retourne\b|decris\b|attends\b|memorise\b")
+
+
+def _clauses_consigne(texte: str) -> list[str]:
+    normalise = _normaliser(texte).replace("’", "'").replace("-", " ")
+    return [c.strip(" ,;.!?") for c in re.split(
+        rf"\bpuis\b|\bensuite\b|[;]|,(?=\s+(?:{_VERBES_ETAPE}))|"
+        rf"\bet\b(?=\s+(?:{_VERBES_ETAPE}))", normalise)
+        if c.strip(" ,;.!?")]
+
+
+def _piece_demandee(clause: str) -> str | None:
+    cible = re.search(
+        rf"\b(?:va|vas|aller|rejoins|rejoindre|retourne|rends toi|cherche|trouve)\s+"
+        rf"(?:(?:a|au|aux|dans|vers|jusqu|la|le|les|l|une|un)\b[' ]*)*"
+        rf"(?P<piece>{_NOM_PIECE})\b\s*(?:s il te plait|s'il te plait|stp|maintenant)?$",
+        clause)
+    return _PIECES[cible["piece"]] if cible else None
+
+
+def _cle_destination(nom: str) -> str:
+    nom = " ".join(_normaliser(nom).replace("’", " ").replace("'", " ").split())
+    return re.sub(r"^(?:le|la|les|l|du|au|aux)\s+", "", nom)
+
+
+def _lieu_demande(clause: str, lieux: tuple[str, ...]) -> str | None:
+    for lieu in lieux:
+        cible = re.escape(_cle_destination(lieu))
+        if re.search(
+                rf"\b(?:va|vas|aller|rejoins|rejoindre|retourne|reviens|rends toi)\s+"
+                rf"(?:(?:a|au|aux|dans|vers|jusqu|la|le|les|l)\b[' ]*)*{cible}\b\s*"
+                rf"(?:s il te plait|s'il te plait|stp|maintenant)?$", clause):
+            return lieu
+    return None
+
+
+def _piece_sans_ordre(texte: str, lieux: tuple[str, ...] = ()) -> bool:
+    """Une question ou négation de destination ne donne pas une permission de mouvement."""
+    for clause in _clauses_consigne(texte):
+        if not re.search(rf"\b{_NOM_PIECE}\b", clause) and not any(
+                re.search(rf"\b{re.escape(_cle_destination(n))}\b", clause) for n in lieux):
+            continue
+        if re.search(r"\b(?:pas|jamais|ni)\b", clause):
+            return True
+        if re.search(r"\b(?:ou est|ou se trouve|ou sont|sais tu|tu sais|savez vous|dis moi ou|"
+                     r"indique moi ou|je me demande|comment savoir|pourquoi|si|quand|lorsque)\b",
+                     clause):
+            return True
+    return False
+
+
+def _type_etape(clause: str) -> str | None:
+    # L'ordre compte : « explore pour trouver » désigne une seule mission explorer.
+    motifs = (
+        ("memoriser_lieu",
+         r"\b(?:memorise|memoriser|enregistre cet endroit|retiens cet endroit)\b"),
+        ("explorer", r"\b(?:explore|explorer|cartographie|fais le tour)\b"),
+        ("retour_depart", r"\b(?:reviens|retourne|retourner)\b.*\bdepart\b"),
+        ("chercher", r"\b(?:cherche|chercher|trouve|trouver)\b"),
+        ("photo", r"\b(?:photo|photographie)\b"),
+        ("decrire", r"\b(?:decris|decrire|regarde|regarder)\b"),
+        ("avancer", r"\b(?:avance|avancer|recule|reculer)\b"),
+        ("tourner", r"\b(?:tourne|tourner|demi tour)\b"),
+        ("attendre", r"\b(?:attends|attendre)\b"),
+        ("chercher", r"\b(?:va|vas|aller|rejoins|rejoindre)\b"),
+    )
+    return next((nom for nom, motif in motifs if re.search(motif, clause)), None)
+
+
+def _verifier_mesure(clause: str, appel: AppelFonction) -> None:
+    """Une mission composée n'autorise une manœuvre que dans la quantité demandée."""
+    nombres = {"un": 1, "une": 1, "deux": 2, "trois": 3, "quatre": 4, "cinq": 5,
+               "six": 6, "sept": 7, "huit": 8, "neuf": 9, "dix": 10}
+    motif = r"(?P<n>\d+(?:[.,]\d+)?|" + "|".join(nombres) + ")"
+    args = appel.arguments or {}
+    attendu = None
+    if appel.nom == "avancer":
+        mesure = re.search(rf"\b{motif}\s*(?P<u>m|metres?|cm|centimetres?)\b", clause)
+        if mesure:
+            n = mesure["n"]
+            attendu = float(nombres[n]) if n in nombres else float(n.replace(",", "."))
+            if mesure["u"] in {"cm", "centimetre", "centimetres"}:
+                attendu /= 100
+            if re.search(r"\brecule", clause):
+                attendu *= -1
+        valeur = args.get("distance_m")
+    else:
+        mesure = re.search(rf"\b{motif}\s*(?:degres?|°)", clause)
+        if mesure:
+            n = mesure["n"]
+            attendu = float(nombres[n]) if n in nombres else float(n.replace(",", "."))
+            if "droite" in clause:
+                attendu *= -1
+        elif "demi tour" in clause:
+            attendu = 180
+        elif "gauche" in clause:
+            attendu = 90
+        elif "droite" in clause:
+            attendu = -90
+        valeur = args.get("angle_deg")
+    if attendu is None or isinstance(valeur, bool) or not isinstance(valeur, int | float) or (
+            abs(valeur - attendu) > 0.001):
+        raise ActionInvalide("manœuvre supplémentaire sans mesure conforme à la consigne")
+
+
+def _ancrer_appels(texte: str, appels: list[AppelFonction], lieux: tuple[str, ...]
+                  ) -> list[AppelFonction]:
+    """Permet les étapes réellement demandées ; les pièces sont résolues par la mission.
+
+    Les ordres de pièce simples sont ancrés même si le modèle renvoie l'ancienne chaîne
+    chercher → aller_a → avancer. Pour un composé, chaque autre étape doit avoir son appel
+    explicite. Une consigne ambiguë est refusée en entier, sans exécution partielle.
+    """
+    def lecture(appel: AppelFonction) -> bool:
+        return appel.nom == "decrire" or (
+            appel.nom == "chercher" and (appel.arguments or {}).get("aller") is False)
+    if _piece_sans_ordre(texte, lieux):
+        if any(not lecture(a) and a.nom != "ignorer" for a in appels):
+            raise ActionInvalide("une question ou une négation de pièce n'autorise pas à bouger")
+        return appels
+    if not appels:
+        return appels  # une réponse/refus du modèle reste une réponse sans mouvement
+    clauses = _clauses_consigne(texte)
+    destinations = [_piece_demandee(c) for c in clauses]
+    lieux_cibles = [_lieu_demande(c, lieux) for c in clauses]
+    if not any(destinations) and all(lecture(a) for a in appels):
+        return appels
+    if any(a.nom == "memoriser_lieu" for a in appels) and not any(
+            _type_etape(c) == "memoriser_lieu" for c in clauses):
+        raise ActionInvalide("mémoriser un lieu exige une demande explicite")
+    if not any(destinations) and not any(lieux_cibles) and not any(
+            a.nom in _AUTONOMES for a in appels) and not re.search(
+                r"\b(?:explore|explorer|cartographie|cherche|chercher|trouve|trouver)\b",
+                _normaliser(texte)):
+        return appels
+    resultat = []
+    if re.search(r"\b(?:ensuite|apres ca|ajoute)\b", _normaliser(texte)):
+        resultat.append(AppelFonction("mettre_a_la_suite", {}))
+    restants = [a for a in appels if a.nom not in FONCTIONS_CONTROLE and a.nom != "stop"]
+    for clause, piece, lieu in zip(clauses, destinations, lieux_cibles, strict=True):
+        if piece or lieu:
+            memorise = lieu or next((n for n in lieux if _cle_destination(n) ==
+                                    _cle_destination(piece or "")), None)
+            resultat.append(AppelFonction("aller_lieu" if memorise else "rejoindre_piece",
+                                          {"nom": memorise or piece}))
+            # Une proposition chercher/aller_lieu pour la même pièce est remplacée, jamais
+            # interprétée comme une demande supplémentaire de l'opérateur.
+            restants = [a for a in restants if not (
+                a.nom in {"chercher", "aller_lieu", "rejoindre_piece"} and
+                _normaliser(str((a.arguments or {}).get("nom", (a.arguments or {}).get(
+                    "objet", "")))).removeprefix("la ").removeprefix("le ") ==
+                _normaliser(piece or lieu or ""))]
+            continue
+        attendu = _type_etape(clause)
+        indice = next((i for i, a in enumerate(restants) if a.nom == attendu), None)
+        if attendu is None or indice is None:
+            raise ActionInvalide("étape de la consigne non comprise ; aucun déplacement lancé")
+        appel = restants.pop(indice)
+        if attendu in {"avancer", "tourner"}:
+            _verifier_mesure(clause, appel)
+        resultat.append(appel)
+    if not any(destinations) and not any(lieux_cibles) and restants:
+        raise ActionInvalide("le modèle a ajouté des étapes absentes de la consigne")
+    return resultat
 
 
 class Agent:
@@ -264,18 +467,30 @@ class Agent:
         except Exception:
             journal.exception("etat_resume en erreur")
             etat = {}
+        identite_mission = (etat.get("mission") or {}).get("generation")
+        profil_actif = self.config_ia.actif
         lieux = lieux_depuis_etat(etat)
         vitesse_max = _valeur_profil(self.profil, "vitesses.max_auto_m_s", 0.5)
         try:
-            reponse = await self.config_ia.passerelle().chat(
-                "agent", self._messages(texte, origine, etat),
-                outils=schemas_fonctions(vitesse_max, lieux))
+            messages = self._messages(texte, origine, etat)
+            outils = schemas_fonctions(vitesse_max, lieux)
+            reponse = await self.config_ia.passerelle().chat("agent", messages, outils=outils)
+            if self.config_ia.actif.appels_successifs and reponse.appels:
+                reponse = await self._appels_suivants(messages, outils, reponse, texte)
         except ErreurIA as erreur:
             return self._systeme(echange, f"Consigne non exécutée : {erreur}.",
                                  "indisponible" if isinstance(erreur, IAIndisponible)
                                  else "erreur")
         if generation != self._generation:
             return ResultatConsigne("abandonne", "arrêt demandé pendant l'analyse")
+        actuel = self.outils.etat_resume()
+        if (identite_mission != (actuel.get("mission") or {}).get("generation")
+                or profil_actif is not self.config_ia.actif
+                or actuel.get("arret_urgence")
+                or actuel.get("arme") != etat.get("arme")
+                or actuel.get("mode") != etat.get("mode")):
+            return self._systeme(echange, "Consigne abandonnée : la mission ou le mode a changé "
+                                 "pendant l'analyse.", "abandonne")
         try:
             pose = self.outils.pose_odom()
         except Exception:
@@ -285,7 +500,8 @@ class Agent:
             geofence_m=_valeur_profil(self.profil, "securite.geofence_m", 60.0),
             actions_max=self.config_ia.agent.actions_max)
         try:
-            plan = valider_plan(reponse.appels, contexte)
+            appels_ancres = _ancrer_appels(texte, sans_stop_final(reponse.appels), lieux)
+            plan = valider_plan(appels_ancres, contexte)
         except ActionInvalide as erreur:
             return self._refuser(echange, f"Je ne peux pas : {erreur}.")
 
@@ -344,12 +560,60 @@ class Agent:
 
     # ------------------------------------------------------------------ outils internes
 
+    async def _appels_suivants(self, messages: list[dict[str, Any]], outils: list[Any],
+                               reponse: ReponseModele, texte: str) -> ReponseModele:
+        """Modèles qui appellent une fonction à la fois (Qwen) : boucle agentique habituelle,
+        on rend « noté » et le modèle donne la suivante, jusqu'à ce qu'il réponde sans appel.
+        « avance puis tourne » donne ainsi ses deux actions."""
+        tous = list(reponse.appels)
+        dernier = reponse
+        messages = list(messages)
+        # Une mission autonome réalise elle-même ses déplacements et ses observations.
+        # « Noté » n'est pas un résultat d'exécution autorisant le modèle à inventer la suite.
+        # Les relances ne servent qu'aux étapes supplémentaires écrites par l'opérateur.
+        etapes_max = max(1, len(_clauses_consigne(texte)))
+        for tour in range(APPELS_SUCCESSIFS_MAX):
+            if not dernier.appels or any(a.nom in FONCTIONS_CONTROLE for a in dernier.appels):
+                break
+            if len([a for a in tous if a.nom not in FONCTIONS_CONTROLE]) >= etapes_max:
+                break
+            ids = [a.id or f"appel{tour}_{k}" for k, a in enumerate(dernier.appels)]
+            messages.append({"role": "assistant", "content": dernier.texte or None, "tool_calls": [
+                {"id": i, "type": "function", "function": {
+                    "name": a.nom, "arguments": a.brut or json.dumps(a.arguments or {})}}
+                for i, a in zip(ids, dernier.appels, strict=True)]})
+            messages.extend({"role": "tool", "tool_call_id": i,
+                             "content": "Proposition enregistrée, pas encore exécutée. Donne "
+                                        "uniquement l'étape suivante explicitement demandée "
+                                        "par l'opérateur. Une mission autonome est une étape "
+                                        "complète : n'invente aucun mouvement pour la réaliser. "
+                                        "Réponds sans appel si la consigne est complète."}
+                            for i in ids)
+            suivante = await self.config_ia.passerelle().chat("agent", messages, outils=outils)
+            deja = {(x.nom, json.dumps(x.arguments, sort_keys=True)) for x in tous[-2:]}
+            nouveaux = [x for x in suivante.appels
+                        if (x.nom, json.dumps(x.arguments, sort_keys=True)) not in deja]
+            if not nouveaux:
+                return ReponseModele(texte=suivante.texte or reponse.texte, appels=tous,
+                                     modele=reponse.modele, fin=suivante.fin)
+            tous.extend(nouveaux)
+            dernier = ReponseModele(texte=suivante.texte, appels=nouveaux, modele=suivante.modele)
+        return ReponseModele(texte=dernier.texte or reponse.texte, appels=tous,
+                             modele=reponse.modele, fin=dernier.fin)
+
     def _messages(self, texte: str, origine: str, etat: dict[str, Any]) -> list[dict[str, Any]]:
         systeme = SYSTEME
         if origine == "voix":
             systeme += "\n\n" + VOIX
         etat_json = json.dumps(etat, ensure_ascii=False, default=str, separators=(",", ":"))
         systeme += f"\n\nÉtat du rover (repère odom, mètres, degrés) : {etat_json}"
+        if etat.get("situation"):
+            systeme += ("\n\n« situation » est ce que l'agent de veille a vu il y a « age_s » "
+                        "secondes (« vus » : détecteur continu). Pour une question sur ce qui se "
+                        "passe, réponds d'abord avec elle ; appelle « decrire » seulement si "
+                        "elle est vieille ou si on te demande de regarder. Un ordre (suivre, "
+                        "chercher, aller…) s'exécute même si la situation ne cite pas ce qui est "
+                        "demandé : la vérification se fait sur l'image du moment.")
         return [{"role": "system", "content": systeme}, *self._historique,
                 {"role": "user", "content": texte}]
 
@@ -373,6 +637,15 @@ class Agent:
         self._repondre(echange, texte)
         self._memoriser(echange.texte, texte)
         return ResultatConsigne(statut, texte)
+
+
+def sans_stop_final(appels: list[Any]) -> list[Any]:
+    """« avance puis tourne, puis arrête-toi » : le modèle ajoute parfois `stop` à la fin d'un
+    plan. Le rover s'arrête de lui-même au bout du plan, et un `stop` dans la file l'annulerait
+    tout entier : il n'est gardé que seul."""
+    if len(appels) > 1 and any(a.nom != "stop" for a in appels):
+        return [a for a in appels if a.nom != "stop"]
+    return appels
 
 
 def _sans_mouvement(action: Action) -> bool:

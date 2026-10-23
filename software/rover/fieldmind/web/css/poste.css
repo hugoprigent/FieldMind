@@ -178,6 +178,24 @@ button.pastille { cursor: pointer; }
 .bouton-arret:active { transform: translateY(1px); box-shadow: 0 1px 0 var(--arret-fort); }
 .bouton-arret[data-verrouille="true"] { animation: pulsation 1.6s infinite; }
 @keyframes pulsation { 50% { box-shadow: 0 2px 0 var(--arret-fort), 0 0 0 6px color-mix(in srgb, var(--arret) 35%, transparent); } }
+/* Micro de la barre : appuyer, puis parler ; l'anneau suit le niveau du son */
+.bouton-voix {
+  --niveau: 0;
+  flex: none; display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 12px;
+  border-radius: 20px; border: 1px solid var(--bordure-forte); background: var(--surface-2);
+  color: var(--texte-1); font-weight: 650; cursor: pointer;
+}
+.bouton-voix .icone { width: 18px; height: 18px; }
+.bouton-voix[aria-pressed="true"] { background: var(--accent-fort); border-color: var(--accent-fort); color: #fff; }
+.bouton-voix[data-parole="true"] {
+  box-shadow: 0 0 0 calc(2px + var(--niveau) * 7px) color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.drone-barre { width: 100%; min-width: 0; overflow: hidden; }
+.drone-barre * { max-width: 100%; }
+.drone-barre > summary.drone-resume {
+  cursor: pointer; font-size: 13px; font-weight: 650; color: var(--texte-2); padding: 4px 0;
+}
+.drone-barre[open] > summary.drone-resume { margin-bottom: 6px; }
 .bouton-rearmer {
   flex: none; display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 14px;
   border-radius: 10px; border: 2px solid var(--alerte); background: transparent; color: var(--texte-1); font-weight: 700;
@@ -294,8 +312,9 @@ dl.valeurs dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums
 .vue-pilotage:not([hidden]) {
   display: grid; height: 100%;
   grid-template-columns: minmax(0, 1fr) 340px;
-  grid-template-rows: auto auto minmax(0, 1fr) auto;
-  grid-template-areas: "camera radar" "camera mode" "camera joy" "infos voix";
+  /* Colonne de droite : le radar prend ce qui reste ; modes et joystick ne sont jamais écrasés */
+  grid-template-rows: minmax(140px, 1fr) auto minmax(150px, auto) auto;
+  grid-template-areas: "camera radar" "camera mode" "camera joy" "infos joy";
 }
 .p-camera { grid-area: camera; min-height: 260px; }
 .p-camera > #p-camera, .p-camera > .vue-3d { position: absolute; inset: 0; width: auto; height: auto; }
@@ -321,7 +340,7 @@ dl.valeurs dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums
   border: 1px solid rgba(255, 255, 255, 0.16); pointer-events: none;
 }
 .p-infos { grid-area: infos; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 10px 14px; }
-.p-radar { grid-area: radar; aspect-ratio: 1 / 0.86; }
+.p-radar { grid-area: radar; min-height: 140px; }
 .p-radar canvas { width: 100%; height: 100%; display: block; cursor: pointer; }
 .p-radar .portee { position: absolute; right: 8px; top: 8px; }
 .p-mode { grid-area: mode; display: grid; gap: 10px; }
@@ -332,7 +351,7 @@ dl.valeurs dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums
 .p-mode .modes button[data-mode="banc"][aria-pressed="true"] { box-shadow: inset 0 -3px 0 var(--alerte); }
 .armer { min-height: 46px; font-size: 15px; }
 .armer[aria-pressed="true"] { background: var(--alerte); border-color: var(--alerte); color: #1a1300; }
-.p-joystick { grid-area: joy; display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: center; gap: 12px; }
+.p-joystick { grid-area: joy; min-height: 230px; display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: center; gap: 12px; }
 .joystick {
   position: relative; width: min(100%, 220px); aspect-ratio: 1; border-radius: 50%;
   background: radial-gradient(circle, var(--surface-2) 0 55%, var(--surface-3) 100%);
@@ -446,6 +465,10 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 28px
 .vision-image[data-fige="true"] > .m-direct { display: none; }
 .vision-image[data-fige="false"] > img, .vision-image[data-fige="false"] > canvas, .vision-image[data-fige="false"] > .sans-image { display: none; }
 .m-retour-direct { position: absolute; top: 6px; right: 6px; z-index: 2; }
+.situation { margin: 0 0 10px; padding: 8px 10px; border-radius: 8px; font-size: 13px; line-height: 1.35; background: var(--fond-2, rgba(255,255,255,0.04)); border-left: 3px solid var(--texte-3); }
+.situation[data-niveau="info"] { border-left-color: var(--accent); }
+.situation[data-niveau="attention"] { border-left-color: var(--alerte); }
+.situation[data-niveau="danger"] { border-left-color: var(--critique); }
 .p-remorque { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; }
 .p-remorque .libelle { color: var(--texte-2); }
 .p-remorque b { font-variant-numeric: tabular-nums; }
@@ -681,13 +704,15 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 28px
   /* Deux lignes : marque, simulation et ARRÊT ; puis tous les états, en icônes. */
   .barre {
     display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto auto;
-    grid-template-areas: "marque sim . rearmer arret" "ind ind ind ind ind";
+    grid-template-areas: "marque sim voix rearmer arret" "ind ind ind ind ind";
     padding: 6px 8px 5px 10px; gap: 5px 8px;
   }
   .marque { grid-area: marque; }
   .marque .nom { display: none; }
   .simulation { grid-area: sim; font-size: 10.5px; padding: 3px 7px; letter-spacing: 0.08em; }
   .bouton-rearmer { grid-area: rearmer; height: 40px; padding: 0 10px; }
+  .bouton-voix { grid-area: voix; justify-self: end; padding: 0 10px; }
+  .bouton-voix .libelle { display: none; }
   .bouton-arret { grid-area: arret; min-width: 118px; height: 40px; padding: 0 12px; font-size: 16px; }
   .indicateurs { grid-area: ind; gap: 3px; justify-content: space-between; padding: 0; }
   .indicateurs .pastille { padding: 3px 4px; border-radius: 7px; }
@@ -704,9 +729,11 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 28px
   .vue-pilotage:not([hidden]) {
     height: auto; grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto;
-    grid-template-areas: "camera" "infos" "mode" "joy" "voix" "radar";
+    grid-template-areas: "camera" "mode" "joy" "infos" "radar";
   }
   .p-camera { min-height: 0; aspect-ratio: 16 / 9; }
+  .p-radar { aspect-ratio: 1 / 0.86; }
+  #p-camera-pip { display: none; } /* trop petit sur téléphone : le drone a son bouton « Drone » */
   .p-camera .segments button { padding: 0 8px; font-size: 12px; min-height: 30px; }
   .p-camera .bouton-hud { height: 32px; min-width: 32px; }
   .hud-haut { top: 6px; left: 6px; right: 6px; flex-wrap: wrap; }
@@ -748,3 +775,48 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 28px
   .journal .src { display: none; }
   .filtres input { width: 100%; flex: 1 1 100%; }
 }
+
+/* ------------------------------------------------------------------ assistant stéréo */
+.assistant-stereo {
+  width: min(1100px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); padding: 16px;
+  border: 1px solid var(--bordure-forte); border-radius: 14px; background: var(--surface-1); color: var(--texte-1);
+  overflow: auto;
+}
+.assistant-stereo::backdrop { background: rgb(0 0 0 / 0.6); }
+.assistant-stereo > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.assistant-stereo h2 { margin: 0; font-size: 17px; }
+.as-cameras { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.as-cameras figure { margin: 0; }
+.as-cameras .camera { aspect-ratio: 16 / 9; height: auto; border-radius: 8px; }
+.as-cameras figcaption { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; font-size: 13px; font-weight: 650; color: var(--texte-2); }
+.pastille.petite { font-size: 12px; padding: 2px 8px; border-radius: 10px; background: var(--surface-2); }
+.pastille.petite[data-niveau="ok"] { background: color-mix(in srgb, var(--ok) 25%, transparent); color: var(--ok); }
+.as-bas { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 16px; margin-top: 14px; }
+.as-progres p { margin: 0 0 6px; font-size: 14px; }
+.as-progres .progression { height: 8px; border-radius: 4px; background: var(--surface-3); overflow: hidden; }
+.as-progres .progression span { display: block; height: 100%; width: 0; background: var(--ok); transition: width 0.3s; }
+.as-couverture-ligne { display: flex; align-items: center; gap: 12px; margin: 12px 0 8px; font-size: 13px; color: var(--texte-2); }
+.as-couverture { display: grid; grid-template-columns: repeat(3, 22px); grid-auto-rows: 14px; gap: 3px; flex: none; }
+.as-couverture span { border-radius: 3px; background: var(--surface-3); }
+.as-couverture span[data-niveau="un"] { background: color-mix(in srgb, var(--ok) 55%, transparent); }
+.as-couverture span[data-niveau="plusieurs"] { background: var(--ok); }
+.as-conseils { margin: 6px 0 0; padding-left: 18px; font-size: 13px; color: var(--texte-2); line-height: 1.45; }
+.as-actions { display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
+.as-actions #as-auto[aria-pressed="true"] { border-color: var(--ok); box-shadow: inset 0 -3px 0 var(--ok); }
+.as-resultat { flex-basis: 100%; font-size: 13px; line-height: 1.45; }
+.as-resultat[data-niveau] { padding: 10px 12px; border-radius: 8px; background: var(--surface-2); border-left: 3px solid var(--texte-3); }
+.as-resultat[data-niveau="ok"] { border-left-color: var(--ok); }
+.as-resultat[data-niveau="alerte"] { border-left-color: var(--alerte); }
+.as-resultat[data-niveau="critique"] { border-left-color: var(--critique); }
+.as-resultat .titre { margin: 0 0 4px; font-weight: 700; }
+.as-resultat ul { margin: 0; padding-left: 18px; }
+.as-resultat .avertissement { color: var(--alerte); }
+.aide { margin: 0 0 8px; font-size: 13px; color: var(--texte-2); }
+.banc[data-actif="false"] { opacity: 0.5; }
+@media (max-width: 760px) {
+  .as-cameras, .as-bas { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Manuel sans anticollision : bouton bien visible quand il est coupé */
+.bouton.anticollision { width: 100%; justify-content: center; }
+.bouton.anticollision[aria-pressed="true"] { background: var(--alerte); border-color: var(--alerte); color: #1a1300; font-weight: 750; }

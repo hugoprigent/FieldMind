@@ -54,10 +54,19 @@ class Objet:
     texte: str = ""
     vu: float = field(default_factory=time.monotonic)
     vues: int = 1
+    hauteur_estimee: bool = True
+    source: str = ""
+    corroborations: int = 1
+    confirmation_t: float = float("-inf")
 
     def message(self, maintenant: float) -> dict[str, Any]:
         m: dict[str, Any] = {"id": self.id, "type": self.type, "x": round(self.x, 3),
                              "y": round(self.y, 3), "age_s": round(maintenant - self.vu, 2)}
+        if self.source:
+            m["source"] = self.source
+            m["observations_distinctes"] = self.corroborations
+        if self.type != "etiquette":
+            m["hauteur_estimee"] = self.hauteur_estimee
         if self.type == "mur":
             m |= {"cap": round(self.cap, 4), "longueur": round(self.longueur, 3),
                   "epaisseur": 0.12, "hauteur": self.hauteur, "extrapole": False}
@@ -74,9 +83,32 @@ class Objet:
         return m
 
 
-def _hasard_stable(ident: int) -> float:
-    """Nombre dans [0, 1[ fixe pour un objet (taille des arbres, hauteur des blocs)."""
-    return ((ident * 2654435761) % 2**32) / 2**32
+def _point_sol(point: Any) -> tuple[float, float] | None:
+    """Un modèle ou un détecteur peut renvoyer un objet sans géométrie exploitable."""
+    if not isinstance(point, dict):
+        return None
+    sol = point.get("sol")
+    if not isinstance(sol, list | tuple) or len(sol) != 2:
+        return None
+    if any(isinstance(v, bool) for v in sol):
+        return None
+    try:
+        x, y = float(sol[0]), float(sol[1])
+    except (TypeError, ValueError, OverflowError):
+        return None
+    if not all(math.isfinite(v) for v in (x, y)) or math.hypot(x, y) > 30:
+        return None
+    return x, y
+
+
+def _dimension(point: dict[str, Any], cle: str, defaut: float) -> float:
+    try:
+        if isinstance(point.get(cle), bool):
+            return defaut
+        valeur = float(point.get(cle))
+    except (TypeError, ValueError, OverflowError):
+        return defaut
+    return valeur if math.isfinite(valeur) and 0 < valeur <= 30 else defaut
 
 
 # ---------------------------------------------------------------- géométrie
@@ -156,7 +188,7 @@ class ReconstructeurScene:
         self.libre = self._espace_libre(angles, distances, pose)
         for groupe in segmenter(points, angles, distances):
             for detection in self._classer(groupe):
-                self._associer(detection, pose, t)
+                self._associer({**detection, "source": "lidar"}, pose, t)
 
     def integrer_stereo(self, obstacles: Obstacles, pose: Pose2D, t: float) -> None:
         if not len(obstacles.points):
@@ -191,18 +223,26 @@ class ReconstructeurScene:
             self._associer({"type": "bas", "x": float(centre[0]), "y": float(centre[1]),
                             "cap": math.atan2(direction[1], direction[0]),
                             "longueur": max(longueur, 0.1), "largeur": max(largeur, 0.1),
-                            "hauteur": float(np.max(hauteurs[composante]))}, pose, t)
+                            "hauteur": float(np.max(hauteurs[composante])),
+                            "hauteur_estimee": obstacles.hauteurs is None,
+                            "source": "stereo"}, pose, t)
 
     def integrer_detections(self, message: dict[str, Any], pose: Pose2D, t: float) -> None:
         """Détections continues : personnes et animaux placés au sol, suivis comme les autres."""
+        if not isinstance(message, dict) or message.get("geometrie_valide") is False:
+            return
+        if not isinstance(message.get("objets"), list | tuple):
+            return
         types = {"personne": "personne", "person": "personne", "enfant": "personne",
                  "chien": "animal", "dog": "animal", "chat": "animal", "cat": "animal",
                  "animal": "animal", "cheval": "animal", "vache": "animal", "oiseau": "animal",
                  "mouton": "animal"}
         for objet in message.get("objets") or []:
-            sol = objet.get("sol")
+            sol = _point_sol(objet)
+            if sol is None:
+                continue
             genre = types.get(str(objet.get("label", "")).lower())
-            if not sol or genre is None:
+            if genre is None:
                 continue
             x, y = pose.vers_parent(float(sol[0]), float(sol[1]))
             proche = [o for o in self.objets.values() if o.type == genre
@@ -216,13 +256,17 @@ class ReconstructeurScene:
                                            else 0.6, rayon=0.25, texte=str(objet["label"]), vu=t)
 
     def integrer_vision(self, message: dict[str, Any], pose: Pose2D, t: float) -> None:
+        if not isinstance(message, dict) or message.get("geometrie_valide") is False:
+            return
+        if not isinstance(message.get("points"), list | tuple):
+            return
         for point in message.get("points") or []:
-            sol = point.get("sol")
-            if not sol or not point.get("label"):
+            sol = _point_sol(point)
+            if sol is None or not isinstance(point.get("label"), str) or not point["label"].strip():
                 continue
             x, y = pose.vers_parent(float(sol[0]), float(sol[1]))
             proche = [o for o in self.objets.values() if o.type == "etiquette"
-                      and (o.texte == point["label"] or math.hypot(o.x - x, o.y - y) < 0.50)
+                      and o.texte == point["label"][:40]
                       and math.hypot(o.x - x, o.y - y) < 1.0]
             if proche:
                 o = min(proche, key=lambda c: math.hypot(c.x - x, c.y - y))
@@ -235,10 +279,14 @@ class ReconstructeurScene:
             type_3d = point.get("type_3d")
             if type_3d not in ("bloc", "arbre", "bas"):
                 continue
-            hauteur = float(point.get("hauteur") or (0.18 if type_3d == "bas" else 0.7))
-            largeur = float(point.get("largeur") or 0.35)
-            longueur = float(point.get("longueur") or largeur)
-            cap = normaliser_angle(float(point.get("cap") or 0.0) + pose.cap)
+            hauteur = _dimension(point, "hauteur", 0.18 if type_3d == "bas" else 0.7)
+            largeur = _dimension(point, "largeur", 0.35)
+            longueur = _dimension(point, "longueur", largeur)
+            try:
+                cap_local = float(point.get("cap") or 0.0)
+            except (TypeError, ValueError, OverflowError):
+                cap_local = 0.0
+            cap = normaliser_angle((cap_local if math.isfinite(cap_local) else 0.0) + pose.cap)
             candidats = [o for o in self.objets.values()
                          if o.type in ("bloc", "arbre", "bas")
                          and math.hypot(o.x - x, o.y - y) < 0.75]
@@ -258,6 +306,7 @@ class ReconstructeurScene:
                     cible.largeur = max(cible.largeur, largeur)
                     cible.cap = _moyenne_axes(cible.cap, cap, 0.35)
                 cible.vu = t
+                cible.hauteur_estimee = bool(point.get("dimensions_estimees", True))
             else:
                 ident = next(self._ids)
                 rayon = max(0.04, min(0.25, 0.5 * min(largeur, longueur)))
@@ -268,6 +317,7 @@ class ReconstructeurScene:
                     hauteur=hauteur,
                     rayon=rayon if type_3d == "arbre" else 0.0,
                     vu=t,
+                    hauteur_estimee=bool(point.get("dimensions_estimees", True)),
                 )
 
     # -- classement
@@ -334,14 +384,15 @@ class ReconstructeurScene:
                 meilleur, distance = o, e
         if meilleur is None:
             ident = next(self._ids)
-            h = _hasard_stable(ident)
-            o = Objet(ident, d["type"], x, y, cap, vu=t)
+            o = Objet(ident, d["type"], x, y, cap, vu=t,
+                      source=str(d.get("source") or ""), confirmation_t=t)
+            o.hauteur_estimee = d.get("hauteur_estimee", d.get("hauteur") is None)
             if d["type"] == "arbre":
                 o.rayon = d["rayon"]
-                o.hauteur = float(d.get("hauteur") or (0.75 + 0.35 * h))
+                o.hauteur = float(d.get("hauteur") or 0.30)
             elif d["type"] == "bloc":
                 o.longueur, o.largeur = d["longueur"], d["largeur"]
-                o.hauteur = float(d.get("hauteur") or (0.5 + 0.4 * h))
+                o.hauteur = float(d.get("hauteur") or 0.25)
             else:
                 o.longueur, o.largeur, o.hauteur = d["longueur"], d["largeur"], d["hauteur"]
             self.objets[ident] = o
@@ -351,6 +402,11 @@ class ReconstructeurScene:
         o.x += a * (x - o.x)
         o.y += a * (y - o.y)
         o.vu, o.vues = t, o.vues + 1
+        if t - o.confirmation_t >= 0.08:
+            o.corroborations += 1
+            o.confirmation_t = t
+        if d.get("hauteur") is not None:
+            o.hauteur_estimee = d.get("hauteur_estimee", False)
         if o.type == "arbre":
             o.rayon += a * (d["rayon"] - o.rayon)
             if d.get("hauteur") is not None:
@@ -484,6 +540,14 @@ class ReconstructeurScene:
                   if o.type != "mur" or o.vues >= 2 or maintenant - o.vu < 0.5]
         objets += self._prolongements(carte, maintenant)
         self._marquer_dangers(objets, p, securite)
+        # La scène illustre les mesures ; elle ne décide jamais de la franchissabilité.
+        # Un petit écho lidar isolé ne justifie pas encore un volume solide en 3D.
+        # La stéréo peut mesurer la pelouse : les reliefs < 8 cm restent du terrain.
+        objets = [o for o in objets if o.get("danger") or not (
+            o["type"] in ("arbre", "bloc", "bas") and (
+                (o.get("source") == "lidar" and o.get("observations_distinctes", 0) < 3)
+                or (o.get("source") == "stereo" and not o.get("hauteur_estimee", True)
+                    and o.get("hauteur", 0.0) < 0.08)))]
         return {"type": "scene", "t": round(maintenant, 3),
                 "repere": "odom" if pose is not None else "base_link",
                 "rover": {"x": round(p.x, 3), "y": round(p.y, 3), "cap": round(p.cap, 4)},

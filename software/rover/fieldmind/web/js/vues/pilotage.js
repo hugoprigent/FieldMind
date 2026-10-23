@@ -46,6 +46,13 @@ export class VuePilotage {
       this._selectionnerCamera(b.dataset.camera);
     });
     $('#p-camera').addEventListener('click', () => { if (this.principale === '3d') this._definirPrincipale('camera'); });
+    // Suivre une personne : le prochain clic sur l'image la désigne (le rover doit être armé).
+    this.modeSuivi = false;
+    $('#p-suivre').addEventListener('click', () => {
+      this.modeSuivi = !this.modeSuivi;
+      attribut($('#p-suivre'), 'aria-pressed', this.modeSuivi ? 'true' : 'false');
+      if (this.modeSuivi) signaler('Cliquer sur la personne à suivre', 'info', 2500);
+    });
     $('#p-3d').addEventListener('click', () => { if (this.principale === 'camera') this._definirPrincipale('3d'); });
     $('#p-camera-pip')?.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -100,6 +107,11 @@ export class VuePilotage {
       }
       signalerRefus(await ctx.connexion.demander(message));
     });
+    $('#p-anticollision').addEventListener('click', async (e) => {
+      const coupee = this.ctx.donnees.etat?.securite?.raisons?.includes('anticollision_coupee');
+      if (!coupee && !(await confirmer('Couper l’anticollision ? Le rover ignorera les obstacles : tu conduis à vue, vitesse plafonnée.', e.currentTarget, { danger: true }))) return;
+      signalerRefus(await ctx.connexion.demander({ type: 'anticollision', active: coupee }));
+    });
     $('#p-armer').addEventListener('click', async () => {
       const arme = donnees.etat?.arme;
       signalerRefus(await ctx.connexion.demander({ type: arme ? 'desarmer' : 'armer' }));
@@ -119,9 +131,35 @@ export class VuePilotage {
 
     this._installerJoystick();
     this._installerClavier();
+    $('#p-volets').addEventListener('click', async () => {
+      const d = ctx.donnees;
+      const deplies = !(d.reglages['remorque.volets_deplies'] ?? d.profil?.remorque?.volets_deplies);
+      const r = signalerRefus(await ctx.connexion.demander({ type: 'reglage', cle: 'remorque.volets_deplies', valeur: deplies }));
+      if (r.ok) {
+        d.reglages['remorque.volets_deplies'] = r.valeur;
+        d.emettre('reglage', { cle: 'remorque.volets_deplies', valeur: r.valeur });
+        this._majVolets();
+        signaler(r.valeur ? 'Volets dépliés' : 'Volets repliés', 'info', 1500);
+      }
+    });
     $('#p-remorque-axe').addEventListener('click', async () => {
       const r = signalerRefus(await ctx.connexion.demander({ type: 'remorque_alignee' }));
       if (r.ok) signaler('Remorque dans l’axe', 'info', 1500);
+    });
+
+    $('#p-decollage').addEventListener('click', async () => {
+      const ouvrir = $('#p-decollage').getAttribute('aria-pressed') !== 'true';
+      const r = signalerRefus(await ctx.connexion.demander({ type: 'decollage_preparer', ouvrir }));
+      if (!r.ok) return;
+      $('#p-decollage').disabled = true;
+      texte($('#p-decollage span'), ouvrir ? 'Ouverture des volets…' : 'Fermeture des volets…');
+    });
+    donnees.sur('decollage', (m) => {
+      const b = $('#p-decollage');
+      b.disabled = false;
+      attribut(b, 'aria-pressed', m.pret ? 'true' : 'false');
+      texte(b.querySelector('span'), m.pret ? 'Prêt au décollage ✓ — replier' : 'Prêt au décollage');
+      if (m.pret) signaler('Prêt au décollage : volets ouverts', 'succes', 2500);
     });
 
     $('#p-drone-actions')?.addEventListener('click', async (e) => {
@@ -170,7 +208,6 @@ export class VuePilotage {
       }
     });
 
-    $('#p-voix').addEventListener('click', () => ctx.basculerVoix());
     donnees.sur('etat', () => this._majEtat());
     donnees.sur('voix', () => this._majVoix());
     donnees.sur('liaison', () => this._majEtat());
@@ -317,6 +354,15 @@ export class VuePilotage {
   // ---------------------------------------------------------------- image : aller au pixel
 
   async clicImage({ camera, u, v, x, y }) {
+    if (this.principale === 'camera' && this.modeSuivi) {
+      this.modeSuivi = false;
+      attribut($('#p-suivre'), 'aria-pressed', 'false');
+      this.camera.marquer(u, v);
+      const action = { type: 'suivre', camera, u: Math.round(u * 1e4) / 1e4, v: Math.round(v * 1e4) / 1e4 };
+      const r = signalerRefus(await this.ctx.connexion.demander({ type: 'action', action }));
+      if (r.ok) signaler('Suivi lancé', 'succes', 1800);
+      return;
+    }
     if (this.principale !== 'camera' || this.ctx.donnees.etat?.mode !== 'auto') return;
     this.camera.marquer(u, v);
     const ok = await confirmer('Aller ici ?', { x, y });
@@ -328,6 +374,18 @@ export class VuePilotage {
   }
 
   // ---------------------------------------------------------------- joystick
+
+  _majVolets() {
+    const d = this.ctx.donnees;
+    const deplies = Boolean(d.reglages['remorque.volets_deplies'] ?? d.profil?.remorque?.volets_deplies);
+    attribut($('#p-volets'), 'aria-pressed', deplies ? 'true' : 'false');
+    texte($('#p-volets span'), deplies ? 'Replier les volets' : 'Déplier les volets');
+    const b = $('#p-decollage');
+    if (b && !b.disabled) {
+      attribut(b, 'aria-pressed', deplies ? 'true' : 'false');
+      texte(b.querySelector('span'), deplies ? 'Prêt au décollage ✓ — replier' : 'Prêt au décollage');
+    }
+  }
 
   _installerJoystick() {
     const zone = $('#p-joystick'), manette = zone.querySelector('.manette');
@@ -418,7 +476,12 @@ export class VuePilotage {
     armer.disabled = !e || Boolean(e.arret_urgence) || (!e.arme && e.mode === 'arret');
     attribut(armer, 'title', e && !e.arme && e.mode === 'arret' ? 'Choisir d’abord un mode' : null);
     attribut($('#p-joystick'), 'data-desactive', mode === 'manuel' ? 'false' : 'true');
-    attribut($('#p-camera'), 'data-cliquable', mode === 'auto' && this.principale === 'camera' ? 'true' : 'false');
+    const anticollision = $('#p-anticollision');
+    const coupee = Boolean(e?.securite?.raisons?.includes('anticollision_coupee'));
+    anticollision.hidden = mode !== 'manuel';
+    attribut(anticollision, 'aria-pressed', coupee ? 'true' : 'false');
+    texte(anticollision.querySelector('span'), coupee ? 'Anticollision COUPÉE : rétablir' : 'Anticollision : active');
+    attribut($('#p-camera'), 'data-cliquable', (mode === 'auto' || this.modeSuivi) && this.principale === 'camera' ? 'true' : 'false');
     $('#p-badge-auto').hidden = mode !== 'auto';
     $('#p-badge-auto').title = 'Clic sur l’image : aller au point';
 
@@ -437,7 +500,12 @@ export class VuePilotage {
 
     // Remorque : angle d'attelage estimé (incertitude) ; « ± » grand = marche arrière refusée.
     const rem = e?.remorque;
-    $('#p-remorque').hidden = !rem;
+    // Volets : firmware ROVER_4 et suivants (servos sur l'ESP), remorque attelée ou non
+    const volets = Number(/(\d+)$/.exec(e?.esp?.firmware || '')?.[1] || 0) >= 4;
+    $('#p-remorque').hidden = !rem && !volets;
+    $('#p-volets').hidden = !volets;
+    $('#p-remorque-angle').hidden = $('#p-remorque-axe').hidden = !rem;
+    if (volets) this._majVolets();
     if (rem) {
       const angle = $('#p-remorque-angle');
       texte(angle, `${nombre(rem.angle_deg, 0)}° ± ${nombre(rem.incertitude_deg, 0)}°`);
@@ -475,6 +543,7 @@ export class VuePilotage {
     const libelleEtat = !dr ? 'Drone : attente' : dr.connecte ? 'Drone : Connecté' : `Drone : ${dr.etat}`;
     attribut(pastille, 'data-niveau', niveau);
     texte(pastille.querySelector('.libelle'), libelleEtat);
+    texte($('#p-drone-resume'), libelleEtat); // titre du bloc replié
 
     texte($('#p-drone-reseau'), dr?.ssid ? `Liaison : ${dr.ssid}${dr.canal ? ` (ch ${dr.canal})` : ''}` : 'Liaison : auto (BLE / Wi-Fi)');
     texte($('#p-drone-signal'), Number.isFinite(dr?.rssi_dbm) ? `Signal : ${dr.rssi_dbm} dBm` : 'Signal : —');
@@ -493,7 +562,7 @@ export class VuePilotage {
       const lien = $(`#${id}`);
       if (lien) {
         lien.hidden = !dr?.montage_recon;
-        const url = new URL(`/api/drone/recon/${fichier}`, location.href);
+        const url = new URL(`api/drone/recon/${fichier}`, location.href);
         if (this.ctx.connexion.jeton) url.searchParams.set('jeton', this.ctx.connexion.jeton);
         lien.href = url.href;
       }
@@ -509,6 +578,7 @@ export class VuePilotage {
   _majVoix() {
     const d = this.ctx.donnees, voix = d.liaison === 'ok' ? d.etat?.voix : null;
     const bouton = $('#p-voix');
+    if (!bouton) return; // le micro est dans la barre du haut (barre.js)
     attribut(bouton, 'aria-pressed', voix?.active ? 'true' : 'false');
     attribut(bouton, 'data-parole', voix?.active && (voix?.parle || d.parole) ? 'true' : 'false');
     const niveau = voix?.active ? Math.min(1, Math.max(0, voix.niveau || 0)) : 0;

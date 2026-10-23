@@ -14,6 +14,11 @@ mal (sous-virage) et les moteurs forcent. Quatre étages, du plus simple au plus
 3. **Équilibrage par roue** : gain PWM → vitesse propre à chaque moteur (`traction.equilibre_d`).
 4. **Capteurs de vitesse des roues** (sorties SC des drivers, firmware `roues 1`), s'ils sont
    câblés : régulation de chaque roue sur sa vitesse mesurée.
+
+**Direction par l'arrière** (`direction.par_l_arriere`, servo absent, roues avant libres) : le
+braquage demandé n'est plus suivi par un servo, c'est la différence de vitesse des roues
+arrière qui fait tourner (κ = tan δ / L × `direction.gain_arriere`), avec une boucle de lacet
+plus autoritaire puisque rien d'autre ne tient le cap.
 """
 
 from __future__ import annotations
@@ -76,10 +81,17 @@ class Differentiel:
     def repartir(self, v: float, braquage_consigne: float, esp: EtatEsp | None,
                  odom: Odometrie | None, t: float, dt: float) -> Repartition:
         p = self.profil
-        delta = self.braquage_reel(esp, braquage_consigne, t)
+        arriere = bool(p.valeur("direction.par_l_arriere", False))
+        if arriere:  # pas de servo : l'angle visé est la consigne
+            maximum = braquage_max(p)
+            delta = max(-maximum, min(maximum, braquage_consigne))
+        else:
+            delta = self.braquage_reel(esp, braquage_consigne, t)
         kappa = math.tan(delta) / float(p.geometrie.empattement_m)
+        if arriere:
+            kappa *= float(p.valeur("direction.gain_arriere", 1.0))
         demi_voie = float(p.geometrie.voie_arriere_m) / 2
-        if not bool(p.valeur("traction.differentiel", True)):
+        if not arriere and not bool(p.valeur("traction.differentiel", True)):
             return Repartition(v, v, delta, v * kappa, self._lacet_filtre, 0.0, "aucun")
         v_g, v_d = v * (1 - kappa * demi_voie), v * (1 + kappa * demi_voie)
         # Vitesse réelle si l'odométrie lidar est fiable : le lacet attendu en dépend
@@ -98,6 +110,9 @@ class Differentiel:
             ki = float(p.valeur("traction.lacet_ki", 0.6))
             self._integrale += erreur * dt
             borne = min(0.25 * abs(v), float(p.valeur("traction.lacet_correction_max_m_s", 0.10)))
+            if arriere:  # seules les roues arrière tiennent le cap
+                borne = min(0.5 * abs(v), 3 * float(
+                    p.valeur("traction.lacet_correction_max_m_s", 0.10)))
             if ki > 0:  # anti-emballement : l'intégrale ne dépasse pas la borne à elle seule
                 self._integrale = max(-borne / (ki * demi_voie), min(borne / (ki * demi_voie),
                                                                      self._integrale))

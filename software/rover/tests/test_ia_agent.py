@@ -38,6 +38,9 @@ def profil_rover() -> Profil:
 
 
 CONSIGNES: list[tuple[str, list[tuple[str, dict[str, Any]]], list[dict[str, Any]], bool]] = [
+    ("explore la pièce", [("explorer", {})], [{"type": "explorer"}], True),
+    ("explore la pièce pour trouver une porte", [("explorer", {"objet": "porte"})],
+     [{"type": "explorer", "objet": "porte"}], True),
     ("avance de 5 mètres", [("avancer", {"distance_m": 5})],
      [{"type": "avancer", "distance_m": 5.0}], True),
     ("recule de 50 centimètres", [("avancer", {"distance_m": -0.5})],
@@ -58,6 +61,8 @@ CONSIGNES: list[tuple[str, list[tuple[str, dict[str, Any]]], list[dict[str, Any]
      [{"type": "memoriser_lieu", "nom": "garage"}], True),
     ("retourne au garage", [("aller_lieu", {"nom": "le Garage"})],
      [{"type": "aller_lieu", "nom": "garage"}], True),
+    ("va à la cuisine", [("aller_lieu", {"nom": "cuisine"})],
+     [{"type": "rejoindre_piece", "nom": "cuisine"}], True),
     ("va au point 43.7105, -1.0531", [("aller_gps", {"lat": 43.7105, "lon": -1.0531})],
      [{"type": "aller_gps", "lat": 43.7105, "lon": -1.0531}], True),
     ("va au point GPS 43.71052 -1.05318 à 1 mètre près",
@@ -76,7 +81,8 @@ CONSIGNES: list[tuple[str, list[tuple[str, dict[str, Any]]], list[dict[str, Any]
      [{"type": "avancer", "distance_m": 2.0, "vitesse_m_s": 0.2}], True),
     ("ensuite, avance de 2 mètres et arrête-toi",
      [("mettre_a_la_suite", {}), ("avancer", {"distance_m": 2}), ("stop", {})],
-     [{"type": "avancer", "distance_m": 2.0}, {"type": "stop"}], False),
+     # « stop » après d'autres actions est retiré : dans la file, il annulerait tout le plan
+     [{"type": "avancer", "distance_m": 2.0}], False),
     ("cherche le ballon et décris ce que tu vois",
      [("chercher", {"objet": "ballon", "camera": "gauche"}), ("decrire", {})],
      [{"type": "chercher", "objet": "ballon", "camera": "gauche"}, {"type": "decrire"}], True),
@@ -144,7 +150,6 @@ HORS_BORNES = [
      "hors limites"),
     ("va à 100 mètres devant", [("aller_a", {"x": 100, "y": 0})], "hors limites"),
     ("va 25 m devant et 25 m à gauche", [("aller_a", {"x": 25, "y": 25})], "trop loin"),
-    ("va à la cuisine", [("aller_lieu", {"nom": "cuisine"})], "lieu inconnu"),
     ("va à la porte du garage", [("aller_a", {"lieu": "porte"})], "paramètre inconnu"),
     ("va au point 91, 2", [("aller_gps", {"lat": 91, "lon": 2})], "hors limites"),
     ("va au point 43.7, -181", [("aller_gps", {"lat": 43.7, "lon": -181})], "hors limites"),

@@ -68,9 +68,15 @@ requetes_par_jour = 3000
 [profils.gx10]
 description = "Modèles locaux sur l'ASUS Ascent GX10 (vLLM)"
 api = "openai"
-hote = "gx10.local"            # nom ou adresse IP du GX10 sur le réseau du rover
+# Passerelle du GX10 (deploiement/gx10/passerelle.conf) : un port, un chemin par modèle.
+hote = "http://gx10.local:8090"         # sur réseau privé : renseigner l’adresse du GX10
 variable_hote = "FIELDMIND_GX10_HOTE"   # si elle est définie, remplace `hote`
-url = "http://{hote}:8000/v1"
+url = "{hote}/modele/v1"
+# Tunnel Cloudflare du GX10 : son adresse est lue ici (par l'adresse de base) ; l'IA y bascule
+# quand il répond (5 à 10 fois plus rapide que la liaison directe vers l'Allemagne) et revient
+# à l'adresse de base s'il tombe.
+url_tunnel = "{hote}/tunnel"
+appels_successifs = true   # Qwen appelle une fonction à la fois : l'agent relance
 variable_cle = "GX10_API_KEY"  # la même que VLLM_API_KEY de deploiement/gx10/.env
 cle_obligatoire = false
 reprises = 1
@@ -94,10 +100,10 @@ requetes_par_heure = 3600
 requetes_par_jour = 50000
 
 [profils.gx10.pointage]
-# Modèle incarné (remplace Gemini Robotics-ER) : « chercher » un objet, en [(x, y)] 0–1000
+# Modèle incarné pour désigner/suivre une cible ; la recherche vérifie sa présence via vision.
 fournisseur = "openai"
 modele = "BAAI/RoboBrain2.5-4B"
-url = "http://{hote}:8002/v1"
+url = "{hote}/robotique/v1"
 format_points = "robobrain"
 largeur_image = 640
 delai_s = 30.0
@@ -109,31 +115,31 @@ requetes_par_jour = 50000
 [profils.gx10.detection]
 fournisseur = "inference"
 modele = "ustc-community/dfine-xlarge-obj2coco"
-url = "http://{hote}:8003/v1"
+url = "{hote}/outils/v1"
 delai_s = 8.0
 
 [profils.gx10.profondeur]
 fournisseur = "inference"
 modele = "depth-anything/Depth-Anything-V2-Metric-Outdoor-Large-hf"
-url = "http://{hote}:8003/v1"
+url = "{hote}/outils/v1"
 delai_s = 10.0
 
 [profils.gx10.memoire]
 fournisseur = "inference"
 modele = "Qwen/Qwen3-VL-Embedding-2B"
-url = "http://{hote}:8003/v1"
+url = "{hote}/outils/v1"
 delai_s = 10.0
 
 [profils.gx10.synthese]
 fournisseur = "inference"
 modele = "Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice"
-url = "http://{hote}:8004/v1"
-delai_s = 20.0
+url = "{hote}/voix/v1"
+delai_s = 30.0   # une phrase (≤ 140 caractères) à la fois
 
 [profils.gx10.transcription]
 modele = "Qwen/Qwen3-ASR-1.7B"
 mode = "openai_transcriptions"
-url = "http://{hote}:8001/v1"
+url = "{hote}/transcription/v1"
 langue = "fr"
 vocabulaire = ["FieldMind", "rover", "lidar", "demi-tour", "mètres", "degrés"]
 delai_s = 15.0

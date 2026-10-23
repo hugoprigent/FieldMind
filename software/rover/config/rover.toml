@@ -31,6 +31,7 @@ sens_horaire = true           # angles du RPLIDAR croissants dans le sens horair
 portee_min_m = 0.12
 portee_max_m = 12.0
 debit_bauds = 460800
+masque_marge_m = 0.05         # points ignorés jusqu'à 5 cm autour de l'emprise (le rover lui-même)
 
 [cameras]
 largeur = 1280
@@ -61,19 +62,21 @@ hdop_max = 5.0                # points GPS plus imprécis ignorés
 alignement_etendue_m = 6.0    # trajet nécessaire pour orienter l'odométrie sur le nord
 alignement_residu_max_m = 4.0
 fenetre_s = 300.0             # mémoire du recalage odométrie ↔ GPS
-# reference_lat = 0.0     # facultatif : origine du plan local (sinon le premier point GPS)
-# reference_lon = 0.0
+# reference_lat = 43.7102     # facultatif : origine du plan local (sinon le premier point GPS)
+# reference_lon = -1.0536
 
 [esp]
 debit_bauds = 115200
 chien_de_garde_ms = 400       # demandé au firmware s'il le gère (ROVER_3 et suivants)
 periode_commande_s = 0.05     # 20 Hz
+moteurs_permutes = false      # moteur gauche branché sur la sortie droite (et l'inverse)
+sens_inverse = false          # les deux moteurs tournent à l'envers (avancer fait reculer)
 
 [traction]
 # Correspondance pourcentage PWM -> vitesse (à calibrer : Réglages > Calibration > Vitesse).
 pwm_par_m_s = 35.0            # % de PWM pour 1 m/s en régime établi
 pwm_seuil = 4                 # % sous lequel le moteur ne tourne pas (zone morte)
-pwm_max = 40                  # plafond absolu envoyé à l'ESP, tous modes sauf banc
+pwm_max = 100                 # plafond absolu envoyé à l'ESP, tous modes sauf banc
 pwm_max_banc = 15
 delai_inversion_s = 0.6       # roue à zéro avant de changer son sens (arrêt physique)
 rampe_acceleration_m_s2 = 0.6
@@ -96,19 +99,25 @@ servo_par_degre_roue = 1.0    # à calibrer : Réglages > Calibration > Braquage
 servo_neutre_deg = 0.0        # trim : servo pour rouler droit
 servo_max_deg = 40.0          # butée logicielle
 servo_vitesse_deg_s = 150.0   # vitesse de consigne envoyée au firmware (commande v)
+# Direction par les roues arrière (servo absent ou hors service, roues avant laissées libres) :
+# le braquage demandé devient une différence de vitesse des deux moteurs (même géométrie).
+par_l_arriere = false
+gain_arriere = 1.0            # > 1 : virages plus serrés que la géométrie (manuel surtout)
+vitesse_pivot_m_s = 0.2       # rotation sur place, joystick sur le côté à l'arrêt (manuel)
 
 [vitesses]
 max_manuel_m_s = 0.8
 max_auto_m_s = 0.5
 max_arriere_m_s = 0.3
 defaut_action_m_s = 0.35
+max_suivi_m_s = 0.6           # suivre une personne (plafonné aussi par max_auto_m_s)
 
 [securite]
 deceleration_m_s2 = 0.8       # freinage supposé (roues libres, pas de frein mécanique)
 latence_s = 0.25              # mesure -> commande -> moteur
-marge_avant_m = 0.25
-marge_laterale_m = 0.10
-distance_arret_absolu_m = 0.30
+marge_avant_m = 0.15          # en plus de la distance de freinage
+marge_laterale_m = 0.06
+distance_arret_absolu_m = 0.20  # plus près que ça du nez : on n'avance plus, même au pas
 lidar_perime_s = 0.5
 stereo_perimee_s = 1.0
 inclinaison_max_deg = 25.0
@@ -120,6 +129,9 @@ geofence_m = 60.0             # distance maximale au point de départ en mode au
 exiger_stereo_en_auto = false # true : pas de mode auto sans profondeur caméra
 vitesse_sans_stereo_m_s = 0.3 # plafond quand la stéréo manque (obstacles bas invisibles au lidar)
 vitesse_pres_personne_m_s = 0.25  # personne ou animal détecté devant (< 4 m), si détecteur
+vitesse_sans_anticollision_m_s = 0.3  # manuel avec l'anticollision coupée (bouton du poste)
+stereo_bloquante = false      # true : la stéréo arrête aussi ; false : seul le lidar arrête
+vitesse_obstacle_bas_m_s = 0.25  # plafond quand la stéréo voit un obstacle bas (non bloquante)
 frein_urgence = false         # utiliser la broche BRAKE (polarité à vérifier sur le montage)
 
 [perception]
@@ -159,12 +171,15 @@ resolution_m = 0.10
 marge_m = 0.10
 distance_confort_m = 0.8
 penalite_inconnu = 0.5        # l'inconnu est traversable, un peu pénalisé
+penalite_indicatif = 3.0      # coût des amas stéréo non bloquants dans le chemin global
+poids_indicatifs = 2.0       # préférence locale pour les arcs les moins encombrés par la stéréo
 arcs = 21
 horizon_m = 2.0
 tolerance_arrivee_m = 0.20
 vitesse_min_m_s = 0.12
 vitesse_recul_m_s = 0.15
 distance_recul_m = 0.4
+recul_direct_max_m = 1.5      # but derrière et plus près que ça : on y va en marche arrière
 
 [capteurs]
 # Interrupteurs du poste (Réglages > Capteurs actifs). La sécurité s'adapte : sans lidar le rover
@@ -186,6 +201,15 @@ arriere_m = 0.48              # vis d'attelage -> bord arrière (planche de 380 
 demi_largeur_m = 0.19         # roues comprises, volets repliés
 demi_largeur_volets_m = 0.265 # volets dépliés (à éviter en roulant)
 volets_deplies = false
+# Servos des volets sur D2 (gauche) et D3 (droit) de l'ESP, firmware ROVER_4 : servos à
+# ROTATION CONTINUE (l'impulsion règle la vitesse ; 90 = arrêt). Déplier / replier = tourner
+# dans un sens à `volets_vitesse` % pendant le temps de faire `volets_angle_deg`, d'après
+# `volets_tours_min` (vitesse réelle à fond, à ajuster : volet trop loin -> augmenter), puis arrêt.
+volets_vitesse = 40
+volets_angle_deg = 90
+volets_tours_min = 100.0
+volet_g_inverse = false
+volet_d_inverse = true        # monté en miroir
 angle_contact_deg = 52.0      # au-delà, le coin avant touche une roue arrière du rover (CAO)
 angle_max_arriere_deg = 20.0  # en reculant : au-delà, on ne peut plus la redresser en reculant
 incertitude_max_recul_deg = 8.0   # angle estimé moins sûr : marche arrière refusée
@@ -200,6 +224,8 @@ peripherique = ""
 frequence_hz = 16000
 
 [ia]
+gx10_cartographie = true      # image régulière + carte sémantique, calculs de vision sur le GX10
+gx10_periode_s = 3.0          # intervalle visé ; une seule analyse en vol, pas de file d'images
 vigilance = false             # analyse IA automatique des images : une requête payante par image
 vigilance_periode_s = 12.0    # à l'arrêt ; trois fois plus souvent quand le rover bouge
 detection_continue = true     # GX10 : personnes et animaux, toutes les detection_periode_s
@@ -214,3 +240,6 @@ actif = true                  # boîte noire ~/fieldmind/enregistrements (python
 hote = "0.0.0.0"
 port = 8080
 # Jeton facultatif (variable FIELDMIND_JETON) : sans lui, réseau local de confiance seulement.
+
+[conduite]
+armer_auto = false            # true : armé dès qu'on passe en manuel ou auto (sans le bouton)

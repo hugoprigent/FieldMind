@@ -87,7 +87,8 @@ export class VueMission {
   }
 
   dessiner() {
-    const occupee = this.ctx.donnees.liaison === 'ok' && this.ctx.donnees.etat?.ia?.occupee;
+    const ia = this.ctx.donnees.etat?.ia;
+    const occupee = this.ctx.donnees.liaison === 'ok' && (ia?.consigne_en_cours ?? ia?.occupee);
     $('#m-occupee').hidden = !occupee;
     this.direct.dessiner();
   }
@@ -120,8 +121,22 @@ export class VueMission {
   _jouerParole(m) {
     if (!m.audio || !lireLocal('lire', false)) return;
     if (Number.isFinite(m.t) && Math.abs(Date.now() / 1000 - m.t) > 30) return; // historique
-    const audio = new Audio(`data:audio/${m.format || 'wav'};base64,${m.audio}`);
-    audio.play().catch(() => {});
+    // Phrases jouées à la suite ; une nouvelle réponse coupe l'ancienne
+    if (m.id !== this.paroleId) {
+      this.paroleId = m.id;
+      this.paroles = [];
+      this.paroleEnCours?.pause();
+      this.paroleEnCours = null;
+    }
+    this.paroles.push(`data:audio/${m.format || 'wav'};base64,${m.audio}`);
+    const suivante = () => {
+      if (this.paroleEnCours || !this.paroles.length) return;
+      this.paroleEnCours = new Audio(this.paroles.shift());
+      const fin = () => { this.paroleEnCours = null; suivante(); };
+      this.paroleEnCours.addEventListener('ended', fin);
+      this.paroleEnCours.play().catch(fin);
+    };
+    suivante();
   }
 
   _lireAVoixHaute(m) {
@@ -143,7 +158,7 @@ export class VueMission {
     const pastille = $('#m-etat');
     attribut(pastille, 'data-niveau', niveau);
     texte(pastille.querySelector('.libelle'), libelle);
-    texte($('#m-action'), m?.action ? decrireAction(m.action) : '—');
+    texte($('#m-action'), m?.action ? decrireAction(m.action) : m ? 'Aucune action en cours' : '—');
     const progression = Number.isFinite(m?.progression) ? Math.min(1, Math.max(0, m.progression)) : 0;
     $('#m-barre').style.width = `${Math.round((m?.action ? progression : code === 'termine' ? 1 : 0) * 100)}%`;
     attribut($('#m-barre').parentElement, 'data-niveau', code === 'bloque' || code === 'pause' ? 'alerte' : code === 'echec' ? 'critique' : null);
@@ -160,6 +175,14 @@ export class VueMission {
     $('#m-reprendre').disabled = !enCours || code === 'route';
     $('#m-annuler').disabled = !enCours;
     for (const b of $$('#m-rapides button')) b.disabled = d.liaison !== 'ok';
+    // Agent de veille : ce qu'il comprend de la situation, rafraîchi toutes les quelques secondes
+    const s = d.liaison === 'ok' ? d.etat?.situation : null;
+    const ligne = $('#m-situation');
+    ligne.hidden = !s?.resume;
+    if (s?.resume) {
+      texte(ligne, s.alerte && s.niveau !== 'rien' ? `${s.resume} — ${s.alerte}` : s.resume);
+      attribut(ligne, 'data-niveau', s.niveau || 'info');
+    }
   }
 
   // ---------------------------------------------------------------- vision

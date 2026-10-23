@@ -10,7 +10,7 @@ import numpy as np
 from budget import dans_le_budget
 
 from fieldmind.config import FICHIER_PROFIL, Profil
-from fieldmind.estimation.cartographie import Cartographe
+from fieldmind.estimation.cartographie import VALEUR_INDICATIVE, Cartographe
 from fieldmind.simulation.monde import Monde, deplacer
 from fieldmind.types import Obstacles, Pose2D, Scan
 
@@ -68,6 +68,7 @@ def test_murs_occupes_et_centre_libre() -> None:
 
 def test_obstacles_bas_non_effaces_par_le_lidar() -> None:
     profil = profil_test()
+    profil.regler("securite.stereo_bloquante", True)
     monde = Monde(0, "salle")
     cartographe = Cartographe(profil)
     pose = Pose2D(5.0, 1.0, 0.0)
@@ -91,6 +92,27 @@ def test_obstacles_bas_non_effaces_par_le_lidar() -> None:
     assert valeur(cartographe.carte(), 6.24, 1.0) < 50
 
 
+def test_stereo_indicative_filtre_isoles_et_garde_les_murs() -> None:
+    profil = profil_test()
+    profil.regler("securite.stereo_bloquante", False)
+    cartographe = Cartographe(profil)
+    points = np.array([[1.02, 0.02], [1.02, 0.07], [1.07, 0.02], [2.02, 0.02]])
+    for _ in range(2):
+        cartographe.integrer_obstacles(Obstacles(0.0, "stereo", points), Pose2D(), liberer=False)
+    # Un écho lidar au milieu de l'amas garde sa valeur occupée, même sous la stéréo.
+    lig, col = cartographe.carte().indice(1.02, 0.07)
+    cartographe.lidar[lig, col] = 3.0
+    carte = cartographe.carte()
+    assert valeur(carte, 1.02, 0.07) > 65
+    assert valeur(carte, 1.02, 0.02) == VALEUR_INDICATIVE
+    assert valeur(carte, 2.02, 0.02) == 50  # point isolé écarté
+    assert cartographe.occupees().sum() == 1  # seul le lidar est bloquant
+    # Le réglage agit aussi sur une carte déjà construite.
+    profil.regler("securite.stereo_bloquante", True)
+    assert valeur(cartographe.carte(), 2.02, 0.02) == 100
+    assert cartographe.occupees().sum() == 4
+
+
 def test_fenetre_glissante() -> None:
     profil = profil_test()
     monde = Monde(0, "salle")
@@ -108,3 +130,18 @@ def test_fenetre_glissante() -> None:
     assert math.isclose(apres.resolution, 0.05)
     cartographe.effacer()
     assert np.all(cartographe.carte().cellules == -1)
+
+
+def test_obstacle_bas_oublie_s_il_n_est_pas_revu() -> None:
+    """Une détection de la stéréo qui n'est plus confirmée (fausse, ou hors du champ) s'efface
+    d'elle-même en quelques secondes."""
+    cartographe = Cartographe(profil_test())
+    pose = Pose2D(5.0, 1.0, 0.0)
+    # Point sur le côté, hors du champ de la caméra : jamais « vu libre » ensuite
+    point = Obstacles(0.0, "stereo", np.array([[0.2, 0.6]], np.float32))
+    for _ in range(3):
+        cartographe.integrer_obstacles(point, pose, liberer=False)
+    assert len(cartographe.obstacles_proches(pose, 3.0, bas_seulement=True).points) == 1
+    rien = Obstacles(12.0, "stereo", np.zeros((0, 2), np.float32))
+    cartographe.integrer_obstacles(rien, pose, liberer=False)
+    assert len(cartographe.obstacles_proches(pose, 3.0, bas_seulement=True).points) == 0

@@ -21,8 +21,22 @@ from fieldmind.types import EchantillonAudio
 DUREE_BLOC_S = 0.02
 
 
+_CACHE_CARTES: tuple[float, list[dict[str, str]]] = (-1e9, [])
+
+
 def cartes_usb() -> list[dict[str, str]]:
-    """Cartes de capture USB d'après /proc/asound (webcams, micros USB)."""
+    """Cartes de capture USB d'après /proc/asound (webcams, micros USB), relues au plus toutes
+    les 5 s : l'état du poste les demande 10 fois par seconde."""
+    global _CACHE_CARTES
+    quand, cartes = _CACHE_CARTES
+    if time.monotonic() - quand < 5.0:
+        return cartes
+    cartes = _lire_cartes()
+    _CACHE_CARTES = (time.monotonic(), cartes)
+    return cartes
+
+
+def _lire_cartes() -> list[dict[str, str]]:
     cartes = []
     try:
         texte = Path("/proc/asound/cards").read_text()

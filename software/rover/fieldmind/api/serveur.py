@@ -56,6 +56,7 @@ class Serveur:
         self.rover = rover
         self.bus = rover.bus
         self.atelier_drone = AtelierDrone(self.bus)
+        self.dossier_photos = None
         self.jeton = jeton if jeton is not None else (os.environ.get("FIELDMIND_JETON") or None)
         self.postes: dict[str, Poste] = {}
         self.ponts_ros: set[web.WebSocketResponse] = set()
@@ -476,6 +477,10 @@ class Serveur:
             if action == "aller":
                 return r.executeur.ajouter([{"type": "aller_lieu", "nom": nom}], remplacer=True)
             raise ActionRefusee("action de lieu inconnue")
+        if t == "environnement_reinitialiser":
+            r.refuser_si_roule()
+            r.reinitialiser_environnement()
+            return None
         if t == "remise_a_zero_odom":
             r.refuser_si_roule()
             r.remise_a_zero_odom()
@@ -487,6 +492,11 @@ class Serveur:
             if esp is None or not esp.envoyer_ligne(str(m["texte"])):
                 raise ActionRefusee("ESP absent ou ligne invalide")
             return None
+        if t == "reglages_reinitialiser":
+            retires = p.reinitialiser()
+            self.bus.journaliser("reglages", f"réglages réinitialisés ({len(retires)}) ; "
+                                 "branchement et calibrations gardés")
+            return retires
         if t == "reglage":
             cle = str(m["cle"])
             try:
@@ -497,6 +507,27 @@ class Serveur:
                 return valeur
             self.bus.journaliser("reglages", f"{cle} = {valeur}")
             return valeur
+        if t == "anticollision":
+            couper = not bool(m.get("active", True))
+            if couper and c.mode != "manuel":
+                raise ActionRefusee("seulement en mode manuel")
+            r.superviseur.anticollision_coupee = couper
+            self.bus.journaliser("securite", "anticollision COUPÉE (manuel, conduite à vue)"
+                                 if couper else "anticollision rétablie",
+                                 "alerte" if couper else "succes")
+            return None
+        if t == "decollage_preparer":
+            # Volets ouverts (servos à rotation continue, durée réglée) : plateau prêt pour le
+            # drone. Aucune commande n'est envoyée au drone lui-même (protocole non validé).
+            ouvrir = bool(m.get("ouvrir", True))
+            esp = r.materiel.esp()
+            if esp is None or not hasattr(esp, "volets_disponibles") or \
+                    not esp.volets_disponibles():
+                raise ActionRefusee("volets indisponibles (firmware ROVER_4 requis, ESP présent)")
+            duree = esp.duree_volets()
+            p.regler("remorque.volets_deplies", ouvrir)  # le mouvement part du rappel du réglage
+            self._lancer(self._annoncer_volets(ouvrir, duree))
+            return duree
         if t == "remorque_alignee":
             if not r.remorque.etat.attelee:
                 raise ActionRefusee("aucune remorque attelée (Réglages > Remorque)")
@@ -514,7 +545,8 @@ class Serveur:
         if t == "photo":
             from fieldmind.mission.executeur import enregistrer_photo
 
-            chemin = await asyncio.to_thread(enregistrer_photo, self.bus, m.get("camera", "gauche"))
+            chemin = await asyncio.to_thread(enregistrer_photo, self.bus,
+                                             m.get("camera", "gauche"), self.dossier_photos)
             return None if chemin is None else chemin.name
         if t == "calibration":
             return await self._calibration(m)
@@ -560,6 +592,13 @@ class Serveur:
         if t in ("chat", "voix", "vision", "ia_profil", "ia_cle"):
             return await self._ia(t, m)
         raise ActionRefusee(f"demande inconnue : {t}")
+
+    async def _annoncer_volets(self, ouvrir: bool, duree: float) -> None:
+        await asyncio.sleep(duree + 0.2)
+        if ouvrir:
+            self.bus.journaliser("remorque", "prêt au décollage : volets ouverts", "succes")
+        self._diffuser_a_tous({"type": "decollage", "pret": bool(
+            self.rover.profil.valeur("remorque.volets_deplies", False))})
 
     def _lancer(self, coroutine: Any) -> None:
         """Tâche de fond gardée en référence jusqu'à sa fin (sinon le ramasse-miettes la coupe)."""
@@ -614,7 +653,7 @@ class Serveur:
         if nom in ("vitesse", "braquage", "imu_repos"):
             return r.executeur.ajouter([{"type": "calibration", "nom": nom}], remplacer=True,
                                        origine="calibration")
-        if nom in ("stereo_capture", "stereo_calculer", "stereo_effacer"):
+        if nom in ("stereo_capture", "stereo_calculer", "stereo_effacer", "stereo_apercu"):
             return await asyncio.to_thread(self._calibration_stereo, nom)
         raise ActionRefusee("calibration inconnue")
 
@@ -629,6 +668,15 @@ class Serveur:
                 annoncer(self.bus, "stereo", "en_cours", "paires effacées")
                 return 0
         cal = r.calibration_stereo
+        if nom == "stereo_apercu":  # assistant : mire vue dans chaque caméra, en direct
+            from fieldmind.perception.calibration_stereo import PAIRES_MIN
+
+            g = self.bus.dernier(S.IMAGE_GAUCHE)
+            d = self.bus.dernier(S.IMAGE_DROITE)
+            return {"gauche": cal.apercu(g.bgr()) if g is not None else None,
+                    "droite": cal.apercu(d.bgr()) if d is not None else None,
+                    "paires": cal.nombre, "minimum": PAIRES_MIN, "conseille": 15,
+                    "couverture": cal.couverture(), "mire": [cal.colonnes, cal.lignes, cal.case_m]}
         if nom == "stereo_capture":
             g: ImageCamera | None = self.bus.dernier(S.IMAGE_GAUCHE)
             d: ImageCamera | None = self.bus.dernier(S.IMAGE_DROITE)

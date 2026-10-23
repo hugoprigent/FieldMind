@@ -23,11 +23,19 @@ from typing import Any
 from fieldmind.bus import Bus
 from fieldmind.ia.agent import Agent
 from fieldmind.ia.config import ConfigIA, ErreurConfigIA
-from fieldmind.ia.distant import DetectionContinue, MemoireLieux, VoixRover
+from fieldmind.ia.decisions import ChoixExploration, contexte_borne
+from fieldmind.ia.distant import (
+    DetectionContinue,
+    MemoireLieux,
+    TunnelGx10,
+    VeilleSituation,
+    VoixRover,
+)
 from fieldmind.ia.fournisseurs import ErreurIA
 from fieldmind.ia.inference import ClientInference
 from fieldmind.ia.messages import publier_chat
 from fieldmind.ia.outils import ActionRefusee as RefusIa
+from fieldmind.ia.pieces import IdentificationPieces
 from fieldmind.ia.transcription import Transcripteur
 from fieldmind.ia.vision import Vision
 from fieldmind.ia.voix import Voix
@@ -64,6 +72,10 @@ class _Outils:
     def derniere_image(self, camera: str) -> ImageCamera | None:
         return self._o.derniere_image(camera)
 
+    def snapshot_image(self, camera: str) -> Any:
+        snapshot = getattr(self._o, "snapshot_image", None)
+        return snapshot(camera) if snapshot is not None else None
+
     def pixel_vers_sol(self, camera: str, u: float, v: float) -> tuple[float, float] | None:
         return self._o.pixel_vers_sol(camera, u, v)
 
@@ -76,6 +88,11 @@ class _Outils:
     def detecter_camera(self, camera: str = "gauche") -> list[dict[str, Any]]:
         detecter = getattr(self._o, "detecter_camera", None)
         return [] if detecter is None else detecter(camera)
+
+    def memoriser_pieces(self, propositions: list[dict[str, Any]], *,
+                        generation: int | None = None) -> list[dict[str, Any]]:
+        memoriser = getattr(self._o, "memoriser_pieces", None)
+        return memoriser(propositions, generation=generation) if memoriser is not None else []
 
     def pose_odom(self) -> Pose2D:
         return self._o.pose_odom()
@@ -92,6 +109,11 @@ class Ia:
         self.detection = DetectionContinue(bus, profil, self.inference, self.outils)
         self.voix_rover = VoixRover(bus, profil, self.inference)
         self.memoire = MemoireLieux(self.inference)
+        self.decisions = ChoixExploration(self.config, self.outils)
+        self.pieces = IdentificationPieces(self.config, self.outils)
+        self.veille = VeilleSituation(bus, profil, self.config, self.outils,
+                                      occupee=lambda: self.agent.occupee or self.vision_ia.occupee
+                                      or self.decisions.occupee or self.pieces.occupee)
         self._taches: list[asyncio.Task[None]] = []
         self.agent = Agent(bus, profil, self.config, self.outils, vision=self.vision_ia)
         self.transcripteur = Transcripteur(self.config)
@@ -111,8 +133,10 @@ class Ia:
         if not self._config_explicite:
             self._tache_vigilance = asyncio.create_task(self._boucle_vigilance())
             # Outils du GX10 (profil gx10) : détection continue, voix du rover
-            self._taches = [asyncio.create_task(self.detection.boucle()),
-                            asyncio.create_task(self.voix_rover.boucle())]
+            self._taches = [asyncio.create_task(TunnelGx10(self.bus, self.config).boucle()),
+                            asyncio.create_task(self.detection.boucle()),
+                            asyncio.create_task(self.voix_rover.boucle()),
+                            asyncio.create_task(self.veille.boucle())]
 
     async def fermer(self) -> None:
         for tache in self._taches:
@@ -131,10 +155,15 @@ class Ia:
         await self.config.passerelle().fermer()
 
     async def _boucle_vigilance(self) -> None:
-        """Analyse 3D autonome en arrière-plan (Vision + Lidar + Stéréo) au démarrage et à chaque
-        déplacement ou rotation significatif du rover."""
+        """Images récentes vers le GX10, une inférence en vol, sans file d'images.
+
+        Même immobile, le rover découvre les changements de la pièce. Une caméra figée ne
+        renvoie pas éternellement la même image. La commande opérateur garde la priorité.
+        """
         await asyncio.sleep(1.2)
         dernier_t = 0.0
+        derniere_image: tuple[str, float, int] | None = None
+        echecs = 0
         while True:
             try:
                 maintenant = time.monotonic()
@@ -146,19 +175,46 @@ class Ia:
                     or abs(math.atan2(math.sin(pose.cap - self._pose_vigilance.cap),
                                       math.cos(pose.cap - self._pose_vigilance.cap))) >= 0.22
                 )
-                # Analyse automatique : payante (une requête Gemini par image), donc seulement si
-                # l'opérateur l'a activée (Réglages > IA), et pas plus souvent que le réglage.
-                if not bool(self.profil.valeur("ia.vigilance", False)):
+                local = self.config.actif.api == "openai"
+                if local and not bool(self.profil.valeur("ia.gx10_cartographie", True)):
                     await asyncio.sleep(1.0)
                     continue
-                periode = float(self.profil.valeur("ia.vigilance_periode_s", 12.0))
-                if not self.occupee() and self.outils.derniere_image("gauche") is not None and (
-                        (deplace and maintenant - dernier_t >= periode / 3)
+                mission = self.outils.etat_resume().get("mission", {})
+                exploration = mission.get("action") is not None and bool(mission.get("exploration"))
+                if not local and not exploration and not bool(
+                        self.profil.valeur("ia.vigilance", False)):
+                    await asyncio.sleep(1.0)
+                    continue
+                if not self.config.disponibilite("vision")[0]:
+                    await asyncio.sleep(1.0)
+                    continue
+                periode = max(1.0, float(self.profil.valeur(
+                    "ia.gx10_periode_s" if local else "ia.vigilance_periode_s",
+                    3.0 if local else 12.0)))
+                periode *= min(10, 1 + echecs)
+                image = self.outils.derniere_image("gauche")
+                identite = (image.camera, image.t, image.numero) if image is not None else None
+                recente = image is not None and 0 <= maintenant - image.t <= 5.0
+                if not self.occupee() and not self.veille.occupee and recente and (
+                        identite != derniere_image) and (
+                        (not local and deplace and maintenant - dernier_t >= periode / 3)
                         or maintenant - dernier_t >= periode):
                     self._pose_vigilance = pose
                     dernier_t = maintenant
-                    with contextlib.suppress(ErreurIA):
-                        await self.vision_ia.analyser("gauche", silencieux=True)
+                    # L'identité n'est retenue qu'après succès : une panne réseau se réessaie.
+                    try:
+                        async with asyncio.timeout(35.0):
+                            await self.vision_ia.analyser(
+                                "gauche", silencieux=True,
+                                contexte=contexte_borne(self.outils.etat_resume()))
+                        await self._comprendre_pieces()
+                        derniere_image = identite
+                        echecs = 0
+                    except (ErreurIA, TimeoutError):
+                        echecs += 1
+                        if echecs == 3:
+                            self.bus.journaliser("ia", "cartographie GX10 en attente du réseau",
+                                                 "alerte")
             except asyncio.CancelledError:
                 raise
             except Exception:
@@ -182,6 +238,7 @@ class Ia:
                     publier_chat(self.bus, "rover", f"Je ne vois pas « {objet} ».")
             elif demande == "analyser":
                 await self.vision_ia.analyser(camera)
+                await self._comprendre_pieces()
             else:
                 message = await self.vision_ia.decrire(camera)
                 await self._lieu_reconnu(message)
@@ -242,15 +299,63 @@ class Ia:
 
     def occupee(self) -> bool:
         voix = self.voix_ia.occupee if self.voix_ia is not None else False
-        return bool(self.agent.occupee or self.vision_ia.occupee or voix)
+        return bool(self.agent.occupee or self.vision_ia.occupee or self.decisions.occupee
+                    or self.pieces.occupee or voix)
+
+    async def _comprendre_pieces(self, nom: str | None = None) -> list[dict[str, Any]]:
+        monde = self.outils.etat_resume().get("monde") or {}
+        generation = monde.get("generation")
+        propositions = await self.pieces.identifier(nom)
+        return (self.outils.memoriser_pieces(propositions, generation=generation)
+                if propositions else [])
+
+    def _piece_confirmee(self, nom: str) -> dict[str, Any] | None:
+        from fieldmind.estimation.semantique import normaliser_piece
+
+        monde = self.outils.etat_resume().get("monde") or {}
+        correspondances = [p for p in monde.get("pieces") or [] if isinstance(p, dict)
+                           and p.get("statut") == "confirmee"
+                           and normaliser_piece(str(p.get("nom") or ""))
+                           == normaliser_piece(nom)]
+        return correspondances[0] if len(correspondances) == 1 else None
 
     # ------------------------------------------------------------------ mission
 
     async def pour_mission(self, demande: str, argument: Any) -> Any:
         """Appelé par l'exécuteur (actions « chercher » et « decrire »)."""
+        if demande == "identifier_piece":
+            a = argument if isinstance(argument, dict) else {"nom": argument}
+            nom = str(a.get("nom") or "")[:100]
+            if not nom.strip():
+                return None
+            connue = self._piece_confirmee(nom)
+            if connue is not None:
+                return connue
+            await self._comprendre_pieces(nom)
+            return self._piece_confirmee(nom)
+        if demande == "choisir_exploration":
+            return await self.decisions.choisir(argument or {})
+        if demande == "observer":
+            a = argument or {}
+            camera = a.get("camera", "gauche")
+            if a.get("objet"):
+                # La recherche publie déjà une observation qui alimente la mémoire.
+                # Ne pas cumuler trois inférences dans le budget d'une étape terrain.
+                points = await self.vision_ia.chercher(str(a["objet"]), camera)
+                return {"points": points}
+            message = await self.vision_ia.analyser(camera, silencieux=True)
+            await self._comprendre_pieces(str(a["piece"]) if a.get("piece") else None)
+            if a.get("piece"):
+                message["piece"] = self._piece_confirmee(str(a["piece"]))
+            return message
         if demande == "chercher":
             objet, camera = (argument if isinstance(argument, tuple) else (argument, "gauche"))
             return await self.vision_ia.chercher(str(objet), camera or "gauche")
         if demande == "decrire":
             return await self.vision_ia.decrire(argument or "gauche")
+        if demande == "designer":  # action « suivre » : la personne à suivre
+            a = argument or {}
+            point = (float(a["u"]), float(a["v"])) if a.get("u") is not None else None
+            return await self.vision_ia.designer(a.get("description"), point,
+                                                 a.get("camera") or "gauche")
         raise ErreurIA(f"demande inconnue : {demande}")

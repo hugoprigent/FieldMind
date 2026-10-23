@@ -24,3 +24,11 @@ Les STEP de composants Arduino Modulino Knob, bibliothèque FreeCAD SG90, lidar 
 ## Modèles d'IA
 
 Les fichiers de configuration proposent des modèles Qwen / NVIDIA, RoboBrain, D-FINE, Depth Anything et SAM. Leurs poids ne sont pas inclus. Chaque téléchargement reste soumis aux conditions de son éditeur ; la présence d'un identifiant dans la configuration n'affirme ni une licence commune ni une validation sur le rover.
+
+## Protocole expérimental du drone
+
+`software/rover/fieldmind/drone/cooleerx.py` contient un encodeur expérimental écrit pour FieldMind,
+établi à partir de l'analyse hors ligne de l'application tierce HD dragon 1.1.0. Aucun binaire,
+ressource ou code source de cette application n'est inclus. Les trames ne sont pas validées sur le
+drone réel ; leur publication ne constitue pas une autorisation de réutiliser l'application ou ses
+éléments.

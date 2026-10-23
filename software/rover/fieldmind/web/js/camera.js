@@ -114,6 +114,7 @@ export class VueCamera {
     ctx.rect(cadre.x, cadre.y, cadre.l, cadre.h);
     ctx.clip();
     if (this.camera !== 'drone') this._dessinerArc(ctx, cadre, dims);
+    this._dessinerCible(ctx, cadre);
     if (this.marque) {
       const age = (performance.now() - this.marque.t) / 1000;
       if (age > 8) {
@@ -132,6 +133,32 @@ export class VueCamera {
       }
     }
     ctx.restore();
+  }
+
+  /** Personne suivie (perception.suivi sur le Pi) : boîte, état et distance. */
+  _dessinerCible(ctx, cadre) {
+    const c = this.donnees.etat?.cible;
+    if (!c || !Array.isArray(c.boite) || c.camera !== this.camera) return;
+    const [u0, v0, u1, v1] = c.boite;
+    const x = cadre.x + u0 * cadre.l, y = cadre.y + v0 * cadre.h;
+    const l = (u1 - u0) * cadre.l, h = (v1 - v0) * cadre.h;
+    const teinte = c.etat === 'suivi' ? couleur('--ok') : couleur('--alerte');
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+    ctx.strokeRect(x, y, l, h);
+    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = teinte;
+    ctx.strokeRect(x, y, l, h);
+    const texte = c.etat === 'suivi'
+      ? `suivi${Number.isFinite(c.distance_m) ? ` · ${nombre(c.distance_m, 1)} m` : ''}`
+      : 'perdu de vue';
+    ctx.font = '600 12px system-ui, sans-serif';
+    const largeur = ctx.measureText(texte).width + 10;
+    ctx.fillStyle = teinte;
+    ctx.fillRect(x, Math.max(cadre.y, y - 18), largeur, 18);
+    ctx.fillStyle = '#fff';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(texte, x + 5, Math.max(cadre.y, y - 18) + 9);
   }
 
   _dessinerArc(ctx, cadre, dims) {

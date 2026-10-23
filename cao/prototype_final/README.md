@@ -1,10 +1,9 @@
 # FieldMind — prototype final
 
-> **Statut, 21 octobre 2026.** Cette page décrit la conception en CAO et ses contrôles
-> géométriques. Les images sont des vues du modèle. Le rover réel roule en commande
-> manuelle, avec son châssis et son électronique visibles ; la coque n'est pas montée
-> et la remorque n'est pas encore disponible. Les contrôles CAO ne prouvent pas la tenue
-> mécanique en charge. Voir les [résultats et limites](../../docs/validation.md).
+> **Statut, 23 octobre 2026.** Cette page décrit la conception en CAO et ses contrôles
+> géométriques. Les images sont des vues du modèle. Le rover réel roule avec son châssis et
+> son électronique visibles ; la coque n'est pas montée. La remorque porte-drone a été
+> fabriquée. Les contrôles CAO ne prouvent pas la tenue mécanique en charge. Voir les [résultats et limites](../../docs/validation.md).
 
 Document Fusion **`prtotype final fieldmind`**. Il contient deux groupes :
 - `FM_Direction_V04` : le rover de la [direction V04](../mounts/prototype/direction_v04_servo_traversant/README.md),
@@ -112,6 +111,23 @@ Pourquoi cette implantation :
 - les contrôleurs sont au plus court de leurs moteurs ;
 - le Pi est près des ouïes de son flanc ;
 - la carte A7 est au-dessus de la breadboard, et l'écran comme le Knob restent sur le dessus.
+
+### SG90 à la place du DT996
+
+Le DT996 de la direction a grillé : un **SG90** prend sa place, avec deux pièces imprimées (document
+Fusion « servo SG90 direction fieldmind », `22_servo_sg90.py`) :
+- **`support_sg90.stl`** (20,4 × 55 × 9 mm) : plaque de 3 mm sur la planche, vissée dans les 4 trous des
+  oreilles du DT996 (S1–S4) par 4 vis **M2,5×16 + écrou sous la planche**, avec un bouchon qui entre dans
+  la découpe du DT996. Les oreilles du SG90 se posent dans la cuvette et se vissent par 2 vis **M2,5×10**
+  dans les avant-trous Ø2,2. L'axe du SG90 tombe exactement sur celui du DT996.
+- **`palonnier_sg90.stl`** (37 × 55,4 × 18,9 mm) : le palonnier du rover (mêmes biellettes), empreinte
+  de l'étoile bouchée, avec un bossage qui porte l'empreinte de la **tête 1 bras du SG90** (sans picots).
+  Une vis **M2,5 + rondelle large**, par-dessous dans l'accès central, traverse le palonnier et la tête et
+  se visse dans l'axe du servo (environ M2,5×18 : mesurer).
+- Vérifié : aucun contact avec la planche ni le support, au neutre et à ±31°.
+- Le SG90 est bien moins costaud (environ 1,8 kg·cm contre une quinzaine pour le DT996) : il peut
+  peiner à braquer à l'arrêt sur un sol accrocheur.
+
 
 ### Planche de 10 mm
 
@@ -442,6 +458,7 @@ Ils passent par le serveur MCP local de Fusion (client `../mounts/prototype/dire
 | `20_incrustations.py` | Incrustation FIELDMIND sur les flancs : poches de 1,2 mm et lettres de la couleur opposée ; STL |
 | `21_planche_10mm.py` | Planche de 10 mm : paramètre d4_planche_ep, pièces posées dessus montées de 5 mm (fonction Déplacer), sans reconstruire |
 | `20_support_moteur_v2.py` | Support moteur V2 allégé (−31 %, mêmes interfaces), à côté du V1 dans le document des supports ; référence du rover mise à jour ; STL |
+| `22_servo_sg90.py` | SG90 à la place du DT996 : support sur la planche et palonnier à l'empreinte de la tête du SG90, document séparé ; contrôle à ±31° ; STL |
 | `pf_helpers.py` → `importer_step` | Import d'un vrai modèle STEP, recopié en place dans le composant (Knob, SG90, palonnier) |
 
 Le document Fusion n'est pas enregistré par les scripts.

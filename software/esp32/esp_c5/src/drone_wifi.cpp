@@ -94,7 +94,7 @@ bool contientIgnoreCasse(const char *chaine, const char *motif) {
 bool estReseauDomestiqueIgnore(const char *ssid) {
   if (!ssid || !*ssid) return true;
   static const char *const IGNORES[] = {
-    "HomeWiFi", "SFR_", "Livebox", "Extender-WiFi", "SoundBarSetup",
+    "SFR_", "Livebox", "Extender-WiFi", "SoundBarSetup",
     "ShellyPlusPlug", "Shelly", "Chromecast", "Bbox", "Freebox", "Orange"
   };
   for (const char *motif : IGNORES) {

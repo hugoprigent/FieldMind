@@ -2,7 +2,7 @@
 // (repli : `reglables` et les libellés du poste), valeur retenue renvoyée par `reponse` ;
 // fournisseur IA, inversion des caméras, voix, et options du poste (thème, jeton, carte).
 
-import { $, $$, el, texte, attribut, nombre, signaler, signalerRefus, lireLocal, ecrireLocal } from '../outils.js';
+import { $, $$, el, texte, attribut, nombre, signaler, signalerRefus, lireLocal, ecrireLocal, confirmer } from '../outils.js';
 import { reglage } from '../textes.js';
 import { enregistrerJeton } from '../connexion.js';
 import { TUILES_OSM } from '../cartegps.js';
@@ -49,6 +49,7 @@ export class VueReglages {
   constructor(ctx) {
     this.ctx = ctx;
     const { donnees, connexion } = ctx;
+    if (location.pathname.startsWith('/fieldmind/')) $('#r-ia-cle-form').hidden = true;
 
     $('#r-ia-profils').addEventListener('click', async (e) => {
       const b = e.target.closest('button[data-profil]');
@@ -109,6 +110,21 @@ export class VueReglages {
       signaler('Jeton enregistré', 'succes');
     });
     jeton.addEventListener('change', () => $('#r-jeton-form').requestSubmit());
+
+    $('#r-reinitialiser').addEventListener('click', async (e) => {
+      if (!(await confirmer('Revenir aux réglages d’origine ? Branchement, montage et calibrations sont gardés.', e.currentTarget, { danger: true }))) return;
+      const r = signalerRefus(await connexion.demander({ type: 'reglages_reinitialiser' }));
+      if (r.ok) {
+        signaler(`${(r.valeur || []).length} réglages remis à l’origine`, 'succes');
+        setTimeout(() => location.reload(), 800); // le poste repart des valeurs du rover
+      }
+    });
+
+    $('#r-environnement').addEventListener('click', async (e) => {
+      if (!(await confirmer('Effacer la carte, les objets vus, la position et les missions ? Réglages, calibrations et lieux nommés sont gardés.', e.currentTarget, { danger: true }))) return;
+      const r = signalerRefus(await connexion.demander({ type: 'environnement_reinitialiser' }));
+      if (r.ok) signaler('Environnement réinitialisé', 'succes');
+    });
 
     donnees.sur('bienvenue', () => this._construireGroupes());
     donnees.sur('etat', () => this._majEtat());

@@ -19,6 +19,9 @@
    réduite quand la cible est loin de l'axe ou que l'arc frôle un obstacle.
 5. Aucun arc avant admissible : **marche arrière courte** (`navigation.distance_recul_m`) en
    braquant pour ramener le nez vers la cible, si l'arrière est libre (lidar). Sinon `bloque`.
+6. But **derrière et proche** (moins de `navigation.recul_direct_max_m` à vol d'oiseau, au-delà de
+   120° de l'axe) : on y va **en marche arrière** (poursuite pure à reculons, κ = 2y/d²) si
+   l'arrière est libre, plutôt que de chercher la place d'un demi-tour.
 
 Le superviseur de sécurité limite encore la vitesse et arrête : le pilote évite, la sécurité
 arrête.
@@ -31,6 +34,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 
 import numpy as np
+from scipy.spatial import cKDTree
 
 from fieldmind.config import Profil, braquage_max
 from fieldmind.types import Chemin, Obstacles, Odometrie, Pose2D
@@ -64,6 +68,17 @@ def points_obstacles(obstacles: ObstaclesEntree) -> np.ndarray:
     return np.vstack(morceaux) if morceaux else np.zeros((0, 2))
 
 
+def filtrer_isoles(points: np.ndarray, rayon: float = 0.10, voisins: int = 2) -> np.ndarray:
+    """Points qui ont au moins `voisins` autres points à moins de `rayon` : une détection
+    isolée de la stéréo (joint, reflet) est écartée, un vrai objet en fait plusieurs."""
+    points = np.asarray(points, dtype=np.float64).reshape(-1, 2)
+    points = np.unique(points[np.isfinite(points).all(axis=1)], axis=0)
+    if len(points) <= voisins:
+        return np.zeros((0, 2))
+    nombres = cKDTree(points).query_ball_point(points, rayon, return_length=True)
+    return points[np.asarray(nombres) > voisins]
+
+
 class PiloteLocal:
     def __init__(self, profil: Profil) -> None:
         v = profil.valeur
@@ -92,6 +107,8 @@ class PiloteLocal:
         self.vitesse_recul = min(float(v("vitesses.max_arriere_m_s", 0.3)),
                                  float(v("navigation.vitesse_recul_m_s", 0.15)))
         self.distance_recul = float(v("navigation.distance_recul_m", 0.4))
+        self.recul_direct_max = float(v("navigation.recul_direct_max_m", 1.5))
+        self.poids_indicatifs = float(v("navigation.poids_indicatifs", 2.0))
         self.reinitialiser()
 
     def reinitialiser(self) -> None:
@@ -102,7 +119,10 @@ class PiloteLocal:
 
     # ------------------------------------------------------------------ commande
     def commande(self, odom: Odometrie | Pose2D, chemin: Chemin | None,
-                 obstacles: ObstaclesEntree, vitesse_max: float) -> CommandeLocale:
+                 obstacles: ObstaclesEntree, vitesse_max: float,
+                 indicatifs: np.ndarray | None = None) -> CommandeLocale:
+        """`obstacles` bloquent (lidar) ; `indicatifs` (stéréo, mémoire des obstacles bas)
+        rendent seulement un arc plus coûteux : on passe là où il y en a le moins."""
         pose = odom.pose if isinstance(odom, Odometrie) else odom
         vitesse_mesuree = odom.vitesse if isinstance(odom, Odometrie) else 0.0
         if chemin is None or len(chemin.points) == 0:
@@ -143,6 +163,20 @@ class PiloteLocal:
             kappa_pp = float(np.clip(2 * math.sin(alpha) / distance_cible, -self.courbure_max,
                                      self.courbure_max))
 
+        # But juste derrière : marche arrière directe.
+        bx_l, by_l = pose.vers_local(float(fin[0]), float(fin[1]))
+        if (self._recul is None and distance_but < self.recul_direct_max and bx_l < 0
+                and abs(math.atan2(by_l, bx_l)) > math.radians(120)):
+            d2 = max(bx_l * bx_l + by_l * by_l, 0.04)
+            kappa_r = float(np.clip(2 * by_l / d2, -self.courbure_max, self.courbure_max))
+            libre_r = float(self._distance_libre(np.array([kappa_r]), obstacles_xy, arriere=True,
+                                                 longueur=distance_but + 0.2)[0])
+            if libre_r >= min(distance_but, 0.3):
+                au_but = max(distance_but - self.tolerance_arrivee / 2, 0.0)
+                v_r = min(self.vitesse_recul, max(math.sqrt(2 * self.deceleration * au_but),
+                                                  self.vitesse_min))
+                return self._sortie(-v_r, kappa_r, restante, "marche_arriere", libre_r, indice)
+
         # Manœuvre de recul en cours ?
         if self._recul is not None:
             depart, kappa_r = self._recul
@@ -176,6 +210,12 @@ class PiloteLocal:
         cout = (4.0 * ecart + 1.0 * (1 - np.minimum(libres, self.horizon) / self.horizon)
                 + 0.5 * (1 - np.minimum(degages, self.horizon) / self.horizon)
                 + 0.3 * np.abs(kappas - self._courbure_prec) / (2 * self.courbure_max))
+        if indicatifs is not None and len(indicatifs):
+            doux = filtrer_isoles(self._filtrer(np.asarray(indicatifs).reshape(-1, 2)))
+            if len(doux):
+                libres_doux = self._distance_libre(kappas, doux)
+                cout += self.poids_indicatifs * (1 - np.minimum(libres_doux, self.horizon)
+                                                 / self.horizon)
         cout[~admissibles] = np.inf
         k = int(np.argmin(cout))
         kappa = float(kappas[k])
@@ -271,10 +311,12 @@ class PiloteLocal:
         return utiles
 
     def _distance_libre(self, kappas: np.ndarray, obstacles_xy: np.ndarray,
-                        arriere: bool = False, marge_sup: float = 0.0) -> np.ndarray:
+                        arriere: bool = False, marge_sup: float = 0.0,
+                        longueur: float | None = None) -> np.ndarray:
         """Distance (m, ≥ 0) parcourue le long de chaque arc avant que l'emprise (agrandie des
         marges) ne touche un point ; `horizon` (ou la distance de recul) si rien."""
-        longueur = self.distance_recul + 0.2 if arriere else self.horizon
+        if longueur is None:
+            longueur = self.distance_recul + 0.2 if arriere else self.horizon
         n = int(math.ceil(longueur / self.pas))
         s = np.arange(1, n + 1) * self.pas * (-1.0 if arriere else 1.0)  # (S,)
         if len(obstacles_xy) == 0:

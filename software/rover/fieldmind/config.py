@@ -35,8 +35,18 @@ _DETAILS: dict[str, tuple[float, float, float, str, str, str]] = {
                                        "Direction"),
     "direction.servo_max_deg": (5.0, 90.0, 1.0, "°", "Butée logicielle du servo", "Direction"),
     "direction.servo_vitesse_deg_s": (10.0, 180.0, 5.0, "°/s", "Vitesse du servo", "Direction"),
+    "direction.par_l_arriere": (0, 1, 1, "", "Direction par les roues arrière (sans servo)",
+                                "Direction"),
+    "direction.gain_arriere": (0.5, 4.0, 0.1, "×", "Virage par l'arrière : gain", "Direction"),
+    "direction.vitesse_pivot_m_s": (0.05, 0.6, 0.05, "m/s", "Rotation sur place (manuel)",
+                                    "Direction"),
     "vitesses.max_manuel_m_s": (0.05, 1.5, 0.05, "m/s", "Vitesse max en manuel", "Vitesses"),
     "vitesses.max_auto_m_s": (0.05, 1.0, 0.05, "m/s", "Vitesse max en auto", "Vitesses"),
+    "esp.moteurs_permutes": (0, 1, 1, "", "Moteurs gauche et droite permutés (branchement)",
+                             "Traction"),
+    "esp.sens_inverse": (0, 1, 1, "", "Sens des deux moteurs inversé (branchement)", "Traction"),
+    "vitesses.max_suivi_m_s": (0.1, 1.0, 0.05, "m/s", "Vitesse max pour suivre une personne",
+                               "Vitesses"),
     "vitesses.max_arriere_m_s": (0.05, 0.5, 0.05, "m/s", "Vitesse max en arrière", "Vitesses"),
     "vitesses.defaut_action_m_s": (0.05, 1.0, 0.05, "m/s", "Vitesse des actions", "Vitesses"),
     "traction.pwm_par_m_s": (5.0, 100.0, 0.5, "%/(m/s)", "PWM pour 1 m/s", "Traction"),
@@ -50,11 +60,24 @@ _DETAILS: dict[str, tuple[float, float, float, str, str, str]] = {
     "traction.boucle_lacet": (0, 1, 1, "", "Correction par le gyroscope", "Traction"),
     "roues.capteurs": (0, 1, 1, "", "Capteurs de vitesse des roues (SC)", "Traction"),
     "roues.impulsions_par_metre": (0.0, 5000.0, 1.0, "imp/m", "Impulsions par mètre", "Traction"),
-    "securite.marge_avant_m": (0.10, 1.0, 0.05, "m", "Marge devant", "Sécurité"),
-    "securite.marge_laterale_m": (0.05, 0.5, 0.01, "m", "Marge sur les côtés", "Sécurité"),
+    "securite.marge_avant_m": (0.05, 1.0, 0.05, "m", "Marge devant", "Sécurité"),
+    "securite.marge_laterale_m": (0.02, 0.5, 0.01, "m", "Marge sur les côtés", "Sécurité"),
+    "securite.distance_arret_absolu_m": (0.05, 0.6, 0.05, "m", "Distance minimale devant le nez",
+                                         "Sécurité"),
+    "conduite.armer_auto": (0, 1, 1, "", "Armé dès qu'on passe en manuel ou auto", "Sécurité"),
+    "securite.stereo_bloquante": (0, 1, 1, "", "La stéréo peut arrêter (sinon elle ralentit "
+                                  "seulement, le lidar arrête)", "Sécurité"),
+    "securite.vitesse_obstacle_bas_m_s": (0.05, 0.6, 0.05, "m/s",
+                                          "Vitesse près d'un obstacle bas (stéréo non bloquante)",
+                                          "Sécurité"),
+    "securite.vitesse_sans_anticollision_m_s": (0.05, 1.5, 0.05, "m/s",
+                                                "Vitesse en manuel sans anticollision",
+                                                "Sécurité"),
+    "lidar.masque_marge_m": (0.0, 0.20, 0.01, "m", "Marge du rover ignorée par le lidar",
+                             "Capteurs"),
     "securite.deceleration_m_s2": (0.2, 3.0, 0.1, "m/s²", "Freinage supposé", "Sécurité"),
     "securite.latence_s": (0.15, 1.0, 0.05, "s", "Latence", "Sécurité"),
-    "securite.vitesse_sans_stereo_m_s": (0.05, 0.6, 0.05, "m/s", "Vitesse sans stéréo", "Sécurité"),
+    "securite.vitesse_sans_stereo_m_s": (0.05, 1.5, 0.05, "m/s", "Vitesse sans stéréo", "Sécurité"),
     "securite.vitesse_pres_personne_m_s": (0.05, 0.5, 0.05, "m/s", "Vitesse près d'une personne",
                                            "Sécurité"),
     "securite.exiger_stereo_en_auto": (0, 1, 1, "", "Stéréo obligatoire en auto", "Sécurité"),
@@ -67,12 +90,25 @@ _DETAILS: dict[str, tuple[float, float, float, str, str, str]] = {
     "gnss.alignement_etendue_m": (3.0, 30.0, 1.0, "m", "Trajet avant alignement", "GPS"),
     "ia.vigilance": (0, 1, 1, "", "Analyse IA automatique des images (payante)", "IA"),
     "ia.vigilance_periode_s": (4.0, 300.0, 1.0, "s", "Période de l'analyse automatique", "IA"),
+    "ia.gx10_cartographie": (0, 1, 1, "", "Analyse vidéo continue et carte mentale (GX10)", "IA"),
+    "ia.gx10_periode_s": (1.0, 30.0, 0.5, "s", "Période de l'analyse vidéo GX10", "IA"),
     "ia.detection_continue": (0, 1, 1, "", "Détection continue des personnes et animaux (GX10)",
                               "IA"),
     "ia.detection_periode_s": (1.0, 30.0, 0.5, "s", "Période de la détection continue", "IA"),
     "ia.voix_rover": (0, 1, 1, "", "Voix du rover (synthèse sur le GX10)", "IA"),
+    "ia.veille": (0, 1, 1, "", "Agent de veille : analyse continue de la situation", "IA"),
+    "ia.veille_periode_s": (3.0, 120.0, 1.0, "s", "Période de l'agent de veille", "IA"),
     "remorque.attelee": (0, 1, 1, "", "Remorque attelée", "Remorque"),
     "remorque.volets_deplies": (0, 1, 1, "", "Volets dépliés (plus large)", "Remorque"),
+    "remorque.volets_angle_deg": (10, 360, 5, "°", "Rotation pour déplier un volet", "Remorque"),
+    "remorque.volets_tours_min": (10.0, 300.0, 5.0, "tr/min",
+                                  "Vitesse réelle des servos à fond (à ajuster si le volet va "
+                                  "trop loin : augmenter)", "Remorque"),
+    "remorque.volets_vitesse": (5, 100, 5, "%", "Vitesse des servos des volets", "Remorque"),
+    "remorque.volet_g_inverse": (0, 1, 1, "", "Volet gauche : sens inversé (servo D2)",
+                                 "Remorque"),
+    "remorque.volet_d_inverse": (0, 1, 1, "", "Volet droit : sens inversé (servo D3)",
+                                 "Remorque"),
     "remorque.masse_kg": (0.5, 6.0, 0.1, "kg", "Masse de la remorque et du drone", "Remorque"),
     "remorque.vitesse_max_m_s": (0.1, 0.8, 0.05, "m/s", "Vitesse maximale", "Remorque"),
     "remorque.vitesse_max_arriere_m_s": (0.05, 0.2, 0.01, "m/s", "Vitesse en marche arrière",
@@ -87,15 +123,26 @@ _DETAILS: dict[str, tuple[float, float, float, str, str, str]] = {
     "capteurs.gnss": (0, 1, 1, "", "GPS", "Capteurs actifs"),
     "capteurs.imu": (0, 1, 1, "", "Centrale inertielle", "Capteurs actifs"),
     "perception.stereo_ips": (1, 8, 1, "i/s", "Cadence de la stéréo", "Capteurs"),
+    "perception.stereo_largeur": (320, 640, 160, "px", "Largeur des images de la stéréo (au "
+                                  "redémarrage)", "Capteurs"),
+    "perception.stereo_sans_calibration": (0, 1, 1, "", "Stéréo non calibrée utilisée pour la "
+                                           "sécurité (déconseillé)", "Capteurs"),
     "lidar.decalage_deg": (-180.0, 180.0, 0.5, "°", "Orientation du lidar", "Capteurs"),
     "cameras.inclinaison_deg": (0.0, 30.0, 0.5, "°", "Inclinaison des caméras", "Capteurs"),
     "cameras.hfov_deg": (40.0, 120.0, 1.0, "°", "Champ des caméras (sans calibration)",
                          "Capteurs"),
 }
 REGLABLES: dict[str, tuple[float, float]] = {k: (v[0], v[1]) for k, v in _DETAILS.items()}
+# Gardés par « tout réinitialiser » : branchement, montage et calibrations du rover (les
+# perdre ferait tourner les moteurs à l'envers ou fausserait les distances)
+GARDES_REINITIALISATION = ("cameras.port_", "esp.", "imu.axe_", "imu.niveau",
+                           "cameras.inclinaison_deg", "cameras.hfov_deg", "traction.pwm_par_m_s",
+                           "traction.pwm_seuil",
+                           "traction.equilibre_d", "direction.servo_par_degre_roue",
+                           "direction.servo_neutre_deg", "roues.impulsions_par_metre")
 """Clé -> (min, max). Les booléens sont bornés par (0, 1)."""
 TEXTES_REGLABLES = {"cameras.port_gauche", "cameras.port_droite", "imu.axe_x", "imu.axe_y",
-                    "imu.axe_z", "audio.peripherique"}
+                    "imu.axe_z", "imu.niveau", "audio.peripherique"}
 
 
 class Section:
@@ -195,6 +242,26 @@ class Profil:
         for rappel in rappels:
             rappel(cle, valeur)
         return valeur
+
+    def reinitialiser(self) -> list[str]:
+        """Revient aux valeurs du profil, sauf branchement, montage et calibrations
+        (`GARDES_REINITIALISATION`). Renvoie les réglages retirés."""
+        with self._verrou:
+            retires = [c for c in self._reglages
+                       if not any(c.startswith(g) for g in GARDES_REINITIALISATION)]
+            for cle in retires:
+                del self._reglages[cle]
+            self._fusion = self._fusionner()
+            if self._fichier is not None and retires:
+                temporaire = self._fichier.with_suffix(".tmp")
+                temporaire.write_text(json.dumps(self._reglages, indent=2, ensure_ascii=False),
+                                      encoding="utf-8")
+                temporaire.replace(self._fichier)
+            rappels = list(self._rappels)
+        for cle in retires:
+            for rappel in rappels:
+                rappel(cle, self.valeur(cle))
+        return retires
 
     def sur_changement(self, rappel: Callable[[str, Any], None]) -> None:
         self._rappels.append(rappel)

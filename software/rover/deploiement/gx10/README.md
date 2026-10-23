@@ -1,20 +1,20 @@
 # Inférence FieldMind sur ASUS Ascent GX10
 
-Ces fichiers configurent les services IA du profil `gx10` du rover. Le modèle principal `nvidia/Qwen3.6-35B-A3B-NVFP4` a répondu à de vrais appels sur le GB10 pendant la session ASUS. Les autres services sont en intégration : ce fichier décrit leur configuration, pas un résultat de validation complet.
+Ces fichiers configurent les services IA du profil `gx10` du rover. Au 23 octobre 2026, huit modèles sont servis sur le GB10 du GX10. Qwen3.6, Qwen3-ASR et RoboBrain 2.5 ont été vérifiés par de vrais appels ; les autres sont branchés au rover et vérifiés en simulation (état détaillé dans [MODELES.md](../../MODELES.md)). Ce fichier décrit leur configuration ; ce n'est pas un benchmark.
 
-| Service | Port | Rôle prévu |
-| --- | --- | --- |
-| `modele` | 8000 | Agent, images et appels d'outils |
-| `transcription` | 8001 | Reconnaissance vocale |
-| `robotique` | 8002 | Pointage d'objets |
-| `outils` | 8003 | Détection, profondeur, segmentation, empreintes |
-| `voix` | 8004 | Synthèse vocale |
+| Service | Port | Modèle | Rôle |
+| --- | --- | --- | --- |
+| `modele` | 8000 | `nvidia/Qwen3.6-35B-A3B-NVFP4` | Agent, images et appels d'outils |
+| `transcription` | 8001 | `Qwen/Qwen3-ASR-1.7B` | Reconnaissance vocale |
+| `robotique` | 8002 | `BAAI/RoboBrain2.5-4B` | Pointage d'objets |
+| `outils` | 8003 | D-FINE, Depth Anything V2 (métrique), SAM 2.1, Qwen3-VL-Embedding-2B | Détection, profondeur, segmentation, empreintes |
+| `voix` | 8004 | `Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice` | Synthèse vocale |
 
 Les identifiants et réglages précis sont dans [`docker-compose.yml`](docker-compose.yml) et [`config/ia.toml`](../../config/ia.toml). Les poids ne sont pas distribués. Vérifier leurs licences et les recettes de l'éditeur avant téléchargement ou changement de modèle.
 
 ## Démarrer le modèle principal
 
-Prérequis sur le GX10 : pilote NVIDIA fonctionnel, Docker avec NVIDIA Container Toolkit, accès aux registres et assez d'espace pour les poids. Ces fichiers utilisent l'image `vllm/vllm-openai:v0.31.0` ; les réglages des modèles complémentaires restent à valider individuellement.
+Prérequis sur le GX10 : pilote NVIDIA fonctionnel, Docker avec NVIDIA Container Toolkit, accès aux registres et assez d'espace pour les poids. Ces fichiers utilisent l'image `vllm/vllm-openai:v0.31.0`.
 
 ```bash
 cd software/rover/deploiement/gx10

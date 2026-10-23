@@ -25,6 +25,7 @@ export const RAISONS = {
   ralenti_obstacle: ['Ralenti', 'alerte'],
   banc: ['Banc', 'neutre'],
   remorque: ['Remorque', 'neutre'],
+  anticollision_coupee: ['Anticollision coupée', 'alerte'],
   remorque_portefeuille: ['Remorque trop braquée', 'critique'],
   remorque_incertaine: ['Angle remorque incertain', 'alerte'],
   remorque_recul_auto: ['Pas de recul (remorque)', 'alerte'],
@@ -67,6 +68,8 @@ export function decrireAction(a) {
       return a.nom ? `Aller à « ${a.nom} »` : 'Aller au point GPS';
     case 'aller_lieu':
       return `Aller à « ${a.nom || '?'} »`;
+    case 'rejoindre_piece':
+      return `Rejoindre « ${a.nom || '?'} » selon les observations`;
     case 'memoriser_lieu':
       return `Mémoriser « ${a.nom || '?'} »`;
     case 'aller_pixel':
@@ -79,6 +82,8 @@ export function decrireAction(a) {
       return 'Retour au départ';
     case 'chercher':
       return `Chercher « ${a.objet || '?'} »`;
+    case 'explorer':
+      return a.objet ? `Explorer pour trouver « ${a.objet} »` : 'Explorer la pièce';
     case 'decrire':
       return 'Décrire la scène';
     case 'photo':
@@ -95,8 +100,7 @@ export const CALIBRATIONS = [
   { nom: 'vitesse', libelle: 'Vitesse', icone: 'avancer', confirmer: '2 m libres devant ?' },
   { nom: 'braquage', libelle: 'Braquage', icone: 'gauche90', confirmer: 'Place pour tourner ?' },
   { nom: 'imu_repos', libelle: 'Centrale au repos', icone: 'bouclier' },
-  { nom: 'stereo_capture', libelle: 'Capture mire', icone: 'camera' },
-  { nom: 'stereo_calculer', libelle: 'Calcul stéréo', icone: 'stereo' },
+  { nom: 'stereo_assistant', libelle: 'Stéréo (damier)', icone: 'stereo' },
 ];
 
 /** Réglages connus : libellé, unité, groupe, pas du curseur. Les clés inconnues gardent leur nom. */

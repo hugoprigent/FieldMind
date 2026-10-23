@@ -108,6 +108,7 @@ class FauxEsp:
         self.servo_cible = 0.0
         self.servo_actif = True
         self.servo_vitesse = 30.0
+        self.volets: list[float | None] = [None, None]  # ROVER_4 : angle des servos D2/D3
         self.frein = False
         self.defaut = False
         self.chien_ms = 0
@@ -205,6 +206,10 @@ class FauxEsp:
                 self.imu_hz = int(args[0])
             elif rover3 and nom == "lacet0":
                 self.lacet_deg = 0.0
+            elif (self.version.startswith("ROVER_") and int(self.version[6:]) >= 4
+                  and nom in ("volg", "vold") and len(args) == 1):
+                angle = float(args[0])
+                self.volets[0 if nom == "volg" else 1] = None if angle < 0 else angle
             elif rover3 and nom == "p" and len(args) == 3:
                 self.dernier_battement = time.monotonic()
                 self.chien_expire = False

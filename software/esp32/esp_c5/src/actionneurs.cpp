@@ -3,6 +3,7 @@
 // Commandes : m 10, s -30, v 30, centre, stop, etat, aide.
 // ROVER_3 (pilotage par le Pi) : p g d servo, hb, wd ms, inv ms, tel hz, imu hz, lacet0.
 // Facultatif : roues 1 lit les sorties SC des drivers sur D2 (gauche) et D3 (droite).
+// ROVER_4 : ou bien servos des volets de la remorque sur D2 (volg) et D3 (vold), au choix.
 #include <Arduino.h>
 #include <ESP32Servo.h>
 #include <Preferences.h>
@@ -24,7 +25,7 @@
 
 namespace actionneurs {
 #ifdef FIELDMIND_ROVER_COMPLET
-constexpr const char *VERSION = "ROVER_3";
+constexpr const char *VERSION = "ROVER_4";
 constexpr bool CENTRALE_PRESENTE = true; // IMU lue par main.cpp
 #else
 constexpr const char *VERSION = "TOUT_MOTEUR_4";
@@ -70,6 +71,22 @@ rover3::Cadence telemetrie;
 uint32_t delaiInversion = rover3::INVERSION_DEFAUT_MS;
 std::atomic<uint32_t> cadenceImu{0}, dernierMouvement{0};
 std::atomic<bool> remiseLacet{false};
+
+// Volets de la remorque : servos 50 Hz sur D2/D3 (les broches SC, non cablees), canaux LEDC
+// 2/3 (timer 1, distinct du servo de direction et de la traction). Rien n'est envoye avant
+// la premiere consigne volg/vold : au demarrage, les broches restent en entree.
+constexpr uint8_t CANAUX_VOLETS[] = {2, 3};
+constexpr uint32_t VOLET_HZ = 50;
+constexpr uint8_t VOLET_BITS = 14;
+constexpr float VOLET_VITESSE_DEG_S = 90; // mouvement doux, les volets ne claquent pas
+struct Volet { bool actif = false; float position = 0, cible = 0; };
+Volet volets[2];
+uint32_t dernierVolet = 0;
+
+uint32_t dutyVolet(float angle) {
+  const float us = 500.0f + angle * 2000.0f / 180.0f;
+  return static_cast<uint32_t>(us * (1u << VOLET_BITS) / 20000.0f + 0.5f);
+}
 
 // Sorties SC facultatives (roues 1) : coupees au demarrage, broches non configurees.
 bool rouesActives = false;
@@ -233,6 +250,7 @@ void aide() {
     console::println("imu / lacet0 : centrale absente de ce programme (main esp_c5 seulement)");
   }
   console::println("roues 1/0  : lire les sorties SC des drivers sur D2 (gauche) / D3 (droite) ; T + hz_g hz_d");
+  console::println("volg 0..180 / vold 0..180 : volets de la remorque, servos D2 / D3 (-1 coupe)");
   console::println("etat / aide : afficher les consignes / les commandes");
   console::println("Chaque ligne finit par Entree. STOP du driver n'est pas cable par ce code.");
 }
@@ -261,6 +279,10 @@ void etat() {
                   static_cast<unsigned long>(chien.delai), chien.nom(),
                   static_cast<unsigned long>(delaiInversion), static_cast<unsigned long>(telemetrie.hz),
                   imu, static_cast<unsigned long>(console::perdues()));
+  if (volets[0].actif || volets[1].actif)
+    console::printf("[VOLETS] gauche D2 %s %.0f deg ; droit D3 %s %.0f deg\n",
+                    volets[0].actif ? "actif" : "coupe", volets[0].position,
+                    volets[1].actif ? "actif" : "coupe", volets[1].position);
   if (rouesActives) {
     roues_sc::Releve r[2];
     SC_ENTRER();
@@ -280,9 +302,58 @@ void erreur(const char *message) {
   console::printf("[ERREUR] %s Traction a zero, signal servo coupe.\n", message);
 }
 
+// volg/vold : angle 0..180 ; -1 coupe le signal. La premiere consigne place le servo
+// directement (position de depart inconnue) ; les suivantes l'y menent a 90 deg/s.
+void reglerVolet(size_t i, float angle, uint32_t maintenant) {
+  const uint8_t pin = test_actionneurs::PINS_SC[i];
+  if (angle < 0) {
+    if (volets[i].actif) { ledcWrite(pin, 0); ledcDetach(pin); }
+    volets[i].actif = false;
+    pinMode(pin, INPUT);
+    console::printf("[VOLETS] %s : signal coupe.\n", i == 0 ? "gauche D2" : "droit D3");
+    return;
+  }
+  if (rouesActives) {
+    console::println("[VOLETS] Refuse : D2/D3 lisent les sorties SC (roues 1) ; envoyer roues 0.");
+    return;
+  }
+  if (!volets[i].actif) {
+    if (!ledcAttachChannel(pin, VOLET_HZ, VOLET_BITS, CANAUX_VOLETS[i])) {
+      console::println("[VOLETS] Initialisation PWM impossible.");
+      return;
+    }
+    volets[i].actif = true;
+    volets[i].position = angle;
+  }
+  volets[i].cible = angle;
+  ledcWrite(pin, dutyVolet(volets[i].position));
+  dernierVolet = maintenant;
+  console::printf("[VOLETS] %s : cible %.0f deg.\n", i == 0 ? "gauche D2" : "droit D3", angle);
+}
+
+void actualiserVolets(uint32_t maintenant) {
+  const uint32_t ecoule = maintenant - dernierVolet;
+  if (ecoule < 20) return;
+  dernierVolet = maintenant;
+  const float pas = VOLET_VITESSE_DEG_S * ecoule / 1000.0f;
+  for (size_t i = 0; i < 2; ++i) {
+    Volet &v = volets[i];
+    if (!v.actif || v.position == v.cible) continue;
+    const float ecart = v.cible - v.position;
+    v.position = std::fabs(ecart) <= pas ? v.cible : v.position + (ecart > 0 ? pas : -pas);
+    ledcWrite(test_actionneurs::PINS_SC[i], dutyVolet(v.position));
+  }
+}
+
 // roues 1 : D2/D3 en entree, interruptions sur front montant, compteurs remis a zero.
 // roues 0 : interruptions retirees, D2/D3 en entree haute impedance.
 void reglerRoues(bool actif) {
+  if (volets[0].actif || volets[1].actif) {
+    // D2/D3 pilotent les volets : roues 0 ne doit pas les remettre en entree
+    if (actif) console::println("[ROUES] Refuse : D2/D3 commandent les volets ; volg -1 et vold -1 d'abord.");
+    else console::println("[ROUES] Lecture SC coupee ; D2/D3 gardes pour les volets.");
+    return;
+  }
   if (rouesActives)
     for (uint8_t pin : test_actionneurs::PINS_SC) detachInterrupt(digitalPinToInterrupt(pin));
   for (uint8_t pin : test_actionneurs::PINS_SC) pinMode(pin, INPUT);
@@ -411,8 +482,12 @@ bool reglerRover3(const test_actionneurs::Commande &commande, uint32_t maintenan
         );
       else console::println("[PILOTAGE] Telemetrie coupee.");
       return true;
+    case Type::VoletGauche: case Type::VoletDroite:
+      reglerVolet(commande.type == Type::VoletGauche ? 0 : 1, commande.valeur, maintenant);
+      return true;
     case Type::Roues:
       reglerRoues(commande.valeur != 0);
+      if (volets[0].actif || volets[1].actif) return true; // reglerRoues a deja repondu
       if (rouesActives) console::println("[ROUES] Lecture SC active : gauche D2/GPIO25, droite D3/GPIO7, "
                                          "fronts montants ; T + hz_g hz_d ; compteurs a zero.");
       else console::println("[ROUES] Lecture SC coupee ; D2/D3 en entree haute impedance.");
@@ -561,6 +636,7 @@ void actualiser() {
   actualiserSorties(maintenant);
   noterMouvement(maintenant);
   mesurerRoues(maintenant);
+  actualiserVolets(maintenant);
   if (!usbPresent) { delay(1); return; }
   if (!accueil) { aide(); etat(); accueil = true; }
 #ifdef FIELDMIND_ROVER_COMPLET

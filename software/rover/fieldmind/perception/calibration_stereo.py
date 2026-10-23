@@ -84,6 +84,37 @@ class CalibrationStereo:
             coins = cv2.cornerSubPix(gris, coins, (7, 7), (-1, -1), critere)
         return np.asarray(coins, np.float32).reshape(-1, 1, 2)
 
+    def apercu(self, bgr: np.ndarray, largeur_max: int = 640) -> list[list[float]] | None:
+        """Coins de la mire en coordonnées normalisées (0–1), vite (image réduite, abandon
+        rapide sans mire) : pour l'aperçu en direct de l'assistant, pas pour le calcul."""
+        h, lg = bgr.shape[:2]
+        echelle = min(1.0, largeur_max / lg)
+        petite = cv2.resize(bgr, (int(lg * echelle), int(h * echelle))) if echelle < 1 else bgr
+        gris = cv2.cvtColor(petite, cv2.COLOR_BGR2GRAY) if petite.ndim == 3 else petite
+        trouve, coins = cv2.findChessboardCorners(
+            gris, (self.colonnes, self.lignes),
+            flags=cv2.CALIB_CB_ADAPTIVE_THRESH | cv2.CALIB_CB_NORMALIZE_IMAGE
+            | cv2.CALIB_CB_FAST_CHECK)
+        if not trouve or coins is None:
+            return None
+        hp, lp = gris.shape[:2]
+        return [[round(float(x) / lp, 4), round(float(y) / hp, 4)] for x, y in coins.reshape(-1, 2)]
+
+    def couverture(self) -> list[list[float]]:
+        """Centre (u, v) et taille relative de la mire pour chaque paire gardée (caméra gauche),
+        pour montrer les zones de l'image déjà couvertes."""
+        if self.taille is None:
+            return []
+        lg, h = self.taille
+        sortie = []
+        for coins in self._coins_g:
+            pts = coins.reshape(-1, 2)
+            centre = pts.mean(axis=0)
+            etendue = float(np.ptp(pts[:, 0]) / lg)
+            sortie.append([round(float(centre[0]) / lg, 3), round(float(centre[1]) / h, 3),
+                           round(etendue, 3)])
+        return sortie
+
     def ajouter_paire(self, bgr_g: np.ndarray, bgr_d: np.ndarray) -> bool:
         """Cherche la mire dans les deux images ; garde la paire si elle est vue dans les deux
         (et n'est pas presque identique à une paire déjà gardée). Renvoie True si gardée."""

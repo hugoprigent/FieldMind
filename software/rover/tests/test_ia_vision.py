@@ -8,7 +8,7 @@ from typing import Any
 import pytest
 from test_ia_faux_serveur import Ecoute, FauxOutils, config_essai, faux_serveur
 
-from fieldmind.bus import Bus
+from fieldmind.bus import Bus, S
 from fieldmind.config import FICHIER_PROFIL, Profil
 from fieldmind.ia.fournisseurs import ErreurIA
 from fieldmind.ia.vision import (
@@ -151,10 +151,10 @@ async def test_decrire() -> None:
 
 
 async def test_vision_profil_gx10() -> None:
-    """Profil gx10 : « chercher » passe par le modèle incarné RoboBrain 2.5 (consigne et
-    réponse `[(x, y)]` propres au modèle), pas par le modèle de vision."""
+    """Profil gx10 : la recherche exige une confirmation sémantique de la vision."""
     async with faux_serveur() as fs:
-        fs.chat = lambda corps: {"content": "[(500, 250)]"}
+        fs.chat = lambda corps: {"content": '{"present":true,"correspondance":true,'
+                                             '"points":[{"point":[500,250],"label":"porte"}]}'}
         config = config_essai(fs.base, env={}, profil="gx10")
         vision = Vision(Bus(), profil_rover(), config, FauxOutils())
         points = await vision.chercher("porte")
@@ -162,8 +162,8 @@ async def test_vision_profil_gx10() -> None:
         await config.passerelle().fermer()
     assert points[0]["u"] == 0.5 and points[0]["v"] == 0.25
     chat = [corps for chemin, corps in fs.requetes if chemin == "/v1/chat/completions"]
-    assert chat[0]["model"] == "BAAI/RoboBrain2.5-4B"
-    assert "[(x, y)]" in chat[0]["messages"][0]["content"][1]["text"]
+    assert chat[0]["model"] == "nvidia/Qwen3.6-35B-A3B-NVFP4"
+    assert "correspondance" in chat[0]["messages"][0]["content"][1]["text"]
 
 
 def test_image_reduite_a_640_px() -> None:
@@ -222,4 +222,23 @@ async def test_analyser_fusion_lidar_stereo() -> None:
     assert pt["hauteur"] == 0.48 and pt["largeur"] == 0.55
     assert pt["type_3d"] == "bloc" and pt["source"] == "lidar+stereo"
     assert ecoute.vision[-1]["demande"] == "analyser"
+
+
+async def test_une_image_alimente_la_carte_et_la_veille() -> None:
+    async with faux_serveur() as fs:
+        fs.chat = lambda corps: {"content": (
+            '{"resume":"Une porte à gauche de la table.","niveau":"info","alerte":null,'
+            '"points":[{"point":[700,300],"label":"porte","categorie":"porte"}]}'
+        )}
+        bus, outils = Bus(), FauxOutils()
+        config = config_essai(fs.base)
+        vision = Vision(bus, profil_rover(), config, outils)
+        try:
+            message = await vision.analyser(silencieux=True)
+        finally:
+            await config.passerelle().fermer()
+    assert message["points"][0]["label"] == "porte"
+    assert bus.dernier(S.SITUATION)["resume"] == "Une porte à gauche de la table."
+    assert bus.dernier(S.SITUATION)["modele"] == message["modele"]
+    assert len(fs.requetes) == 1  # aucune seconde analyse vidéo pour la veille
 

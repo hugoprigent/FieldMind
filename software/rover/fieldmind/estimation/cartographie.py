@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import math
 
+import cv2
 import numpy as np
 
 from fieldmind.config import Profil
@@ -32,6 +33,9 @@ L_BAS_LIBRE = -0.3
 L_BAS_MAX = 3.0
 SEUIL_BAS = 0.5
 """Log-odds de la couche basse au-delà duquel la cellule est un obstacle (2 vues suffisent)."""
+VALEUR_INDICATIVE = 55
+"""Valeur dans la carte d'un obstacle bas non bloquant : sous le seuil d'occupation du
+planificateur (65), au-dessus de « libre » ; le planificateur l'évite par son coût."""
 
 
 def _pose(pose: Pose2D | Odometrie) -> Pose2D:
@@ -53,6 +57,11 @@ class Cartographe:
         self.camera_z = float(v("cameras.z_m", 0.265))
         self.hfov = math.radians(float(v("cameras.hfov_deg", 78.0)))
         self.inclinaison = math.radians(float(v("cameras.inclinaison_deg", 10.0)))
+        # Couche basse oubliée avec le temps : une détection de la stéréo qui n'est pas revue
+        # (fausse, ou sortie du champ) s'efface en quelques secondes au lieu de rester
+        self.oubli_bas_s = float(v("cartographie.oubli_bas_s", 4.0))
+        self.profil = profil
+        self._t_bas: float | None = None
         self.n = int(round(self.taille_m / self.resolution))
         self._libres = np.zeros(self.n * self.n, dtype=bool)
         self.effacer()
@@ -140,6 +149,11 @@ class Cartographe:
         """
         p = _pose(pose)
         self._recentrer(p.x, p.y)
+        if self.oubli_bas_s > 0:
+            t = float(obstacles.t)
+            if self._t_bas is not None and t > self._t_bas:
+                self.bas *= math.exp(-(t - self._t_bas) / self.oubli_bas_s)
+            self._t_bas = t if self._t_bas is None else max(self._t_bas, t)
         points = np.asarray(obstacles.points, dtype=np.float64).reshape(-1, 2)
         c, s = math.cos(p.cap), math.sin(p.cap)
         if liberer:
@@ -203,7 +217,15 @@ class Cartographe:
         """Grille int8 : -1 inconnu, 0 libre … 100 occupé (lidar, ou obstacle bas confirmé)."""
         probabilite = 1.0 / (1.0 + np.exp(-self.lidar))
         cellules = np.round(100 * probabilite).astype(np.int8)
-        cellules[self.bas > SEUIL_BAS] = 100
+        bas = self.bas > SEUIL_BAS
+        if bool(self.profil.valeur("securite.stereo_bloquante", True)):
+            cellules[bas] = 100
+        else:
+            # Indicatif, et seulement en amas (une cellule isolée est du bruit de la stéréo)
+            voisins = cv2.boxFilter(bas.astype(np.uint8), cv2.CV_16U, (3, 3), normalize=False,
+                                    borderType=cv2.BORDER_CONSTANT)
+            amas = bas & (voisins >= 3)
+            cellules[amas] = np.maximum(cellules[amas], VALEUR_INDICATIVE)
         cellules[~self.vue] = -1
         return CarteOccupation(t=self.t if t is None else t, resolution=self.resolution,
                                origine_x=self.origine_x, origine_y=self.origine_y,
@@ -211,7 +233,9 @@ class Cartographe:
 
     def occupees(self) -> np.ndarray:
         """Masque des cellules occupées (lidar p > 0,65 ou obstacle bas)."""
-        masque: np.ndarray = (self.lidar > 0.62) | (self.bas > SEUIL_BAS)
+        masque: np.ndarray = self.lidar > 0.62
+        if bool(self.profil.valeur("securite.stereo_bloquante", True)):
+            masque |= self.bas > SEUIL_BAS
         return masque
 
     def obstacles_proches(self, pose: Pose2D | Odometrie, rayon: float = 3.0,

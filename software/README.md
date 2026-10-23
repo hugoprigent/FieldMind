@@ -6,7 +6,7 @@ Le logiciel utilisé avec le prototype est dans [`rover/`](rover/README.md) : Ra
 
 ## Première démo web — MuJoCo
 
-Cette pile reste celle de la [démo publique](https://hugoprigent.com/fieldmind/). Elle illustre la navigation dans une forêt simulée et possède ses propres services et interface. Elle est distincte de la pile du rover courant.
+Cette pile est la première démo MuJoCo du projet. Elle illustre la navigation dans une forêt simulée et possède ses propres services et interface. Elle est distincte de la pile du rover courant ; la [simulation publique](https://hugoprigent.com/fieldmind/) sert désormais le poste du rover (`software/rover/fieldmind/public_demo.py`).
 
 Python 3.12 et, sous Linux, OSMesa (`sudo apt install libosmesa6`) :
 

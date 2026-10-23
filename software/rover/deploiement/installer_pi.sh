@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Préparation unique du Raspberry Pi (à lancer SUR le Pi, avec sudo pour apt et les groupes).
-#   ssh pi-wifi 'bash -s' < installer_pi.sh
+#   ssh utilisateur@adresse-du-pi 'bash -s' < installer_pi.sh
 set -euo pipefail
 
 sudo apt-get update

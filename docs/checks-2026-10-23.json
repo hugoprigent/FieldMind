@@ -1,0 +1,47 @@
+{
+  "date_local": "2026-10-23",
+  "platform": "macOS",
+  "clean_install": true,
+  "python": "3.13 (uv)",
+  "checks": [
+    {
+      "name": "rover Python",
+      "command": "python -m pytest -q -m \"not lent\"",
+      "passed": 756,
+      "deselected": 2
+    },
+    {
+      "name": "rover JavaScript",
+      "command": "node --test tests/web/*.test.mjs",
+      "passed": 22
+    },
+    {
+      "name": "rover lint",
+      "command": "uvx ruff@0.16.9 check .",
+      "status": "passed"
+    },
+    {
+      "name": "firmware ESP32-C5",
+      "command": "pio run -e esp_c5",
+      "status": "passed",
+      "flashed_by_this_check": false
+    },
+    {
+      "name": "public simulation HTTP",
+      "command": "python -m fieldmind.public_demo --hote 127.0.0.1",
+      "status": "passed",
+      "routes": [
+        "/",
+        "/js/main.js",
+        "/api/sante"
+      ]
+    },
+    {
+      "name": "local Markdown links",
+      "status": "passed"
+    }
+  ],
+  "not_rerun": [
+    "legacy MuJoCo demo (unchanged since 2026-10-21)"
+  ]
+}

@@ -1,7 +1,7 @@
 """Pilote du XIAO ESP32-C5 (firmware software/esp32/esp_c5) : traction, servo et centrale.
 
 Deux versions du firmware sont gérées :
-- **ROVER_3** : commande combinée `p <g> <d> <servo>` à 20 Hz, chien de garde `wd` (le firmware
+- **ROVER_4** : commande combinée `p <g> <d> <servo>` à 20 Hz, chien de garde `wd` (le firmware
   coupe la traction si le Pi se tait), télémétrie `T …` et centrale `I …` rapides. L'inversion de
   sens d'une roue est séquencée par le firmware.
 - **ROVER_2** (et inconnu) : commandes `g`, `d`, `sensg`, `sensd`, `s` envoyées seulement quand
@@ -19,13 +19,16 @@ import re
 import threading
 import time
 from collections import deque
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import replace
 from pathlib import Path
 from typing import Any, Protocol
 
+import numpy as np
+
 from fieldmind.bus import Bus, S
 from fieldmind.config import Profil
+from fieldmind.drone.cooleerx import DRAPEAUX_ACTION, paquet_camera, paquet_rc
 from fieldmind.materiel.reconnaissance import REFUS_VOL, ReconnaissanceDrone
 from fieldmind.types import CommandeRoues, EtatDrone, EtatEsp, ImageCamera, Imu
 
@@ -65,10 +68,28 @@ def ouvrir_port(peripherique: str, debit: int) -> Transport:
 
     port = serial.Serial()
     port.port, port.baudrate, port.timeout = peripherique, debit, 0.05
+    # Écriture bornée : un ESP qui ne lit plus ne doit pas bloquer la boucle de conduite (la
+    # commande suivante part 50 ms plus tard ; son chien de garde gère les vrais blocages)
+    port.write_timeout = 0.05
     port.dtr = port.rts = False
     port.exclusive = True
     port.open()
     return port
+
+
+def rotation_niveau(gravite: Sequence[float]) -> np.ndarray:
+    """Rotation qui amène la gravité mesurée au repos, rover à plat, sur +z : corrige un
+    GY-521 monté de biais (au-delà des simples échanges d'axes imu.axe_*). Le lacet autour
+    de la verticale n'est pas observable ainsi : seuls roulis, tangage et vitesse de lacet."""
+    v = np.asarray(gravite, dtype=np.float64)
+    v = v / max(float(np.linalg.norm(v)), 1e-9)
+    z = np.array([0.0, 0.0, 1.0])
+    k = np.cross(v, z)
+    s, c = float(np.linalg.norm(k)), float(v @ z)
+    if s < 1e-9:
+        return np.eye(3) if c > 0 else np.diag([1.0, -1.0, -1.0])
+    kx = np.array([[0, -k[2], k[1]], [k[2], 0, -k[0]], [-k[1], k[0], 0]])
+    return np.eye(3) + kx + kx @ kx * ((1 - c) / (s * s))
 
 
 def axes_imu(profil: Profil) -> Callable[[tuple[float, float, float]], tuple[float, float, float]]:
@@ -90,6 +111,10 @@ def axes_imu(profil: Profil) -> Callable[[tuple[float, float, float]], tuple[flo
     return convertir
 
 
+# Préparation d'une roue dans ROVER_3 (100 ms), avec une marge pour la liaison série
+PREPARATION_ROVER3_S = 0.16
+
+
 class PiloteEsp:
     def __init__(self, bus: Bus, profil: Profil, transport: Transport, nom: str = "esp",
                  *, drone_reel: bool = True) -> None:
@@ -99,6 +124,12 @@ class PiloteEsp:
         self._drone_reel = drone_reel
         self._t = transport
         self._verrou_ecriture = threading.Lock()
+        self._ecritures_sautees = 0
+        # Préparation des roues dans ROVER_3 (voir appliquer) : dernière consigne p envoyée,
+        # instant jusqu'auquel on n'envoie que des battements
+        self._p_envoye = (0, 0)
+        self._sens_envoye = [True, True]  # dernier sens non nul (True = avant de la sortie)
+        self._preparation_fin = 0.0
         self._actif = True
         self.etat = EtatEsp(t=time.monotonic())
         self.etat_drone = EtatDrone(t=time.monotonic(), largeur=240, hauteur=320)
@@ -128,6 +159,11 @@ class PiloteEsp:
         self.version: str | None = None
         self.erreur: str | None = None
         self._axes = axes_imu(profil)
+        self._niveau_texte: str | None = None
+        self._niveau: np.ndarray | None = None
+        # Volets : dernier état commandé (au démarrage, celui du réglage) ; un mouvement à la fois
+        self._volets_deplies = bool(profil.valeur("remorque.volets_deplies", False))
+        self._verrou_volets = threading.Lock()
         self._signe_lacet = self._axes((0.0, 0.0, 1.0))[2]
         self._fil = threading.Thread(target=self._lire, name=f"{nom}-lecture", daemon=True)
         self._fil_ble = threading.Thread(
@@ -188,12 +224,16 @@ class PiloteEsp:
         if not self._actif:
             return
         g, d = int(cmd.pwm_g), int(cmd.pwm_d)
+        if self._permutes():  # moteurs branchés à l'envers : sortie gauche → moteur droit
+            g, d = d, g
+        if self._sens_inverse():  # avancer faisait reculer : les deux sens retournés
+            g, d = -g, -d
         self._traction_demandee = g != 0 or d != 0
         servo = max(-90.0, min(90.0, cmd.servo_deg))
         if self.rover3:
             if not self._configure:
                 self._configurer()
-            self._ecrire(f"p {g} {d} {self._fmt_servo(servo)}")
+            self._ecrire(self._ligne_rover3(g, d, servo))
             return
         if not self._configure:  # ROVER_2 : seulement la vitesse du servo
             vitesse = float(self.profil.valeur("direction.servo_vitesse_deg_s", 150))
@@ -206,6 +246,35 @@ class PiloteEsp:
         if self._servo_envoye is None or abs(servo - self._servo_envoye) >= 0.5:
             self._ecrire(f"s {self._fmt_servo(servo)}")
             self._servo_envoye = servo
+
+    def _ligne_rover3(self, g: int, d: int, servo: float) -> str:
+        """Ligne `p`, ou `hb` pendant la préparation d'une roue.
+
+        Dans ROVER_3, une roue qui démarre (ou change de sens, après `inv` ms à zéro) passe
+        100 ms en préparation avant de recevoir sa PWM, et chaque nouvelle ligne `p` pendant
+        ce temps relance la préparation : à 20 Hz, la roue ne démarrait jamais. On laisse donc
+        passer la préparation en n'envoyant que le battement (le chien de garde reste nourri).
+        Un arrêt (une roue à zéro) part toujours tout de suite."""
+        maintenant = time.monotonic()
+        demarre = inverse = arret = False
+        for i, (v, avant) in enumerate(zip((g, d), self._p_envoye, strict=True)):
+            if not v:
+                arret = arret or bool(avant)
+            elif (v > 0) != self._sens_envoye[i]:
+                inverse = True  # le firmware attend d'abord `inv` ms roue à zéro
+            elif not avant:
+                demarre = True
+        if not (arret or demarre or inverse) and maintenant < self._preparation_fin:
+            return "hb"
+        if demarre or inverse:
+            attente = PREPARATION_ROVER3_S
+            if inverse:
+                attente += float(self.profil.valeur("traction.delai_inversion_s", 0.6))
+            self._preparation_fin = max(self._preparation_fin, maintenant + attente)
+        self._p_envoye = (g, d)
+        self._sens_envoye = [v > 0 if v else ancien for v, ancien in zip((g, d), self._sens_envoye,
+                                                                strict=True)]
+        return f"p {g} {d} {self._fmt_servo(servo)}"
 
     def reconfigurer(self) -> None:
         """Un réglage a changé (chien de garde, vitesse du servo…) : renvoyé au prochain cycle."""
@@ -277,10 +346,8 @@ class PiloteEsp:
                     if cmd == "camera":
                         self._cam_drone_index = 1 - getattr(self, "_cam_drone_index", 0)
                         cible = self._cam_drone_index + 1
-                        # Requêtes caméra existantes, à valider sur le matériel.
-                        # Ne pas envoyer 0x66 + drapeau 0x08 : c'est une trame de vol.
-                        self._ble_cmd_file.extend((bytes([0x43, cible, 0, 0, 0, 0]),
-                                                   bytes([0x06, cible])))
+                        # HD dragon 1.1.0, v2.y : sélection caméra hors RC.
+                        self._ble_cmd_file.append(paquet_camera(cible))
                     else:
                         pkt = _paquet_vol_ble(cmd)
                         if pkt:
@@ -337,6 +404,53 @@ class PiloteEsp:
             "succes",
         )
 
+    def volets_disponibles(self) -> bool:
+        """Firmware ROVER_4 et D2/D3 libres (pas de capteurs SC des roues)."""
+        return (self._actif and bool(self.version) and _numero(self.version) >= 4
+                and not bool(self.profil.valeur("roues.capteurs", False)))
+
+    def mouvoir_volets(self, deplies: bool) -> bool:
+        """Volets de la remorque, servos à **rotation continue** (D2/D3) : l'impulsion règle la
+        vitesse, pas la position (90 = arrêt). Pour déplier ou replier, chaque servo tourne à
+        `remorque.volets_vitesse` % dans le bon sens le temps de `remorque.volets_angle_deg`
+        (voir duree_volets), puis
+        son signal est coupé (arrêt). Sans capteur de position : rien n'est fait si l'état
+        demandé est déjà l'état connu. Bloquant (à lancer dans un fil) ; faux si rien n'a bougé."""
+        if not self.volets_disponibles() or deplies == self._volets_deplies:
+            return False
+        if not self._verrou_volets.acquire(blocking=False):
+            return False  # déjà en mouvement
+        try:
+            vitesse = max(0.0, min(100.0, float(self.profil.valeur("remorque.volets_vitesse", 40))))
+            duree = self.duree_volets()
+            for cote in ("g", "d"):
+                sens = 1.0 if deplies else -1.0
+                if bool(self.profil.valeur(f"remorque.volet_{cote}_inverse", cote == "d")):
+                    sens = -sens
+                self._ecrire(f"vol{cote} {round(90 + sens * 0.9 * vitesse)}")
+            fin = time.monotonic() + duree
+            while time.monotonic() < fin and self._actif:
+                time.sleep(0.02)
+            self._volets_deplies = deplies
+            return True
+        finally:
+            self._ecrire("volg -1")  # arrêt, même en cas d'erreur
+            self._ecrire("vold -1")
+            self._verrou_volets.release()
+
+    def duree_volets(self) -> float:
+        """Temps de rotation pour `remorque.volets_angle_deg` (90° par défaut) à
+        `remorque.volets_vitesse` %, d'après la vitesse réelle des servos à fond
+        (`remorque.volets_tours_min`, ×6 en °/s ; supposée proportionnelle)."""
+        v = self.profil.valeur
+        degres_s = (max(5.0, float(v("remorque.volets_vitesse", 40))) / 100
+                    * float(v("remorque.volets_tours_min", 100.0)) * 6)
+        return max(0.05, float(v("remorque.volets_angle_deg", 90)) / max(degres_s, 1.0))
+
+    def arreter_volets(self) -> None:
+        self._ecrire("volg -1")
+        self._ecrire("vold -1")
+
     def _sequencer(self, roue: int, cible: int) -> None:
         """ROVER_2 : passage par zéro et attente avant de changer le sens d'une roue."""
         maintenant = time.monotonic()
@@ -365,8 +479,17 @@ class PiloteEsp:
         return f"{angle:.1f}"
 
     def _ecrire(self, ligne: str) -> None:
-        with self._verrou_ecriture:
+        if not self._verrou_ecriture.acquire(timeout=0.05):
+            self._ecritures_sautees += 1
+            return
+        try:
             self._t.write(ligne.encode("ascii") + b"\n")
+        except Exception as erreur:  # délai d'écriture dépassé (port plein) : ligne sautée
+            if type(erreur).__name__ != "SerialTimeoutException":
+                raise
+            self._ecritures_sautees += 1
+        finally:
+            self._verrou_ecriture.release()
 
     # ------------------------------------------------------------------ lecture
 
@@ -451,16 +574,19 @@ class PiloteEsp:
             self._mettre_a_jour(maintenant, frein=m.group(3) == "1", defaut=m.group(4) == "1")
         elif m := LIGNE_ROUE.match(ligne):
             cote = "g" if m.group(1) == "GAUCHE" else "d"
+            if self._permutes():
+                cote = "d" if cote == "g" else "g"
             pwm = max(0, int(m.group(3)))
+            sens = int(m.group(4)) ^ int(self._sens_inverse())
             champs: dict[str, Any] = {
                 f"pwm_{cote}": pwm,
-                f"sens_{cote}": int(m.group(4)),
+                f"sens_{cote}": sens,
                 f"inverse_{cote}": m.group(6) == "1",
             }
             self._mettre_a_jour(maintenant, **champs)
             if not self.rover3:  # resynchroniser le séquenceur sur l'état réel
                 roue = 0 if cote == "g" else 1
-                self._sens[roue] = int(m.group(4))
+                self._sens[roue] = int(m.group(4))  # sens de la sortie, pas de la roue
         elif m := LIGNE_SERVO.match(ligne):
             self._mettre_a_jour(
                 maintenant,
@@ -941,8 +1067,8 @@ class PiloteEsp:
                             ):  # 'S' : bande JPEG 240x40
                                 en_reception_hdr = False
                                 sid, tot, idx = pkt[1], pkt[2], pkt[3]
-                                if sid == 1 and idx == 1 and 0 < pkt[4] <= 100:
-                                    batterie_pct = int(pkt[4])
+                                # S[4] identifie le modèle/résolution dans HD dragon,
+                                # pas la batterie (84 = SPI_KL41_8K). Niveau inconnu.
                                 if sid == 1 and idx == 1:
                                     bandes_valides.clear()
                                 if idx == 1 or sid not in bandes or bandes[sid][0] != tot:
@@ -961,9 +1087,13 @@ class PiloteEsp:
                                         toile[y0 : y0 + 40, :, :] = im_bande
                                         bandes_valides.add(sid)
                                         if sid == 8 and len(bandes_valides) == 8:
+                                            # Le capteur CooleerX arrive en portrait, décalé
+                                            # d'un quart de tour : corriger avant publication
+                                            # pour le flux, les captures et la vision du drone.
+                                            orientee = cv2.rotate(toile, cv2.ROTATE_90_CLOCKWISE)
                                             ok, buf = cv2.imencode(
                                                 ".jpg",
-                                                toile,
+                                                orientee,
                                                 [int(cv2.IMWRITE_JPEG_QUALITY), 88],
                                             )
                                             if ok:
@@ -976,8 +1106,8 @@ class PiloteEsp:
                                                         t=maintenant,
                                                         camera="drone",
                                                         jpeg=bytes(buf),
-                                                        largeur=240,
-                                                        hauteur=320,
+                                                        largeur=320,
+                                                        hauteur=240,
                                                         numero=self._drone_num_image,
                                                     ),
                                                 )
@@ -1049,12 +1179,27 @@ class PiloteEsp:
                 self.recon.interrompre("Liaison BLE indisponible — essai interrompu")
                 time.sleep(1.5)
 
+    def _permutes(self) -> bool:
+        """Moteurs gauche et droite branchés sur les sorties de l'autre côté (réglage) : les
+        commandes et les mesures sont échangées ici, le reste du logiciel parle des vraies
+        roues."""
+        return bool(self.profil.valeur("esp.moteurs_permutes", False))
+
+    def _sens_inverse(self) -> bool:
+        """Les deux moteurs tournent à l'envers (réglage) : commandes et mesures retournées ici."""
+        return bool(self.profil.valeur("esp.sens_inverse", False))
+
     def _telemetrie(self, ligne: str, maintenant: float) -> None:
         champs = ligne.split()
         if len(champs) < 8:
             return
+        if self._permutes():
+            champs[2], champs[3] = champs[3], champs[2]
+            if len(champs) >= 10:
+                champs[8], champs[9] = champs[9], champs[8]
+        signe = -1 if self._sens_inverse() else 1
         try:
-            g, d = int(champs[2]), int(champs[3])
+            g, d = signe * int(champs[2]), signe * int(champs[3])
             self._mettre_a_jour(
                 maintenant,
                 pwm_g=abs(g),
@@ -1068,8 +1213,8 @@ class PiloteEsp:
                 chien_de_garde_ms=int(self.profil.valeur("esp.chien_de_garde_ms", 400))
                 if champs[7] == "1"
                 else 0,
-                hz_g=float(champs[8]) if len(champs) >= 10 else None,
-                hz_d=float(champs[9]) if len(champs) >= 10 else None,
+                hz_g=signe * float(champs[8]) if len(champs) >= 10 else None,
+                hz_d=signe * float(champs[9]) if len(champs) >= 10 else None,
             )
         except ValueError:
             return
@@ -1098,12 +1243,30 @@ class PiloteEsp:
         a = self._axes(accel)
         w = self._axes(tuple(math.radians(x) for x in gyro_dps))  # type: ignore[arg-type]
         lacet = None if lacet_deg is None else self._signe_lacet * math.radians(lacet_deg)
+        niveau = self._rotation_niveau()
+        if niveau is not None:
+            a = tuple(float(x) for x in niveau @ np.asarray(a))  # type: ignore[assignment]
+            w = tuple(float(x) for x in niveau @ np.asarray(w))  # type: ignore[assignment]
+            lacet = None  # lacet du firmware intégré autour de l'axe z du capteur, penché
         self.bus.publier(
             S.IMU,
             Imu(
                 t=t, accel_g=a, gyro_rad_s=w, lacet_rad=lacet, temperature_c=temperature, etat=etat
             ),
         )
+
+    def _rotation_niveau(self) -> np.ndarray | None:
+        """Mise à niveau enregistrée par la calibration « centrale au repos » (imu.niveau :
+        gravité « gx gy gz » dans le repère des axes du profil), ou None."""
+        texte = str(self.profil.valeur("imu.niveau", "") or "").strip()
+        if texte != self._niveau_texte:
+            self._niveau_texte = texte
+            try:
+                g = [float(x) for x in texte.split()]
+                self._niveau = rotation_niveau(g) if len(g) == 3 else None
+            except ValueError:
+                self._niveau = None
+        return self._niveau
 
     def _mettre_a_jour(self, maintenant: float, **champs: Any) -> None:
         self.etat = replace(
@@ -1127,33 +1290,9 @@ def _entier(val: str | None, defaut: int = 0) -> int:
 
 
 def _paquet_vol_ble(cmd: str) -> bytes | None:
-    drapeau = 0x00
-    gaz = 128
-    if cmd == "decoller":
-        drapeau = 0x01
-    elif cmd == "atterrir":
-        drapeau = 0x02
-    elif cmd == "stop":
-        drapeau = 0x04
-        gaz = 0
-    elif cmd == "camera":
-        drapeau = 0x08
-    elif cmd == "calibrer":
-        drapeau = 0x80
-    else:
+    if cmd not in DRAPEAUX_ACTION:
         return None
-    corps = [128, 128, gaz, 128, drapeau]
-    cs = corps[0] ^ corps[1] ^ corps[2] ^ corps[3] ^ corps[4]
-    return bytes([0x66, *corps, cs, 0x99])
-
-
-def _paquet_manette_ble(gaz: int, lacet: int, tangage: int, roulis: int) -> bytes:
-    g = max(0, min(255, gaz))
-    y = max(0, min(255, lacet))
-    p = max(0, min(255, tangage))
-    r = max(0, min(255, roulis))
-    cs = r ^ p ^ g ^ y ^ 0x00
-    return bytes([0x66, r, p, g, y, 0x00, cs, 0x99])
+    return paquet_rc(action=cmd)
 
 
 def _generer_mire_drone(d: EtatDrone) -> bytes | None:

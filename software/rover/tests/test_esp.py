@@ -5,6 +5,7 @@ from __future__ import annotations
 import threading
 import time
 
+import numpy as np
 import pytest
 
 from fieldmind.bus import Bus, S
@@ -128,3 +129,120 @@ def test_centrale_absente_ignoree(profil: Profil) -> None:
     pilote._traiter("IMU OK      a=[+0.01 -0.02 +0.99] g  w=[   +0.1    +0.0    +1.5] deg/s  31.0 C"
                     " | BARO OK      1013.20 hPa  22.0 C | KNOB ABSENT pos    +0        | Accueil")
     assert bus.dernier(S.IMU) is not None
+
+
+def test_moteurs_permutes(profil: Profil) -> None:
+    """Moteurs branchés à l'envers : la commande gauche part sur la sortie droite, et l'état
+    publié parle toujours de la vraie roue gauche."""
+    profil.regler("esp.moteurs_permutes", True)
+    bus, faux, pilote, horloge = demarrer("ROVER_3", profil)
+    try:
+        fin = time.monotonic() + 1.5
+        while time.monotonic() < fin and faux.pwm[1] != 12:
+            pilote.appliquer(CommandeRoues(t=time.monotonic(), pwm_g=12, pwm_d=5, servo_deg=0))
+            time.sleep(0.05)
+        assert faux.pwm[1] == 12 and faux.pwm[0] == 5  # sorties échangées
+        attendre(lambda: bus.dernier(S.ESP) is not None and bus.dernier(S.ESP).pwm_g == 12)
+        assert bus.dernier(S.ESP).pwm_d == 5  # mesures remises dans l'ordre des vraies roues
+    finally:
+        horloge.arreter()
+        pilote.arreter()
+
+
+def test_sens_inverse(profil: Profil) -> None:
+    """Avancer faisait reculer : les sorties partent retournées, l'état publié parle du vrai
+    sens des roues."""
+    profil.regler("esp.sens_inverse", True)
+    bus, faux, pilote, horloge = demarrer("ROVER_3", profil)
+    try:
+        fin = time.monotonic() + 1.5
+        while time.monotonic() < fin and faux.pwm[0] != -12:
+            pilote.appliquer(CommandeRoues(t=time.monotonic(), pwm_g=12, pwm_d=-5, servo_deg=0))
+            time.sleep(0.05)
+        assert faux.pwm[0] == -12 and faux.pwm[1] == 5  # sorties retournées
+        attendre(lambda: bus.dernier(S.ESP) is not None and bus.dernier(S.ESP).pwm_g == 12)
+        etat = bus.dernier(S.ESP)
+        assert etat.sens_g == 0 and etat.sens_d == 1  # vrai sens : gauche avant, droite arrière
+    finally:
+        horloge.arreter()
+        pilote.arreter()
+
+
+def test_preparation_rover3_laissee_passer(profil: Profil, monkeypatch: pytest.MonkeyPatch) -> None:
+    """ROVER_3 relance la préparation (100 ms) d'une roue qui démarre à chaque nouvelle ligne p :
+    pendant ce temps, seulement des battements ; un arrêt part toujours tout de suite."""
+    _bus, _faux, pilote, horloge = demarrer("ROVER_3", profil)
+    horloge.arreter()
+    t = [100.0]
+    monkeypatch.setattr(time, "monotonic", lambda: t[0])
+    try:
+        assert pilote._ligne_rover3(20, 20, 0.0).startswith("p 20 20")  # départ
+        t[0] += 0.05
+        assert pilote._ligne_rover3(22, 22, 0.0) == "hb"  # préparation en cours
+        t[0] += 0.12
+        assert pilote._ligne_rover3(24, 24, 0.0).startswith("p 24 24")  # roues lancées
+        t[0] += 0.05
+        assert pilote._ligne_rover3(26, 26, 0.0).startswith("p 26 26")
+        assert pilote._ligne_rover3(-20, -20, 0.0).startswith("p -20 -20")  # inversion
+        t[0] += 0.5
+        assert pilote._ligne_rover3(-20, -20, 0.0) == "hb"  # inv ms à zéro + préparation
+        assert pilote._ligne_rover3(0, 0, 0.0).startswith("p 0 0")  # arrêt immédiat
+    finally:
+        pilote.arreter()
+
+
+def test_volets_rotation_continue(profil: Profil) -> None:
+    """Servos à rotation continue : rien au démarrage ; déplier = tourner (droit en miroir)
+    pendant la durée réglée puis couper le signal ; même état demandé deux fois : rien."""
+    profil.regler("remorque.volets_vitesse", 50)
+    profil.regler("remorque.volets_tours_min", 150)  # 450 °/s à 50 % : 90° en 0,2 s
+    _bus, faux, pilote, horloge = demarrer("ROVER_4", profil)
+    lignes: list[str] = []
+    ecrire = faux.write
+
+    def espion(donnees: bytes) -> int:
+        lignes.extend(lg for lg in donnees.decode().splitlines() if lg.startswith("vol"))
+        return ecrire(donnees)
+
+    faux.write = espion  # type: ignore[method-assign]
+    try:
+        pilote.appliquer(CommandeRoues(t=time.monotonic(), pwm_g=0, pwm_d=0, servo_deg=0))
+        time.sleep(0.1)
+        assert lignes == []  # aucune position imposée au démarrage
+        debut = time.monotonic()
+        assert pilote.mouvoir_volets(True)
+        assert time.monotonic() - debut >= 0.2
+        assert lignes == ["volg 135", "vold 45", "volg -1", "vold -1"]
+        assert faux.volets == [None, None]  # arrêtés
+        assert not pilote.mouvoir_volets(True)  # déjà dépliés : pas de rotation en butée
+        assert pilote.mouvoir_volets(False) and lignes[-4:-2] == ["volg 45", "vold 135"]
+    finally:
+        horloge.arreter()
+        pilote.arreter()
+    _bus, faux3, pilote3, horloge3 = demarrer("ROVER_3", profil)
+    try:
+        assert not pilote3.mouvoir_volets(True) and faux3.volets == [None, None]
+    finally:
+        horloge3.arreter()
+        pilote3.arreter()
+
+
+def test_mise_a_niveau_de_la_centrale(profil: Profil) -> None:
+    """GY-521 monté de biais : la gravité mesurée au repos ramenée sur +z (roulis et tangage
+    nuls à plat), et le lacet du firmware (autour de l'axe penché) n'est plus utilisé."""
+    from fieldmind.materiel.esp import rotation_niveau
+
+    g = (-0.79, 0.416, -0.475)
+    r = rotation_niveau(g)
+    assert np.allclose(r @ (np.array(g) / np.linalg.norm(g)), [0, 0, 1], atol=1e-9)
+    assert np.allclose(r @ r.T, np.eye(3), atol=1e-9)
+    profil.regler("imu.niveau", " ".join(str(x) for x in g))
+    bus, _faux, pilote, horloge = demarrer("ROVER_3", profil)
+    try:
+        pilote._publier_imu(time.monotonic(), g, (0.0, 0.0, 0.0), 12.0, None, "OK")
+        imu = bus.dernier(S.IMU)
+        roulis, tangage = imu.roulis_tangage()
+        assert abs(roulis) < 0.01 and abs(tangage) < 0.01 and imu.lacet_rad is None
+    finally:
+        horloge.arreter()
+        pilote.arreter()

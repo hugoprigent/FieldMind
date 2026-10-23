@@ -27,6 +27,7 @@ from __future__ import annotations
 import heapq
 import math
 import time
+from itertools import pairwise
 from typing import Any
 
 import cv2
@@ -35,6 +36,7 @@ from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import dijkstra
 
 from fieldmind.config import Profil
+from fieldmind.estimation.cartographie import VALEUR_INDICATIVE
 from fieldmind.types import CarteOccupation, Chemin, Pose2D
 
 RACINE_2 = math.sqrt(2.0)
@@ -93,6 +95,7 @@ _A_ETOILE = _njit(cache=True)(_a_etoile_noyau) if _njit is not None else None
 
 class Planificateur:
     def __init__(self, profil: Profil) -> None:
+        self.profil = profil
         v = profil.valeur
         self.demi_largeur = float(v("geometrie.emprise_demi_largeur_m", 0.225))
         self.marge = float(v("navigation.marge_m", 0.10))
@@ -100,6 +103,7 @@ class Planificateur:
         self.distance_confort = float(v("navigation.distance_confort_m", 0.8))
         self.penalite_proximite = float(v("navigation.penalite_proximite", 2.0))
         self.penalite_inconnu = float(v("navigation.penalite_inconnu", 0.5))
+        self.penalite_indicatif = float(v("navigation.penalite_indicatif", 3.0))
         self.seuil_occupe = int(v("navigation.seuil_occupe", 65))
         self.resolution = float(v("navigation.resolution_m", 0.10))
         self.cellules_max = int(v("navigation.cellules_max", 40000))
@@ -152,6 +156,16 @@ class Planificateur:
         proximite = np.clip((self.distance_confort - distance)
                             / max(self.distance_confort - self.rayon_gonflement, 1e-3), 0.0, 1.0)
         cout = 1.0 + self.penalite_proximite * proximite**2 + self.penalite_inconnu * inconnu
+        # Obstacles bas indicatifs (stéréo non bloquante) : passer ailleurs si on peut
+        indicatif = ((fine >= VALEUR_INDICATIVE) & ~occupe
+                     & (not bool(self.profil.valeur("securite.stereo_bloquante", True)))
+                     ).astype(np.uint8)
+        a_indicatifs = bool(indicatif.any())
+        if a_indicatifs:
+            rayon = max(1, int(round(self.demi_largeur / res)))
+            noyau = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * rayon + 1, 2 * rayon + 1))
+            proche = cv2.dilate(indicatif, noyau)[np.ix_(centres_l, centres_c)] > 0
+            cout = cout + self.penalite_indicatif * proche
         ox = carte.origine_x + c0 * res
         oy = carte.origine_y + l0 * res
 
@@ -212,7 +226,18 @@ class Planificateur:
             col = min(max(int((x - carte.origine_x) / res) - c0, 0), fine.shape[1] - 1)
             return float(distance_fine[lig, col])
 
-        lisse = _lisser(brut, marge, self.rayon_gonflement, self.distance_confort, res)
+        def cout_segment(a: tuple[float, float], b: tuple[float, float]) -> float:
+            longueur = math.dist(a, b)
+            n = max(2, int(math.ceil(longueur / res)))
+            xs = np.linspace(a[0], b[0], n + 1)
+            ys = np.linspace(a[1], b[1], n + 1)
+            lig = np.clip(((ys - oy) / pas).astype(int), 0, h - 1)
+            col = np.clip(((xs - ox) / pas).astype(int), 0, w - 1)
+            valeurs = cout[lig, col]
+            return float((valeurs.sum() - 0.5 * (valeurs[0] + valeurs[-1])) * longueur / n)
+
+        lisse = _lisser(brut, marge, self.rayon_gonflement, self.distance_confort, res,
+                        cout_segment if a_indicatifs else None)
         points = _reechantillonner(lisse, self.pas_chemin)
         longueur = float(np.sum(np.hypot(*np.diff(points, axis=0).T))) if len(points) > 1 else 0.0
         self._bilan(debut, "ok", pas, len(indices), methode)
@@ -257,12 +282,16 @@ def _dijkstra(cout: np.ndarray, interdit: np.ndarray, source: int) -> np.ndarray
 
 
 def _lisser(points: list[tuple[float, float]], marge: Any, seuil_min: float, plafond: float,
-            pas_controle: float) -> list[tuple[float, float]]:
+            pas_controle: float, cout_segment: Any = None) -> list[tuple[float, float]]:
     """Raccourcis gloutons : de chaque point, on va au plus lointain atteignable en ligne droite
     sans passer plus près des obstacles que le chemin d'origine (plafonné à `plafond`)."""
     if len(points) <= 2:
         return points
     marges = [marge(x, y) for x, y in points]
+    # Un raccourci ne doit pas retraverser les obstacles indicatifs que la recherche évitait.
+    couts = (np.concatenate(([0.0], np.cumsum([
+        cout_segment(a, b) for a, b in pairwise(points)
+    ]))) if cout_segment is not None else None)
 
     def segment_sur(a: tuple[float, float], b: tuple[float, float], seuil: float) -> bool:
         n = max(2, int(math.ceil(math.dist(a, b) / pas_controle)))
@@ -280,7 +309,9 @@ def _lisser(points: list[tuple[float, float]], marge: Any, seuil_min: float, pla
         for j in range(i + 2, len(points)):
             sous_chemin = min(sous_chemin, marges[j])
             seuil = max(seuil_min, min(sous_chemin, plafond)) - 1e-6
-            if segment_sur(points[i], points[j], seuil):
+            if (segment_sur(points[i], points[j], seuil)
+                    and (couts is None or cout_segment(points[i], points[j])
+                         <= (couts[j] - couts[i]) * 1.01 + 1e-9)):
                 retenu = j
             elif j - retenu > 8:
                 break

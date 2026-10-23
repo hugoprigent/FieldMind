@@ -15,7 +15,7 @@ from budget import dans_le_budget
 from fieldmind.config import FICHIER_PROFIL, Profil, braquage_max
 from fieldmind.estimation.cartographie import Cartographe
 from fieldmind.estimation.odometrie import Odometre
-from fieldmind.navigation.local import PiloteLocal
+from fieldmind.navigation.local import PiloteLocal, filtrer_isoles
 from fieldmind.navigation.planificateur import Planificateur
 from fieldmind.perception.stereo import Stereo
 from fieldmind.simulation.monde import Monde, deplacer
@@ -90,6 +90,29 @@ def test_arrivee_et_ralentissement(profil: Profil) -> None:
     assert fin.arrive and fin.vitesse == 0.0 and fin.raison == "arrive"
 
 
+def test_indicatifs_orientent_sans_bloquer(profil: Profil) -> None:
+    chemin = ligne(0, 5)
+    amas = np.array([[1.1 + dx, 0.15 + dy] for dx in (-0.03, 0, 0.03)
+                    for dy in (-0.03, 0, 0.03)])
+    libre = PiloteLocal(profil).commande(Pose2D(), chemin, None, 0.5)
+    indicatif = PiloteLocal(profil).commande(Pose2D(), chemin, None, 0.5, amas)
+    assert indicatif.braquage < libre.braquage  # l'amas à gauche incite à passer à droite
+    assert indicatif.vitesse > 0 and not indicatif.bloque
+    # Même un mur de stéréo ne force ni arrêt ni marche arrière.
+    mur = segment(0.75, -2, 0.75, 2)
+    doux = PiloteLocal(profil).commande(Pose2D(), chemin, None, 0.5, mur)
+    dur = PiloteLocal(profil).commande(Pose2D(), chemin, mur, 0.5)
+    assert doux.vitesse > 0 and not doux.bloque
+    assert dur.vitesse < 0  # le même mur vu au lidar impose un dégagement
+
+
+def test_points_isoles_invalides_et_doublons_ignores(profil: Profil) -> None:
+    bruit = np.array([[0.8, 0.0], [1.2, 0.1], [np.nan, 0], [np.inf, 0], [0.8, 0.0]])
+    assert len(filtrer_isoles(bruit)) == 0
+    commande = PiloteLocal(profil).commande(Pose2D(), ligne(0, 5), None, 0.5, bruit)
+    assert commande.braquage == 0 and commande.vitesse == pytest.approx(0.5)
+
+
 def test_evite_un_obstacle_imprevu(profil: Profil) -> None:
     """Une boîte de 50 cm, absente de la carte, est posée sur le chemin : le pilote la
     contourne et arrive, sans que l'emprise ne la touche."""
@@ -111,6 +134,18 @@ def test_evite_un_obstacle_imprevu(profil: Profil) -> None:
             assert not touche(pose, boite)
     assert c.arrive
     assert "evitement" in raisons
+
+
+def test_but_derriere_en_marche_arriere(profil: Profil) -> None:
+    """But à 1 m derrière, place libre : marche arrière directe (pas de demi-tour), braquée du
+    bon côté ; mur juste derrière : pas de marche arrière directe."""
+    pilote = PiloteLocal(profil)
+    chemin = Chemin(t=1.0, points=np.array([[0.0, 0.0], [-0.5, 0.1], [-1.0, 0.3]]), but=(-1.0, 0.3))
+    c = pilote.commande(Pose2D(), chemin, np.zeros((0, 2)), 0.5)
+    assert c.raison == "marche_arriere" and c.vitesse < 0 and c.courbure > 0
+    pilote.reinitialiser()
+    c = pilote.commande(Pose2D(), chemin, segment(-0.3, -1.0, -0.3, 1.0), 0.5)
+    assert c.raison != "marche_arriere"
 
 
 def test_impasse_recul_puis_blocage(profil: Profil) -> None:
@@ -147,7 +182,9 @@ def test_salle_coin_a_coin(profil: Profil) -> None:
     """Du coin sud-ouest au coin nord-est de la salle, à travers les obstacles bas (poutre et
     carton bas sur la diagonale, invisibles au lidar) : odométrie lidar + gyroscope, carte,
     stéréo à 2 Hz sur les images rendues, planification toutes les 2 s, pilote à 10 Hz. La
-    vraie emprise ne touche jamais rien (obstacles bas compris)."""
+    vraie emprise ne touche jamais rien (obstacles bas compris), stéréo bloquante."""
+    profil = Profil(profil.dict(), {}, None)
+    profil.regler("securite.stereo_bloquante", True)
     monde = Monde(0, "salle")
     depart = monde.depart
     rng = np.random.default_rng(2)

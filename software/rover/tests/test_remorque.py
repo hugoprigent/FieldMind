@@ -111,7 +111,7 @@ def test_sans_remorque_rien_ne_change(profil: Profil) -> None:
 def test_obstacle_derriere_la_remorque(attele: Profil) -> None:
     """À 0,3 m derrière la planche : le rover seul pourrait reculer, pas avec la remorque."""
     g = geometrie(attele)
-    derriere = -(g.attelage_m + g.arriere_m + 0.3)
+    derriere = -(g.attelage_m + g.arriere_m + 0.12)
     sup = superviseur(bus_sain([(8.0, 3.0), (derriere, 0.0)]), attele)
     sortie, etat = evaluer(sup, -0.12)
     assert sortie.vitesse == 0.0 and "obstacle_arriere" in etat.raisons

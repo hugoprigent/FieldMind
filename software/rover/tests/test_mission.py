@@ -3,14 +3,17 @@
 from __future__ import annotations
 
 import math
+import time
 
 import numpy as np
 import pytest
 
+from fieldmind.bus import Bus, S
 from fieldmind.config import Profil
 from fieldmind.materiel.lidar import Decodeur, FiltreRover
 from fieldmind.mission import actions as A
-from fieldmind.types import EtatSecurite, Odometrie, Pose2D
+from fieldmind.mission.executeur import Executeur, Navigation
+from fieldmind.types import EtatSecurite, Obstacles, Odometrie, Pose2D, Scan
 
 
 @pytest.fixture
@@ -55,6 +58,27 @@ def test_avancer_cinq_metres(profil: Profil) -> None:
 def test_reculer(profil: Profil) -> None:
     pas, pose, _ = rouler(A.Avancer(A.valider({"type": "avancer", "distance_m": -1.0})), profil)
     assert pas.etat == "termine" and pose.x == pytest.approx(-1.0, abs=0.06)
+
+
+@pytest.mark.parametrize("bloquante", [False, True])
+def test_aller_a_transmet_stereo_et_memoire_selon_le_reglage(profil: Profil,
+                                                          bloquante: bool) -> None:
+    profil.regler("securite.stereo_bloquante", bloquante)
+    bus, t = Bus(), time.monotonic()
+    bus.publier(S.ODOM, Odometrie(t, Pose2D()))
+    bus.publier(S.SECURITE, EtatSecurite(t, arret=False, vitesse_max_avant=0.5,
+                                        vitesse_max_arriere=0.3))
+    bus.publier(S.SCAN, Scan(t, np.array([0.0]), np.array([8.0])))
+    mur = np.column_stack((np.full(101, 0.75), np.linspace(-1.5, 1.5, 101)))
+    bus.publier(S.OBSTACLES_STEREO, Obstacles(t, "stereo", mur))
+    executeur = Executeur(bus, profil, None, Navigation(profil))
+    executeur.memoire_obstacles = lambda: np.array([[-2.0, 0.0]])
+    ctx = executeur._contexte(t)
+    assert ctx is not None
+    assert len(ctx.obstacles) == (103 if bloquante else 1)
+    assert len(ctx.indicatifs) == (0 if bloquante else 102)
+    pas = A.AllerA({"type": "aller_a", "x": 5, "y": 0, "repere": "odom"}).pas(ctx)
+    assert pas.vitesse < 0 if bloquante else pas.vitesse > 0
 
 
 @pytest.mark.parametrize("angle", [90, -90, 180])

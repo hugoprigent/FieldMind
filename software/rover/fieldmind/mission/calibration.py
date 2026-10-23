@@ -192,16 +192,29 @@ class CalibrationImu:
         if len(self.accel) < 3:
             annoncer(bus, "imu_repos", "echec", "centrale muette")
             return Pas(etat="echec", raison="centrale muette")
-        a = np.mean(np.array(self.accel), axis=0)
+        mesures = np.array(self.accel)
+        a = np.mean(mesures, axis=0)
         w = np.mean(np.array(self.gyro), axis=0)
         bruit = float(np.std(np.array(self.gyro)[:, 2]))
-        message = "axes cohérents" if a[2] > 0.9 else (
-            f"gravité mesurée sur {a.round(2).tolist()} : revoir imu.axe_x/axe_y/axe_z")
         esp = self.executeur.conduite._esp()
+        if float(np.std(np.linalg.norm(mesures, axis=1))) > 0.05 or not 0.8 < float(
+                np.linalg.norm(a)) < 1.2:
+            annoncer(bus, "imu_repos", "echec", "le rover a bougé pendant la mesure")
+            return Pas(etat="echec", raison="le rover a bougé pendant la mesure")
+        # Mise à niveau : la gravité au repos (rover posé à plat) définit la verticale, quel que
+        # soit le montage du GY-521. Mesurée avant toute mise à niveau précédente.
+        niveau = esp._rotation_niveau() if esp is not None and hasattr(
+            esp, "_rotation_niveau") else None
+        brut = niveau.T @ a if niveau is not None else a
+        brut = brut / np.linalg.norm(brut)
+        self.executeur.profil.regler("imu.niveau", " ".join(f"{x:.4f}" for x in brut))
+        message = ("axes cohérents" if brut[2] > 0.97 else
+                   f"centrale montée de biais (gravité {brut.round(2).tolist()}) : mise à niveau "
+                   "enregistrée") + " ; rover supposé posé à plat"
         if esp is not None and esp.rover3:
             esp.envoyer_ligne("lacet0", journal=False)
-        annoncer(bus, "imu_repos", "termine" if a[2] > 0.9 else "echec", message,
-                 {"gravite_g": a.round(3).tolist(), "biais_gyro_deg_s":
+        annoncer(bus, "imu_repos", "termine", message,
+                 {"gravite_g": brut.round(3).tolist(), "biais_gyro_deg_s":
                   np.degrees(w).round(3).tolist(), "bruit_lacet_deg_s": round(
                       math.degrees(bruit), 3)})
         return Pas(etat="termine", progression=1.0)

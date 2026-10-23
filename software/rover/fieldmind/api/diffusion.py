@@ -85,14 +85,28 @@ def message_etat(rover: Any) -> dict[str, Any]:
             "vitesse_m_s": _r(gnss.vitesse_m_s, 2), "cap_deg": gnss.cap_deg},
         "capteurs": rover.capteurs(),
         "remorque": _remorque(rover),
+        "cible": rover.suivi.resume() if getattr(rover, "suivi", None) is not None else None,
+        "situation": _situation(bus),
         "mission": rover.executeur.resume(),
+        "monde": rover.monde_semantique.resume() if hasattr(rover, "monde_semantique") else None,
         "voix": rover.ia.etat_voix() if rover.ia is not None else {"active": False},
-        "ia": {"occupee": bool(rover.ia.occupee()) if rover.ia is not None else False},
+        "ia": {"occupee": bool(rover.ia.occupee()) if rover.ia is not None else False,
+               "consigne_en_cours": bool(getattr(getattr(rover.ia, "agent", None),
+                                                 "occupee", False))},
     }
     verite = getattr(rover.materiel, "verite", None)
     if verite is not None:
         message["simulation"] = {k: _r(v) for k, v in verite().items()}
     return message
+
+
+def _situation(bus: Any) -> dict[str, Any] | None:
+    """Agent de veille : dernier résumé (moins de 2 min)."""
+    situation = bus.dernier(S.SITUATION)
+    if not isinstance(situation, dict) or bus.age(S.SITUATION) > 120:
+        return None
+    return {"resume": situation.get("resume"), "niveau": situation.get("niveau"),
+            "alerte": situation.get("alerte"), "age_s": _r(bus.age(S.SITUATION), 1)}
 
 
 def _remorque(rover: Any) -> dict[str, Any] | None:

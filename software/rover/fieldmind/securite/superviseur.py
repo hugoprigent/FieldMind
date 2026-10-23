@@ -134,6 +134,11 @@ class Superviseur:
     memoire_obstacles: Any = None  # () -> points base_link des obstacles bas mémorisés (carte)
     zone: Any = None  # (pose odom, sens) -> True si le mouvement sort de la zone GPS autorisée
     remorque: Any = None  # fieldmind.controle.remorque.SuiviRemorque (facultatif)
+    cible_suivie: Any = None  # () -> (azimut, distance) de la personne suivie, ou None
+    # Manuel « à vue » : obstacles ignorés (bouton du poste). Jamais enregistré : retombe à
+    # chaque changement de mode et au redémarrage. Arrêt d'urgence, homme mort, chien de garde,
+    # inclinaison et choc restent actifs ; vitesse plafonnée.
+    anticollision_coupee: bool = False
     _blocage: _Blocage = field(default_factory=_Blocage)
     _dernier: EtatSecurite | None = None
 
@@ -244,6 +249,19 @@ class Superviseur:
             points_arriere = np.vstack((points_lidar, memoire))
         libre_av, i_av = distance_libre(points_avant, braquage, +1, p)
         libre_ar, _ = distance_libre(points_arriere, braquage, -1, p)
+        # Stéréo non bloquante (réglage) : seul le lidar arrête ; un obstacle bas vu par les
+        # caméras (ou mémorisé) dans le couloir ne fait que ralentir. Les fausses détections
+        # de la stéréo (joints, reflets) ne figent plus le rover.
+        ralenti_bas = False
+        if not bool(p.valeur("securite.stereo_bloquante", True)):
+            if len(points_avant) > len(points_lidar):
+                libre_lidar, i_lidar = distance_libre(points_lidar, braquage, +1, p)
+                ralenti_bas = libre_av < libre_lidar
+                libre_av, i_av = libre_lidar, i_lidar
+            if len(points_arriere) > len(points_lidar):
+                libre_lidar_ar, _ = distance_libre(points_lidar, braquage, -1, p)
+                ralenti_bas = ralenti_bas or (consigne.vitesse < 0 and libre_ar < libre_lidar_ar)
+                libre_ar = libre_lidar_ar
 
         latence = float(p.valeur("securite.latence_s", 0.25)) + min(age_scan, 0.5)
         decel = float(p.valeur("securite.deceleration_m_s2", 0.8))
@@ -282,6 +300,10 @@ class Superviseur:
         if libre_ar < absolu:
             v_ar = 0.0
 
+        if ralenti_bas:
+            plafond_bas = float(p.valeur("securite.vitesse_obstacle_bas_m_s", 0.25))
+            v_av, v_ar = min(v_av, plafond_bas), min(v_ar, plafond_bas)
+
         v_mode = float(p.valeur("vitesses.max_manuel_m_s" if mode == "manuel"
                                 else "vitesses.max_auto_m_s", 0.5))
         v_av = min(v_av, v_mode)
@@ -302,13 +324,20 @@ class Superviseur:
             v_av = prudence
             raisons.append("personne_proche")
 
-        if consigne.vitesse > 0 and v_av < consigne.vitesse:
+        if mode == "manuel" and self.anticollision_coupee:
+            plafond = min(v_mode, float(p.valeur("securite.vitesse_sans_anticollision_m_s",
+                                                  0.3)))
+            v_av = v_ar = plafond
+            raisons = [r for r in raisons if r not in ("stereo_absente", "personne_proche")]
+            raisons.append("anticollision_coupee")
+        elif consigne.vitesse > 0 and v_av < consigne.vitesse:
             bas = stereo_ok and i_av >= len(points_lidar)
             if v_av <= 0.02:
                 raisons.append("obstacle_bas" if bas else "obstacle_avant")
             else:
-                raisons.append("ralenti_obstacle")
-        if consigne.vitesse < 0 and v_ar < -consigne.vitesse:
+                raisons.append("ralenti_obstacle_bas" if ralenti_bas else "ralenti_obstacle")
+        if consigne.vitesse < 0 and v_ar < -consigne.vitesse and not (
+                mode == "manuel" and self.anticollision_coupee):
             if raisons_remorque:
                 raisons.extend(raisons_remorque)
             else:
@@ -316,7 +345,9 @@ class Superviseur:
 
         # ---------------- blocage et geofence
         odom: Odometrie | None = self.bus.dernier(S.ODOM)
-        if self._bloque(consigne, odom, t):
+        # Conduite à vue sans anticollision : roues levées ou rover poussé, l'opérateur décide
+        sans_garde = mode == "manuel" and self.anticollision_coupee
+        if not sans_garde and self._bloque(consigne, odom, t):
             raisons.append("blocage")
             arret = True
         if mode == "auto" and odom is not None and self._hors_zone(consigne, braquage, odom):
@@ -367,6 +398,12 @@ class Superviseur:
         if not isinstance(message, dict) or self.bus.age(S.DETECTIONS) > 1.5:
             return None
         demi = self.profil.geometrie.emprise_demi_largeur_m + 1.0
+        cible = None
+        if self.cible_suivie is not None:
+            try:
+                cible = self.cible_suivie()
+            except Exception:
+                cible = None
         vivants = {"personne", "person", "enfant", "chien", "dog", "chat", "cat", "animal",
                    "cheval", "horse", "vache", "cow", "oiseau", "bird", "mouton", "sheep"}
         for objet in message.get("objets") or []:
@@ -374,6 +411,11 @@ class Superviseur:
             if not sol or str(objet.get("label", "")).lower() not in vivants:
                 continue
             x, y = float(sol[0]), float(sol[1])
+            if cible is not None and abs(math.atan2(y, x) - cible[0]) < math.radians(12) and \
+                    abs(math.hypot(x, y) - cible[1]) < 0.8:
+                # La personne qu'on suit (mission « suivre ») : sa distance est tenue par le
+                # suivi et la distance d'arrêt du lidar ; les autres personnes ralentissent.
+                continue
             # dans le repère de l'arc : on tolère la courbure par une marge latérale large
             if 0 < x < 4.0 and abs(y - x * math.tan(braquage) * 0.5) < demi:
                 return float(self.profil.valeur("securite.vitesse_pres_personne_m_s", 0.25))
@@ -436,6 +478,7 @@ _MESSAGES = {
     "zone": "bord de la zone autorisée (GPS) : arrêt",
     "personne_proche": "personne ou animal devant : ralenti",
     "operateur_perdu": "plus de poste connecté : arrêt",
+    "anticollision_coupee": "manuel sans anticollision : obstacles ignorés, conduite à vue",
     "remorque_portefeuille": "remorque trop braquée pour reculer : avancer pour la redresser",
     "remorque_incertaine": "angle de la remorque incertain : avancer 1 m tout droit, ou la "
                            "déclarer dans l'axe",

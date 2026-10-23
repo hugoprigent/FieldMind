@@ -20,6 +20,7 @@
     </a>
     <span class="simulation" id="bandeau-simulation" hidden>SIMULATION</span>
     <div class="indicateurs" id="indicateurs" role="status"></div>
+    <button type="button" class="bouton-voix" id="bouton-voix" aria-pressed="false" title="Parler au rover : appuyer, puis parler ; chaque phrase part à l'agent, qui exécute"><i data-icone="micro"></i><span class="libelle">Parler</span></button>
     <button type="button" class="bouton-rearmer" id="bouton-rearmer" hidden><i data-icone="cadenas"></i><span>Réarmer</span></button>
     <button type="button" class="bouton-arret" id="bouton-arret" aria-label="Arrêt d’urgence"><i data-icone="arret"></i><span>ARRÊT</span></button>
   </header>
@@ -60,6 +61,7 @@
           <span class="badge-hud" id="p-badge-arriere" hidden>R</span>
           <span class="badge-hud badge-auto" id="p-badge-auto" hidden><i data-icone="cible"></i></span>
           <button type="button" class="bouton-hud" id="p-double-cam" aria-pressed="true" title="Double caméra simultanée (Rover + Drone)">2 Cam</button>
+          <button type="button" class="bouton-hud" id="p-suivre" aria-pressed="false" title="Suivre une personne : cliquer ensuite sur elle dans l'image">Suivre</button>
           <button type="button" class="bouton-hud" id="p-photo" title="Photo"><i data-icone="photo"></i></button>
         </div>
       </div>
@@ -76,8 +78,10 @@
           <span class="libelle">Remorque</span>
           <b id="p-remorque-angle">—</b>
           <button type="button" class="bouton petit" id="p-remorque-axe" title="La remorque est droite, dans l'axe du rover : l'angle repart de 0 et la marche arrière est permise"><span>Dans l'axe</span></button>
+          <button type="button" class="bouton petit" id="p-volets" aria-pressed="false" title="Volets de la remorque (servos D2/D3) : angles dans Réglages › Remorque"><span>Volets</span></button>
         </div>
-        <div class="drone-barre" id="p-drone-barre">
+        <details class="drone-barre" id="p-drone-barre">
+          <summary class="drone-resume"><span id="p-drone-resume">Drone</span></summary>
           <details id="p-drone-atelier" class="drone-atelier">
             <summary>Atelier drone — simulation locale complète</summary>
             <p>Décollage, tour avec photos, caméra du bas, recentrage et descente par paliers. Les commandes ci-dessous agissent sur un drone simulé.</p>
@@ -131,11 +135,12 @@
             <button type="button" class="bouton petit" data-drone-cmd="recon_capture" disabled title="Tourner le drone à la main d'environ 60°, puis capturer la vue suivante"><i data-icone="camera"></i><span>Capturer vue</span></button>
             <button type="button" class="bouton petit" data-drone-cmd="cibler_croix" aria-pressed="false" title="Détection de la croix et écarts dans l'image, sans déplacement"><i data-icone="cible"></i><span>Viser la croix</span></button>
             <button type="button" class="bouton petit" data-drone-cmd="stop_recon"><span>Arrêter l'essai</span></button>
+            <button type="button" class="bouton petit bouton-principal" id="p-decollage" aria-pressed="false" title="Ouvre lentement les volets de la remorque et les tient ouverts (aucune commande au drone)"><span>Prêt au décollage</span></button>
             <button type="button" class="bouton petit" data-drone-cmd="decoller" disabled title="Contrôleur de vol et protocole moteur à identifier et valider"><span>Vol indisponible</span></button>
             <button type="button" class="bouton petit" data-drone-cmd="atterrir" title="Requête expérimentale ; exécution par le drone non confirmée"><i data-icone="reculer"></i><span>Demander atterrissage</span></button>
             <button type="button" class="bouton petit bouton-danger" data-drone-cmd="stop" title="Requête d'arrêt expérimentale ; ne remplace pas une coupure matérielle"><i data-icone="arret"></i><span>Demander arrêt</span></button>
           </div>
-        </div>
+        </details>
       </div>
 
       <div class="p-radar panneau sans-marge">
@@ -148,9 +153,9 @@
           <button type="button" data-mode="arret" aria-pressed="false"><i data-icone="arret"></i><span>Arrêt</span></button>
           <button type="button" data-mode="manuel" aria-pressed="false"><i data-icone="main"></i><span>Manuel</span></button>
           <button type="button" data-mode="auto" aria-pressed="false"><i data-icone="auto"></i><span>Auto</span></button>
-          <button type="button" data-mode="banc" aria-pressed="false"><i data-icone="banc"></i><span>Banc</span></button>
         </div>
         <button type="button" class="bouton armer" id="p-armer" aria-pressed="false"><i data-icone="arme"></i><span>Armer</span></button>
+        <button type="button" class="bouton anticollision" id="p-anticollision" aria-pressed="false" hidden title="Manuel seulement : ignorer les obstacles et conduire à vue (vitesse plafonnée). Revient tout seul au changement de mode."><span>Anticollision : active</span></button>
       </div>
 
       <div class="p-joystick panneau">
@@ -166,11 +171,6 @@
         <div class="clavier" aria-hidden="true"><kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd><kbd>Espace</kbd></div>
       </div>
 
-      <div class="p-voix panneau">
-        <button type="button" class="bouton micro" id="p-voix" aria-pressed="false" title="Mode vocal"><i data-icone="micro"></i><span>Voix</span></button>
-        <div class="niveau" aria-hidden="true"><span id="p-niveau"></span></div>
-        <p class="transcription" id="p-transcription"></p>
-      </div>
     </section>
 
     <!-- ============================================================ Mission / IA -->
@@ -187,6 +187,7 @@
 
       <div class="m-mission panneau">
         <header><h2>Mission</h2><span class="pastille" id="m-etat" data-niveau="neutre"><span class="point"></span><span class="libelle">—</span></span></header>
+        <p class="situation" id="m-situation" hidden title="Agent de veille : analyse continue de la caméra et des capteurs"></p>
         <div class="action-courante">
           <div class="action" id="m-action">—</div>
           <div class="progression"><span id="m-barre"></span></div>
@@ -199,6 +200,7 @@
           <button type="button" class="bouton bouton-attention" id="m-annuler"><i data-icone="annuler"></i><span>Annuler</span></button>
         </div>
         <div class="rapides" id="m-rapides">
+          <button type="button" class="bouton" data-action='{"type":"explorer"}'><i data-icone="carte"></i><span>Explorer la pièce</span></button>
           <button type="button" class="bouton" data-action='{"type":"avancer","distance_m":1}'><i data-icone="avancer"></i><span>1 m</span></button>
           <button type="button" class="bouton" data-action='{"type":"avancer","distance_m":-0.5}'><i data-icone="reculer"></i><span>0,5 m</span></button>
           <button type="button" class="bouton" data-action='{"type":"tourner","angle_deg":90}'><i data-icone="gauche90"></i><span>90°</span></button>
@@ -316,7 +318,7 @@
       <article class="panneau k-courbe"><header><h2>Accélération</h2><span class="source">g</span></header><div class="courbe" id="k-accel"></div></article>
       <article class="panneau k-courbe"><header><h2>Gyroscope</h2><span class="source">°/s</span></header><div class="courbe" id="k-gyro"></div></article>
       <article class="panneau k-courbe"><header><h2>Cap</h2><span class="source">°</span></header><div class="courbe" id="k-cap"></div></article>
-      <article class="panneau"><header><h2>Centrale</h2><span class="pastille" id="k-imu-etat" data-niveau="neutre"><span class="point"></span><span class="libelle">—</span></span></header><dl class="valeurs" id="k-imu"></dl></article>
+      <article class="panneau"><header><h2>Centrale</h2><span class="pastille" id="k-imu-etat" data-niveau="neutre"><span class="point"></span><span class="libelle">—</span></span></header><p class="aide" id="k-imu-aide" hidden>Centrale GY-521 (MPU-6050) non détectée sur le bus I2C de l'ESP : vérifier son alimentation (VCC, GND) et SDA → D5, SCL → D6. Les courbes se remplissent dès qu'elle répond.</p><dl class="valeurs" id="k-imu"></dl></article>
       <article class="panneau"><header><h2>GPS</h2><span class="pastille" id="k-gps-etat" data-niveau="neutre"><span class="point"></span><span class="libelle">—</span></span></header><dl class="valeurs" id="k-gps"></dl></article>
       <article class="panneau"><header><h2>ESP</h2><span class="pastille" id="k-esp-etat" data-niveau="neutre"><span class="point"></span><span class="libelle">—</span></span></header><dl class="valeurs" id="k-esp"></dl></article>
       <article class="panneau"><header><h2>Drone (CooleerX / HD-DRONE)</h2><span class="pastille" id="k-drone-etat" data-niveau="neutre"><span class="point"></span><span class="libelle">—</span></span></header><dl class="valeurs" id="k-drone"></dl></article>
@@ -356,6 +358,10 @@
         <h3>Calibration</h3>
         <ul class="calibrations" id="s-calibrations"></ul>
         <h3>Banc</h3>
+        <p class="aide">Essais moteurs roues levées : commandes brutes, sans sécurité d'obstacles.</p>
+        <div class="rangee">
+          <button type="button" class="bouton bouton-attention" id="s-banc-mode"><i data-icone="banc"></i><span>Passer en banc</span></button>
+        </div>
         <div class="banc" id="s-banc">
           <label>G <input type="range" id="s-banc-g" min="-15" max="15" step="1" value="0"><output id="s-banc-g-v">0 %</output></label>
           <label>D <input type="range" id="s-banc-d" min="-15" max="15" step="1" value="0"><output id="s-banc-d-v">0 %</output></label>
@@ -401,9 +407,41 @@
         <div class="ligne-reglage"><span>Mini-carte GPS</span><button type="button" class="bascule" id="r-minicarte" role="switch" aria-checked="false"><span></span></button></div>
         <form class="ligne-reglage" id="r-tuiles-form" autocomplete="off"><label for="r-tuiles">Tuiles</label><input type="text" id="r-tuiles" spellcheck="false" placeholder="aucune"><button type="button" class="bouton petit" id="r-tuiles-osm" title="OpenStreetMap">OSM</button></form>
         <div class="ligne-reglage"><span>Version</span><span class="source" id="r-version">—</span></div>
+        <div class="ligne-reglage"><span>Réglages du rover</span><button type="button" class="bouton petit" id="r-reinitialiser" title="Branchement, montage et calibrations gardés">Tout réinitialiser</button></div>
+        <div class="ligne-reglage"><span>Environnement</span><button type="button" class="bouton petit" id="r-environnement" title="Carte, objets vus, position, missions et conversation de l'agent effacés ; réglages, calibrations et lieux nommés gardés">Tout réinitialiser</button></div>
       </article>
       <div class="groupes-reglages" id="r-groupes"></div>
     </section>
   </main>
+
+  <!-- ============================================================ Assistant stéréo -->
+  <dialog class="assistant-stereo" id="assistant-stereo" aria-labelledby="as-titre">
+    <header>
+      <h2 id="as-titre">Calibration stéréo avec le damier</h2>
+      <button type="button" class="bouton petit" id="as-fermer" title="Fermer"><i data-icone="annuler"></i><span>Fermer</span></button>
+    </header>
+    <div class="as-cameras">
+      <figure><div class="camera" id="as-gauche"><canvas class="superposition" id="as-gauche-coins" aria-hidden="true"></canvas></div>
+        <figcaption>Gauche <span class="pastille petite" id="as-gauche-etat" data-niveau="neutre">damier non vu</span></figcaption></figure>
+      <figure><div class="camera" id="as-droite"><canvas class="superposition" id="as-droite-coins" aria-hidden="true"></canvas></div>
+        <figcaption>Droite <span class="pastille petite" id="as-droite-etat" data-niveau="neutre">damier non vu</span></figcaption></figure>
+    </div>
+    <div class="as-bas">
+      <section class="as-progres">
+        <p><b id="as-compteur">0 paire</b> <span id="as-objectif"></span></p>
+        <div class="progression"><span id="as-barre"></span></div>
+        <div class="as-couverture-ligne"><div class="as-couverture" id="as-couverture" aria-label="Zones de l'image couvertes"></div><span id="as-couverture-texte"></span></div>
+        <ol class="as-conseils" id="as-conseils"></ol>
+      </section>
+      <section class="as-actions">
+        <button type="button" class="bouton" id="as-auto" aria-pressed="true" title="Capture dès que le damier est vu des deux caméras, immobile, à un nouvel endroit"><i data-icone="auto"></i><span>Capture auto</span></button>
+        <button type="button" class="bouton" id="as-capturer"><i data-icone="camera"></i><span>Capturer</span></button>
+        <button type="button" class="bouton" id="as-effacer"><i data-icone="raz"></i><span>Tout effacer</span></button>
+        <button type="button" class="bouton bouton-principal" id="as-calculer" disabled><i data-icone="stereo"></i><span>Calculer</span></button>
+        <div class="as-resultat" id="as-resultat" role="status"></div>
+      </section>
+    </div>
+  </dialog>
+
 </body>
 </html>

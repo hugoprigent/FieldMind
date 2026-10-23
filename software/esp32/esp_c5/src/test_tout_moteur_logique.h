@@ -10,7 +10,9 @@ namespace test_actionneurs {
 enum class Type { Vide, Moteur, Gauche, Droite, Servo, Vitesse, Centre, Stop, Etat, Aide,
                   Sens, SensGauche, SensDroite, InverseGauche, InverseDroite, Frein, Course,
                   // ROVER_3 : p g d servo, hb, wd ms, inv ms, tel hz, imu hz, lacet0, roues 0/1.
-                  Pilotage, Battement, Chien, Inversion, Telemetrie, Centrale, Lacet0, Roues, Invalide };
+                  Pilotage, Battement, Chien, Inversion, Telemetrie, Centrale, Lacet0, Roues,
+                  // ROVER_4 : volets de la remorque, servos sur D2 (volg) et D3 (vold).
+                  VoletGauche, VoletDroite, Invalide };
 // valeur2/valeur3 : roue droite et angle servo de p.
 struct Commande { Type type = Type::Invalide; float valeur = 0, valeur2 = 0, valeur3 = 0; };
 
@@ -93,6 +95,10 @@ inline Commande analyser(const char *texte) {
     if (entier(valeur, 0, 100)) return {Type::Centrale, valeur};
   } else if (!std::strcmp(nom, "roues")) {
     if (valeur == 0 || valeur == 1) return {Type::Roues, valeur};
+  } else if (!std::strcmp(nom, "volg") || !std::strcmp(nom, "vold")) {
+    // Angle 0..180 (servo standard 500..2500 us) ; -1 coupe le signal.
+    if (valeur == -1 || (valeur >= 0 && valeur <= 180))
+      return {nom[3] == 'g' ? Type::VoletGauche : Type::VoletDroite, valeur};
   }
   return {};
 }

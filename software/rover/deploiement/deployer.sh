@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
 # Copie le logiciel du rover sur le Pi, installe le service utilisateur fieldmind-rover et le
-# (re)démarre. Usage, depuis software/rover/deploiement : ./deployer.sh [hôte ssh, défaut pi-wifi]
+# (re)démarre. Usage : ./deployer.sh utilisateur@adresse-du-pi
 #
 # Le service remplace la supervision fieldmind-embarque : les deux ouvriraient les mêmes ports
 # série et caméras. Celle-ci est donc arrêtée et désactivée (réactivable :
 # systemctl --user enable --now fieldmind-embarque).
 set -euo pipefail
-hote="${1:-pi-wifi}"
+if [ "$#" -ne 1 ]; then
+  echo "Usage : $0 utilisateur@adresse-du-pi" >&2
+  exit 2
+fi
+hote="$1"
 racine="$(cd "$(dirname "$0")/.." && pwd)"
 
-tar czf - -C "$racine" --exclude=__pycache__ --exclude=.venv --exclude=.pytest_cache \
+COPYFILE_DISABLE=1 tar --no-xattrs --no-acls --exclude='._*' -czf - -C "$racine" \
+  --exclude=__pycache__ --exclude=.venv --exclude=.pytest_cache \
   --exclude=.ruff_cache --exclude=.env fieldmind config deploiement/fieldmind-rover.service \
   | ssh "$hote" 'mkdir -p ~/fieldmind/rover && tar xzf - -C ~/fieldmind/rover'
 
@@ -17,6 +22,8 @@ tar czf - -C "$racine" --exclude=__pycache__ --exclude=.venv --exclude=.pytest_c
 if [ -f "$racine/.env" ]; then
   ssh "$hote" 'mkdir -p ~/.config/fieldmind && umask 077 && cat > ~/.config/fieldmind/env' \
     < "$racine/.env"
+  # ConfigIA lit .env dans le dossier du programme ; la cible privée reste hors du code déployé.
+  ssh "$hote" 'if [ ! -e ~/fieldmind/rover/.env ]; then ln -s ~/.config/fieldmind/env ~/fieldmind/rover/.env; fi'
 fi
 
 ssh "$hote" bash -s <<'DISTANT'
@@ -28,6 +35,11 @@ if [ ! -x ~/fieldmind/venv/bin/python ]; then
 fi
 ~/fieldmind/venv/bin/python -c 'import scipy, aiohttp' 2>/dev/null \
   || ~/fieldmind/venv/bin/pip install -q --disable-pip-version-check scipy aiohttp
+# Traqueur VitTrack (suivre une personne) : réseau ONNX de 700 ko d'opencv_zoo
+mkdir -p ~/fieldmind/modeles
+[ -s ~/fieldmind/modeles/vittrack.onnx ] || curl -sL -m 60 -o ~/fieldmind/modeles/vittrack.onnx \
+  https://media.githubusercontent.com/media/opencv/opencv_zoo/main/models/object_tracking_vittrack/object_tracking_vittrack_2023sep.onnx \
+  || echo "VitTrack non téléchargé : le suivi utilisera KCF"
 mkdir -p ~/.config/systemd/user
 if systemctl --user is-enabled --quiet fieldmind-embarque 2>/dev/null; then
   systemctl --user disable --now fieldmind-embarque
@@ -41,4 +53,4 @@ sleep 3
 systemctl --user --no-pager --lines=0 status fieldmind-rover | head -3
 ip -4 -o addr show wlan0 | awk '{print "poste : http://" substr($4, 1, index($4, "/") - 1) ":8080"}'
 DISTANT
-# Journal : ssh pi-wifi journalctl _SYSTEMD_USER_UNIT=fieldmind-rover.service -f -o cat
+# Journal : ssh utilisateur@adresse-du-pi journalctl _SYSTEMD_USER_UNIT=fieldmind-rover.service -f -o cat

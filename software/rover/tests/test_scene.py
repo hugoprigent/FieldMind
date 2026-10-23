@@ -97,3 +97,38 @@ def test_integrer_vision_fusion_3d(profil: Profil) -> None:
     assert blocs[0]["hauteur"] == pytest.approx(0.52)
     assert blocs[0]["largeur"] == pytest.approx(0.65)
 
+
+
+def test_vision_invalide_et_etiquettes_voisines(profil: Profil) -> None:
+    r = ReconstructeurScene(profil)
+    pose = Pose2D()
+    for message in (None, {"points": None}, {"points": 1}):
+        r.integrer_vision(message, pose, 0)
+        r.integrer_detections(message, pose, 0)
+    r.integrer_vision({"points": [None, {"label": "porte", "sol": [float("nan"), 0]},
+                                   {"label": "porte", "sol": "??"},
+                                   {"label": "porte blanche", "sol": [1, 0]},
+                                   {"label": "interrupteur", "sol": [1, 0.2]}]}, pose, 0)
+    objets = r.message(pose, None, None, maintenant=0.1)["objets"]
+    assert {o["texte"] for o in objets} == {"porte blanche", "interrupteur"}
+    r.integrer_vision({"geometrie_valide": False,
+                       "points": [{"label": "fantôme", "sol": [2, 0]}]}, pose, 0)
+    assert len(r.objets) == 2
+
+
+def test_dimensions_visuelles_et_hauteurs_mesurees_identifiees(profil: Profil) -> None:
+    r = ReconstructeurScene(profil)
+    pose = Pose2D()
+    r.integrer_vision({"points": [{"label": "caisse", "sol": [1, 0], "type_3d": "bloc",
+                                  "hauteur": float("nan"), "largeur": -1,
+                                  "cap": float("inf")} ]}, pose, 0)
+    bloc, = [o for o in r.message(pose, None, None, maintenant=0.1)["objets"]
+             if o["type"] == "bloc"]
+    assert bloc["hauteur_estimee"] and math.isfinite(bloc["hauteur"])
+    assert bloc["largeur"] > 0 and math.isfinite(bloc["cap"])
+    points = np.array([[2.0 + 0.03 * i, 0.02 * i] for i in range(5)], np.float32)
+    r.integrer_stereo(Obstacles(t=0, source="stereo", points=points,
+                                hauteurs=np.full(5, 0.12, np.float32)), pose, 0)
+    bas, = [o for o in r.message(pose, None, None, maintenant=0.1)["objets"]
+            if o["type"] == "bas"]
+    assert not bas["hauteur_estimee"]

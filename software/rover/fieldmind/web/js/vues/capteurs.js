@@ -109,11 +109,14 @@ export class VueCapteurs {
 
     // Centrale.
     const imu = e?.imu;
-    pastille($('#k-imu-etat'), !imu ? 'neutre' : imu.etat === 'OK' ? 'ok' : imu.etat === 'DOUTEUX' ? 'alerte' : 'critique', imu?.etat || '—');
+    const absente = !imu && e?.capteurs?.imu?.ok === false;
+    pastille($('#k-imu-etat'), !imu ? (absente ? 'critique' : 'neutre') : imu.etat === 'OK' ? 'ok' : imu.etat === 'DOUTEUX' ? 'alerte' : 'critique', imu?.etat || (absente ? 'absente' : '—'));
+    $('#k-imu-aide').hidden = !absente;
     remplir($('#k-imu'), [
       ['Roulis', unite(imu?.roulis_deg, 1, '°')],
       ['Tangage', unite(imu?.tangage_deg, 1, '°')],
-      ['Lacet', unite(Number.isFinite(imu?.gyro_rad_s?.[2]) ? imu.gyro_rad_s[2] / DEG : null, 1, '°/s')],
+      ['Vitesse de lacet', unite(Number.isFinite(imu?.gyro_rad_s?.[2]) ? imu.gyro_rad_s[2] / DEG : null, 1, '°/s')],
+      ['Cap intégré (ESP)', unite(imu?.lacet_deg, 1, '°')],
       ['Température', unite(imu?.temperature_c, 1, '°C')],
     ]);
 

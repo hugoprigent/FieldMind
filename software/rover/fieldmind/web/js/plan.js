@@ -232,6 +232,41 @@ export class Plan {
     if (carte?.but) this._cible(ctx, carte.but[0], carte.but[1], couleur('--accent'));
     if (this.marque) this._cible(ctx, this.marque.x, this.marque.y, couleur('--alerte'));
 
+    const exploration = this.donnees.etat?.mission?.exploration;
+    for (const p of exploration?.prochains || []) {
+      const [u, v] = this.versEcran(p.x, p.y);
+      ctx.strokeStyle = couleur('--texte-3'); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(u, v, 4, 0, Math.PI * 2); ctx.stroke();
+    }
+    (exploration?.points || []).forEach((p, i) => {
+      const [u, v] = this.versEcran(p.x, p.y);
+      ctx.fillStyle = couleur(p.etat === 'visite' ? '--ok' : p.etat === 'inaccessible' ? '--alerte' : '--accent');
+      ctx.beginPath(); ctx.arc(u, v, 7, 0, Math.PI * 2); ctx.fill();
+      ctx.font = '11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = couleur('--carte-fond'); ctx.fillText(String(i + 1), u, v);
+    });
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    for (const o of this.donnees.etat?.monde?.objets || []) {
+      if ((o.observations_visuelles ?? 1) < 1) continue;
+      const [u, v] = this.versEcran(o.x, o.y);
+      const confirme = o.statut === 'confirme';
+      ctx.fillStyle = couleur(confirme ? '--accent' : '--texte-3');
+      if (confirme) ctx.fillRect(u - 2, v - 2, 4, 4);
+      else { ctx.strokeStyle = ctx.fillStyle; ctx.strokeRect(u - 3, v - 3, 6, 6); }
+      ctx.font = '11px sans-serif'; ctx.fillStyle = couleur('--texte-1');
+      ctx.fillText(`${o.label.slice(0, 32)}${confirme ? '' : ' ?'}`, u + 6, v - 5);
+    }
+    for (const piece of this.donnees.etat?.monde?.pieces || []) {
+      const preuves = piece.preuves || [];
+      if (preuves.length < 2) continue;
+      const x = preuves.reduce((s, p) => s + p.x, 0) / preuves.length;
+      const y = preuves.reduce((s, p) => s + p.y, 0) / preuves.length;
+      const [u, v] = this.versEcran(x, y);
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillStyle = couleur(piece.statut === 'confirmee' ? '--ok' : '--texte-3');
+      ctx.fillText(`${piece.nom}${piece.statut === 'confirmee' ? '' : ' ?'}`, u + 8, v + 16);
+    }
+
     if (odom) {
       const c0 = Math.cos(odom.cap), s0 = Math.sin(odom.cap);
       const scan = this.donnees.scan;

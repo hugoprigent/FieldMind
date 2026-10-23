@@ -29,9 +29,9 @@ def test_fichier_du_depot() -> None:
     assert gemini.agent is not None and gemini.agent.reflexion == "low"
     assert gemini.transcription is not None and gemini.transcription.mode == "gemini_natif"
     gx10 = config.profil("gx10")
-    assert gx10.url == "http://gx10.local:8000/v1"
+    assert gx10.url == "http://gx10.local:8090/modele/v1"  # passerelle du GX10
     assert gx10.transcription is not None
-    assert gx10.transcription.url == "http://gx10.local:8001/v1"
+    assert gx10.transcription.url == "http://gx10.local:8090/transcription/v1"
     assert gx10.transcription.mode == "openai_transcriptions"
     assert config.profil("aucun").agent is None
     assert config.voix.duree_min_s == 0.4 and config.voix.duree_max_s == 15.0
@@ -67,11 +67,12 @@ def test_cle_lue_dans_le_fichier_env(tmp_path: Path) -> None:
 
 def test_hote_du_gx10_par_variable() -> None:
     config = ConfigIA.charger(FICHIER_IA, fichier_env=None, fichier_choix=None,
-                              env={"FIELDMIND_GX10_HOTE": "192.168.1.50"})
+                              env={"FIELDMIND_GX10_HOTE": "http://gx10.example.internal:8090"})
     gx10 = config.profil("gx10")
-    assert gx10.url == "http://192.168.1.50:8000/v1"
+    assert gx10.url == "http://gx10.example.internal:8090/modele/v1"
     assert gx10.transcription is not None
-    assert gx10.transcription.url == "http://192.168.1.50:8001/v1"
+    assert gx10.transcription.url == "http://gx10.example.internal:8090/transcription/v1"
+    assert gx10.url_tunnel == "http://gx10.example.internal:8090/tunnel"
     assert config.disponibilite("agent", "gx10") == (True, None)  # clé facultative
 
 
@@ -107,10 +108,12 @@ async def test_bascule_en_marche_change_de_serveur() -> None:
         config.changer_profil("aucun", enregistrer=False)
         resultat = await agent.consigne("avance de 1 m")
         await config.passerelle().fermer()
+    # Une étape explicite appelle le GX10 une seule fois : « avance de 1 m » est complète.
     assert [c for c, _ in fs.requetes] == ["/v1beta/openai/chat/completions",
                                            "/v1/chat/completions"]
-    assert [corps["model"] for _, corps in fs.requetes] == ["gemini-4-argon",
-                                                            "nvidia/Qwen3.6-35B-A3B-NVFP4"]
+    assert [corps["model"] for _, corps in fs.requetes] == [
+        "gemini-4-argon", "nvidia/Qwen3.6-35B-A3B-NVFP4"]
+    assert fs.requetes[1][1]["messages"][-1]["role"] == "user"
     assert resultat.statut == "indisponible" and len(outils.plans) == 2
 
 

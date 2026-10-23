@@ -1,0 +1,122 @@
+{
+  "apk_sha256": "3cccb4f10c99f32a1341cda0b80bae5b51cff7fe6cfadf10d49d3c9188956537",
+  "method": "LR7$b;->run()V",
+  "interpreter": "Original DEX opcode interpretation; Android/BLE calls stubbed; no motor command transmitted",
+  "vectors": [
+    {
+      "label": "neutral",
+      "fields": {},
+      "axes_l_m_n_o": [
+        128,
+        128,
+        128,
+        128
+      ],
+      "hex": "02 66 80 80 80 80 00 00 99"
+    },
+    {
+      "label": "takeoff",
+      "fields": {
+        "u": true
+      },
+      "axes_l_m_n_o": [
+        128,
+        128,
+        128,
+        128
+      ],
+      "hex": "02 66 80 80 80 80 01 01 99"
+    },
+    {
+      "label": "land",
+      "fields": {
+        "v": true
+      },
+      "axes_l_m_n_o": [
+        128,
+        128,
+        128,
+        128
+      ],
+      "hex": "02 66 80 80 80 80 02 02 99"
+    },
+    {
+      "label": "stop",
+      "fields": {
+        "w": true
+      },
+      "axes_l_m_n_o": [
+        128,
+        128,
+        128,
+        128
+      ],
+      "hex": "02 66 80 80 80 80 04 04 99"
+    },
+    {
+      "label": "calibration",
+      "fields": {
+        "A": true
+      },
+      "axes_l_m_n_o": [
+        128,
+        128,
+        128,
+        128
+      ],
+      "hex": "02 66 80 80 80 80 80 80 99"
+    },
+    {
+      "label": "headless",
+      "fields": {
+        "z": true
+      },
+      "axes_l_m_n_o": [
+        128,
+        128,
+        128,
+        128
+      ],
+      "hex": "02 66 80 80 80 80 10 10 99"
+    },
+    {
+      "label": "combined takeoff + headless",
+      "fields": {
+        "u": true,
+        "z": true
+      },
+      "axes_l_m_n_o": [
+        128,
+        128,
+        128,
+        128
+      ],
+      "hex": "02 66 80 80 80 80 11 11 99"
+    },
+    {
+      "label": "asymmetric axes",
+      "fields": {},
+      "axes_l_m_n_o": [
+        149,
+        103,
+        181,
+        77
+      ],
+      "hex": "02 66 95 67 b5 4d 00 0a 99"
+    },
+    {
+      "label": "asymmetric + land",
+      "fields": {
+        "v": true
+      },
+      "axes_l_m_n_o": [
+        149,
+        103,
+        181,
+        77
+      ],
+      "hex": "02 66 95 67 b5 4d 02 08 99"
+    }
+  ],
+  "scope": "Core controls implemented by cooleerx.py; excludes flips/media and out-of-range inputs rejected by its API"
+}

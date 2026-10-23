@@ -6,9 +6,13 @@
 #include <cstdlib>
 #include <cstring>
 #ifdef FIELDMIND_ROVER_COMPLET
-#define VERSION_ATTENDUE "[FIRMWARE] ROVER_3"
+#define VERSION_ATTENDUE "[FIRMWARE] ROVER_4"
 #else
 #define VERSION_ATTENDUE "[FIRMWARE] TOUT_MOTEUR_4"
+#endif
+#ifdef FIELDMIND_ROVER_COMPLET
+// La liaison Wi-Fi du drone n'est pas compilee ici : aucune ligne ne lui revient.
+namespace drone { bool traiterCommande(const char *) { return false; } }
 #endif
 uint32_t horloge=0;
 uint32_t decalageMicros=0;
@@ -196,7 +200,7 @@ static int scenarioRover3() {
 #ifdef FIELDMIND_ROVER_COMPLET
   CHECK3(Serial.sortie.find("[PILOTAGE] Telemetrie coupee.\n")==0);
   jusqua(horloge+1100);
-  CHECK3(compter(Serial.sortie,"[FIRMWARE] ROVER_3")>=1 && compter(Serial.sortie,"\nT ")==0);
+  CHECK3(compter(Serial.sortie,"[FIRMWARE] ROVER_4")>=1 && compter(Serial.sortie,"\nT ")==0);
 #else
   CHECK3(Serial.sortie=="[PILOTAGE] Telemetrie coupee.\n");
 #endif
@@ -291,6 +295,28 @@ static int scenarioRover3() {
   CHECK3(Serial.sortie=="[CENTRALE] Absente de ce programme ; commande ignoree.\n");
   CHECK3(actionneurs::cadenceCentrale()==0);
 #endif
+
+  // Volets de la remorque (ROVER_4) : servos 50 Hz sur D2/D3, exclusifs avec roues 1.
+  Serial.sortie.clear();
+  envoyer("volg 0");
+  CHECK3(sorties[D2].active && sorties[D2].bus.freq_hz==50 && sorties[D2].duty==410); // 500 us
+  CHECK3(Serial.sortie.find("[VOLETS] gauche D2 : cible 0 deg.")!=std::string::npos);
+  envoyer("volg 90");
+  CHECK3(sorties[D2].duty==410);                 // mouvement doux : pas de saut
+  jusqua(horloge+1100);
+  CHECK3(sorties[D2].duty==1229);                // 1500 us apres 1 s a 90 deg/s
+  envoyer("vold 180");
+  CHECK3(sorties[D3].active && sorties[D3].duty==2048); // premiere consigne : directement
+  Serial.sortie.clear();
+  envoyer("roues 1");
+  CHECK3(Serial.sortie.find("[ROUES] Refuse : D2/D3 commandent les volets")!=std::string::npos);
+  Serial.sortie.clear();
+  modes[D2]=modes[D3]=-1;
+  envoyer("roues 0");                            // reconfiguration du Pi : volets gardes
+  CHECK3(sorties[D2].active && sorties[D3].active && modes[D2]==-1 && modes[D3]==-1);
+  CHECK3(Serial.sortie=="[ROUES] Lecture SC coupee ; D2/D3 gardes pour les volets.\n");
+  envoyer("volg -1"); envoyer("vold -1");
+  CHECK3(!sorties[D2].active && !sorties[D3].active && modes[D2]==INPUT);
 
   // Defaut verrouille : p refuse, reglages toujours acceptes, T signale le defaut.
   envoyer("g 5"); envoyer("d 7");

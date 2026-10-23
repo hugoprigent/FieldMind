@@ -3,6 +3,7 @@
 
 import { $, $$, el, icone, texte, attribut, nombre, heure, duree, confirmer, signaler, signalerRefus } from '../outils.js';
 import { CALIBRATIONS } from '../textes.js';
+import { AssistantStereo } from './assistant_stereo.js';
 
 const TUILES = [
   ['cpu', 'Processeur', 'systeme'],
@@ -97,6 +98,7 @@ export class VueSysteme {
     });
 
     // Calibrations.
+    this.assistantStereo = new AssistantStereo(ctx);
     for (const c of CALIBRATIONS) {
       const bouton = el('button', { type: 'button', class: 'bouton petit' }, icone('lecture'), el('span', { text: 'Lancer' }));
       const li = el('li', { dataset: { nom: c.nom, etat: '' } },
@@ -225,12 +227,15 @@ export class VueSysteme {
   // ---------------------------------------------------------------- calibrations
 
   async _calibrer(c, li, bouton) {
+    if (c.nom === 'stereo_assistant') { this.assistantStereo.ouvrir(); return; }
     const enCours = li.dataset.etat === 'en_cours';
     if (enCours) {
       signalerRefus(await this.ctx.connexion.demander({ type: 'calibration', nom: c.nom, arreter: true }));
       return;
     }
-    if (c.confirmer && !(await confirmer(c.confirmer, bouton))) return;
+    if (c.nom === 'sens_roues') {  // demande le banc : y passer d'ici, après confirmation
+      if (!(await this._entrerBanc(bouton, 'Roues levées ? Le rover passe en banc et fait tourner chaque roue.'))) return;
+    } else if (c.confirmer && !(await confirmer(c.confirmer, bouton))) return;
     if (c.nom.startsWith('stereo_')) this.derniereStereo = c.nom;
     this._majCalibration({ nom: c.nom, etat: 'en_cours', message: '…' });
     const r = await this.ctx.connexion.demander({ type: 'calibration', nom: c.nom });
@@ -244,11 +249,12 @@ export class VueSysteme {
 
   _majCalibration(m) {
     // Le serveur annonce les deux étapes stéréo sous le nom « stereo ».
-    const nom = m.nom === 'stereo' ? this.derniereStereo || 'stereo_capture' : m.nom;
+    const nom = m.nom === 'stereo' ? 'stereo_assistant' : m.nom;
     const li = $(`#s-calibrations li[data-nom="${CSS.escape(String(nom))}"]`);
     if (!li) return;
-    // Une capture de mire est instantanée : son annonce « en_cours » vaut résultat.
-    const etat = nom === 'stereo_capture' && m.etat === 'en_cours' && m.message !== '…' ? 'termine' : m.etat || '';
+    // Stéréo : l'assistant mène les captures ; la ligne ne montre que le dernier bilan, sans
+    // passer en « en cours » (le bouton reste « Lancer », qui rouvre l'assistant)
+    const etat = nom === 'stereo_assistant' && m.etat === 'en_cours' ? '' : m.etat || '';
     li.dataset.etat = etat;
     const bouton = li.querySelector('button');
     const enCours = etat === 'en_cours';
@@ -280,6 +286,8 @@ export class VueSysteme {
       for (const c of Object.values(curseurs)) c.value = 0;
       afficher();
     });
+    // Entrer en banc (et en sortir) d'ici : le mode n'est plus dans Pilotage
+    $('#s-banc-mode').addEventListener('click', (e) => this._basculerBanc(e.currentTarget));
     const bouton = $('#s-banc-go');
     this.minuterieBanc = null;
     const envoyer = () => this.ctx.connexion.envoyer({
@@ -297,6 +305,28 @@ export class VueSysteme {
     this.ctx.surArret(() => this._arreterBanc());
   }
 
+  /** Banc : roues levées, armé. `pour` : texte de la confirmation. Renvoie vrai si en banc. */
+  async _entrerBanc(declencheur, pour = 'Passer en banc ? Roues levées.') {
+    const e = this.ctx.donnees.etat;
+    if (e?.mode === 'banc' && e?.arme) return true;
+    if (!(await confirmer(pour, declencheur, { danger: true }))) return false;
+    if (e?.mode !== 'banc') {
+      const r = signalerRefus(await this.ctx.connexion.demander({ type: 'mode', mode: 'banc', confirmer: true }));
+      if (!r.ok) return false;
+    }
+    const r = signalerRefus(await this.ctx.connexion.demander({ type: 'armer' }));
+    return Boolean(r.ok);
+  }
+
+  async _basculerBanc(bouton) {
+    if (this.ctx.donnees.etat?.mode === 'banc') {
+      this._arreterBanc();
+      signalerRefus(await this.ctx.connexion.demander({ type: 'mode', mode: 'arret' }));
+      return;
+    }
+    await this._entrerBanc(bouton);
+  }
+
   _arreterBanc() {
     if (this.minuterieBanc === null) return;
     clearInterval(this.minuterieBanc);
@@ -306,6 +336,10 @@ export class VueSysteme {
   }
 
   _majEtat() {
+    const enBanc = this.ctx.donnees.etat?.mode === 'banc';
+    const boutonBanc = $('#s-banc-mode');
+    texte(boutonBanc.querySelector('span'), enBanc ? 'Quitter le banc' : 'Passer en banc');
+    attribut($('#s-banc'), 'data-actif', enBanc ? 'true' : 'false');
     if (!this.actif) return;
     const d = this.ctx.donnees, e = d.liaison === 'ok' ? d.etat : null;
     const lidar = e?.capteurs?.lidar;

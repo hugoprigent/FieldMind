@@ -19,8 +19,8 @@ Le test_tout_moteur reste disponible, avec le meme controleur et sans capteurs.
 | D5 / GPIO24 | SDA commun IMU, barometre, OLED et Knob |
 | D6 / GPIO11 | SCL commun IMU, barometre, OLED et Knob |
 | GND | References communes ESP, drivers (orange), alimentation servo |
-| D2 / GPIO25 | Facultatif, non cable : sortie SC du driver gauche, par adaptation ([voir plus bas](#sorties-sc-des-drivers-facultatif)) |
-| D3 / GPIO7 | Facultatif, non cable : sortie SC du driver droit, meme adaptation |
+| D2 / GPIO25 | Signal du servo du **volet gauche** de la remorque (ROVER_4, `volg`) — ou, au choix, sortie SC du driver gauche ([voir plus bas](#sorties-sc-des-drivers-facultatif)) |
+| D3 / GPIO7 | Signal du servo du **volet droit** de la remorque (ROVER_4, `vold`) — ou sortie SC du driver droit |
 
 Les deux fils jaunes D/R restent separes. D8 n'est plus utilisee.
 D7 est occupee par le servo : aucun GPS sur cette broche dans ce montage.
@@ -55,7 +55,7 @@ restaurees au reboot. Les boutons Corriger l'avant de la page PC font ce reglage
 1. Televerser **PlatformIO > esp_c5 > General > Upload**, puis fermer le moniteur.
 2. Connecter le XIAO en USB au Raspberry Pi. Le servo demande le centre
    **1500 us au demarrage** ; traction a zero. Le premier centrage peut etre rapide.
-3. Ouvrir la supervision du Pi, normalement `http://rover.local:8080/`.
+3. Ouvrir la supervision du Pi, normalement `http://rover.local:8080/` (adresse du Pi à adapter).
    L'adresse peut changer avec le reseau. Le service est fieldmind-embarque.
 4. Dans Ports serie, reperer l'ESP USB natif (`/dev/ttyACM0` le plus souvent).
    Verifier **ROVER_3**, puis envoyer `etat` dans le champ de ce port.
@@ -85,6 +85,7 @@ restaurees au reboot. Les boutons Corriger l'avant de la page PC font ce reglage
 | imu 50 / imu 0 | ROVER_3 : ligne I a 0..100 Hz ; imu 0 = ligne IMU texte d'origine |
 | lacet0 | ROVER_3 : remet le lacet integre a zero |
 | roues 1 / roues 0 | Lecture des sorties SC sur D2/D3 et deux champs de plus dans T / coupee (defaut) |
+| volg 0..180 / vold 0..180 | ROVER_4 : servo du volet gauche (D2) / droit (D3), 50 Hz, 500..2500 us ; premiere consigne directe, puis 90 deg/s ; -1 coupe le signal. Refuse si roues 1 ; roues 0 garde les volets |
 
 Les commandes avance/armer/test et les nombres seuls de l'ancien main sont
 remplaces par ces commandes communes avec le test combine. Ne pas envoyer

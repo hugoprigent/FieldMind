@@ -479,7 +479,7 @@ if (parametres.get('ips') === '1') {
 const ws = parametres.get('ws');
 let demo = null;
 if (ws) {
-  brancher(ws === '1' ? `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws` : ws);
+  brancher(ws === '1' ? new URL('ws', location.href).href.replace(/^http/, 'ws') : ws);
 } else {
   demo = new Demo(vue);
   const decalage = Number(parametres.get('t')) || 0;

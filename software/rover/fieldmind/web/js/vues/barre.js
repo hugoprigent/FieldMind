@@ -29,6 +29,14 @@ export class Barre {
       conteneur.append(lien);
       this.pastilles[p.cle] = { lien, libelle: lien.querySelector('.libelle') };
     }
+    // Micro : appuyer, puis parler ; chaque phrase entendue part à l'agent (voix du rover)
+    this.boutonVoix = $('#bouton-voix');
+    this.boutonVoix.addEventListener('click', () => ctx.basculerVoix());
+    ctx.donnees.sur('voix', (m) => {
+      if (m.evenement === 'transcription' && m.texte) signaler(`« ${m.texte} »`, 'info', 3500);
+      if (m.evenement === 'erreur') signaler(m.message || 'micro : erreur', 'erreur', 3500);
+      this.majVoix();
+    });
     this.boutonArret = $('#bouton-arret');
     this.boutonRearmer = $('#bouton-rearmer');
     this.boutonArret.addEventListener('click', () => ctx.arretUrgence());
@@ -50,9 +58,28 @@ export class Barre {
     attribut(p.lien, 'title', titre || p.libelle.textContent);
   }
 
+  majVoix() {
+    const d = this.ctx.donnees, voix = d.liaison === 'ok' ? d.etat?.voix : null;
+    attribut(this.boutonVoix, 'aria-pressed', voix?.active ? 'true' : 'false');
+    attribut(this.boutonVoix, 'data-parole', voix?.active && (voix?.parle || d.parole) ? 'true' : 'false');
+    texte(this.boutonVoix.querySelector('.libelle'), voix?.active ? 'J’écoute' : 'Parler');
+    const niveau = voix?.active ? Math.min(1, Math.max(0, voix.niveau || 0)) : 0;
+    this.boutonVoix.style.setProperty('--niveau', String(Math.round(Math.sqrt(niveau) * 100) / 100));
+  }
+
   maj() {
+    this.majVoix();
     const d = this.ctx.donnees;
-    $('#bandeau-simulation').hidden = d.materiel !== 'simulation';
+    const bandeauSimulation = $('#bandeau-simulation');
+    bandeauSimulation.hidden = d.materiel !== 'simulation';
+    if (location.pathname.startsWith('/fieldmind/')) {
+      const nomIA = d.ia?.profil === 'gx10' ? 'GX10'
+        : d.ia?.profil === 'gemini' ? 'Gemini'
+          : 'désactivée';
+      bandeauSimulation.textContent = `SIMULATION · IA ${nomIA}`;
+    } else {
+      bandeauSimulation.textContent = 'SIMULATION';
+    }
     const enLigne = d.liaison === 'ok';
     const age = d.ageEtat();
     const frais = enLigne && age < 1.5;

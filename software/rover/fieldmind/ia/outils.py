@@ -40,8 +40,8 @@ CAMERAS = ("gauche", "droite")
 ACTIONS_MAX = 12
 
 TYPES_ACTIONS = ("avancer", "tourner", "aller_a", "cap", "attendre", "retour_depart",
-                 "aller_gps", "memoriser_lieu", "aller_lieu", "chercher", "decrire", "photo",
-                 "stop")
+                 "aller_gps", "memoriser_lieu", "aller_lieu", "chercher", "suivre", "decrire",
+                 "photo", "explorer", "rejoindre_piece", "stop")
 """Actions de mission (types.Action) que le modèle peut proposer."""
 FONCTIONS_CONTROLE = ("mettre_a_la_suite", "annuler", "ignorer")
 """Fonctions qui ne sont pas des actions : elles règlent le traitement de la consigne."""
@@ -144,7 +144,8 @@ def schemas_fonctions(vitesse_max_m_s: float = 0.5,
                   ["angle_deg"]),
         _fonction("aller_a", "Aller à un point en évitant les obstacles (planificateur) : point "
                   "relatif au rover (repere robot : x devant, y à gauche) ou point de la carte "
-                  "(repere odom).",
+                  "(repere odom). Seulement pour des coordonnées ou mesures explicitement "
+                  "données par l'opérateur ; jamais pour deviner la position d'une pièce.",
                   {"x": {"type": "number", "description": "mètres"},
                    "y": {"type": "number", "description": "mètres, positif à gauche"},
                    "repere": {"type": "string", "enum": ["robot", "odom"]}},
@@ -174,6 +175,27 @@ def schemas_fonctions(vitesse_max_m_s: float = 0.5,
                   ["nom"]),
         *([_fonction("aller_lieu", "Aller à un lieu mémorisé.",
                      {"nom": {"type": "string", "enum": lieux}}, ["nom"])] if lieux else []),
+        _fonction("rejoindre_piece", "Rejoindre une pièce à partir des preuves observées dans "
+                  "la mémoire spatiale : cuisine (four, micro-ondes...), salon, chambre, etc. "
+                  "L'exécuteur vérifie les objets, la confiance et l'accès ; si la pièce est "
+                  "inconnue il observe ou s'arrête sans fabriquer de coordonnées. Une pièce "
+                  "est une zone déduite d'indices, pas un objet à pointer ni un lieu à créer.",
+                  {"nom": {"type": "string", "description": "type de pièce demandé par "
+                           "l'opérateur, sans article, par exemple cuisine ou salle de bain"}},
+                  ["nom"]),
+        _fonction("explorer", "Explorer progressivement la pièce ou les environs : choisir des "
+                  "points accessibles sur la carte, s'y rendre, analyser la caméra à chaque "
+                  "étape et mémoriser les objets, portes et murs. Les points sont choisis par "
+                  "le rover au fil des mesures. Peut chercher un objet pendant l'exploration.",
+                  {"rayon_m": {"type": "number", "minimum": 1, "maximum": 30,
+                               "description": "omettre sauf limite précisée par l'opérateur (8 m)"},
+                   "points_max": {"type": "integer", "minimum": 1, "maximum": 60,
+                                  "description": "omettre sauf nombre demandé (20 par défaut)"},
+                   "duree_s": {"type": "number", "minimum": 10, "maximum": 1800,
+                               "description": "omettre sauf durée demandée (600 s par défaut)"},
+                   "objet": {"type": "string", "description": "facultatif : objet à trouver"},
+                   "approcher": {"type": "boolean", "description": "rejoindre l'objet trouvé"},
+                   "camera": camera}),
         _fonction("chercher", "Chercher un objet avec la caméra (vision), puis aller jusqu'à lui "
                   "sauf si aller vaut false (simple question « où est… »).",
                   {"objet": {"type": "string", "description": "objet décrit en français, "
@@ -182,6 +204,15 @@ def schemas_fonctions(vitesse_max_m_s: float = 0.5,
                              "défaut)"},
                    "camera": camera},
                   ["objet"]),
+        _fonction("suivre", "Suivre une personne (ou un animal) à distance, en la gardant en vue, "
+                  "jusqu'à ce que l'opérateur annule (« suis la personne en t-shirt rouge », "
+                  "« suis-moi »).",
+                  {"description": {"type": "string", "description": "la personne à suivre, en "
+                                   "français, avec ce qui la distingue (« la personne en t-shirt "
+                                   "rouge » ; « la personne devant toi » pour « suis-moi »)"},
+                   "distance_m": {"type": "number", "description": "distance à garder, en "
+                                  "mètres (1,5 par défaut)"}},
+                  ["description"]),
         _fonction("decrire", "Regarder avec la caméra et décrire la scène à l'opérateur ; "
                   "répondre à une question sur ce qui est visible.",
                   {"camera": camera,
@@ -308,7 +339,10 @@ PARAMETRES: dict[str, frozenset[str]] = {
     "aller_gps": frozenset({"lat", "lon", "tolerance_m"}),
     "memoriser_lieu": frozenset({"nom"}),
     "aller_lieu": frozenset({"nom"}),
+    "rejoindre_piece": frozenset({"nom"}),
     "chercher": frozenset({"objet", "aller", "camera"}),
+    "explorer": frozenset({"rayon_m", "points_max", "duree_s", "objet", "camera", "approcher"}),
+    "suivre": frozenset({"description", "distance_m"}),
     "decrire": frozenset({"camera", "question"}),
     "photo": frozenset({"camera"}),
     "stop": frozenset(),
@@ -330,6 +364,24 @@ def valider_action(nom: str, arguments: Mapping[str, Any] | None,
     if inconnus:
         raise ActionInvalide(f"{nom} : paramètre inconnu {', '.join(sorted(inconnus))}")
     match nom:
+        case "explorer":
+            action = {"type": nom}
+            if "approcher" in args:
+                if not isinstance(args["approcher"], bool):
+                    raise ActionInvalide("approcher doit valoir vrai ou faux")
+                action["approcher"] = args["approcher"]
+            for cle, bas, haut in (("rayon_m", 1, 30), ("duree_s", 10, 1800),
+                                   ("points_max", 1, 60)):
+                valeur = _nombre(args, cle, bas, haut, requis=False)
+                if valeur is not None:
+                    if cle == "points_max" and not valeur.is_integer():
+                        raise ActionInvalide("points_max doit être entier")
+                    action[cle] = int(valeur) if cle == "points_max" else valeur
+            if (objet := _texte(args, "objet", OBJET_LONGUEUR_MAX, requis=False)) is not None:
+                action["objet"] = objet
+            if (camera := _camera(args)) is not None:
+                action["camera"] = camera
+            return action
         case "avancer":
             distance = _nombre(args, "distance_m", -DISTANCE_MAX_M, DISTANCE_MAX_M)
             assert distance is not None
@@ -371,6 +423,13 @@ def valider_action(nom: str, arguments: Mapping[str, Any] | None,
         case "memoriser_lieu":
             nom_lieu = _texte(args, "nom", NOM_LIEU_LONGUEUR_MAX)
             return {"type": "memoriser_lieu", "nom": nom_lieu}
+        case "rejoindre_piece":
+            nom_piece = _texte(args, "nom", NOM_LIEU_LONGUEUR_MAX)
+            assert nom_piece is not None
+            # Le nom est la seule entrée : aucune position proposée par le modèle ne passe.
+            if not all(c.isalpha() or c in " -'’" for c in nom_piece):
+                raise ActionInvalide("nom de pièce invalide")
+            return {"type": "rejoindre_piece", "nom": _cle_lieu(nom_piece)}
         case "aller_lieu":
             demande = _texte(args, "nom", NOM_LIEU_LONGUEUR_MAX)
             assert demande is not None
@@ -389,6 +448,12 @@ def valider_action(nom: str, arguments: Mapping[str, Any] | None,
                 action["aller"] = False
             if (camera := _camera(args)) is not None:
                 action["camera"] = camera
+            return action
+        case "suivre":
+            description = _texte(args, "description", OBJET_LONGUEUR_MAX)
+            action = {"type": "suivre", "description": description}
+            if args.get("distance_m") is not None:
+                action["distance_m"] = _nombre(args, "distance_m", 0.8, 5.0)
             return action
         case "decrire":
             action = {"type": "decrire"}
@@ -498,9 +563,16 @@ def decrire_action(action: Action) -> str:
             return f"je mémorise cet endroit comme « {action['nom']} »"
         case "aller_lieu":
             return f"je vais à « {action['nom']} »"
+        case "rejoindre_piece":
+            return f"je recherche les indices de « {action['nom']} » pour la rejoindre"
+        case "suivre":
+            return f"suivre {action['description']}"
         case "chercher":
             texte = f"je cherche « {action['objet']} »"
             return texte if action.get("aller", True) else texte + " sans y aller"
+        case "explorer":
+            return "j'explore progressivement et je cartographie ce que je vois" + (
+                f" pour trouver « {action['objet']} »" if action.get("objet") else "")
         case "decrire":
             return "je regarde et je décris ce que je vois"
         case "photo":

@@ -15,8 +15,8 @@ import threading
 import time
 from collections import deque
 from collections.abc import Callable, Coroutine
-from concurrent.futures import Future
-from dataclasses import dataclass, field
+from concurrent.futures import Future, ThreadPoolExecutor
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any
 
@@ -26,6 +26,7 @@ from fieldmind.bus import Bus, S
 from fieldmind.config import Profil, braquage_max
 from fieldmind.mission import actions as A
 from fieldmind.mission.actions import ActionRefusee, Contexte, Pas
+from fieldmind.mission.exploration import Explorer, _NavigationConnue
 from fieldmind.types import (
     Action,
     CarteOccupation,
@@ -62,13 +63,13 @@ class Navigation:
         return self._planificateur.planifier(carte, depart, but)
 
     def commande(self, odom: Odometrie, chemin: Chemin, obstacles: np.ndarray,
-                 vitesse_max: float) -> Any:
-        return self._pilote.commande(odom, chemin, obstacles, vitesse_max)
+                 vitesse_max: float, indicatifs: np.ndarray | None = None) -> Any:
+        return self._pilote.commande(odom, chemin, obstacles, vitesse_max, indicatifs)
 
 
 @dataclass
 class Chercher:
-    """Vision IA : pointer l'objet ; s'il n'est pas vu, tourner de 60° et recommencer (6 fois)."""
+    """Recherche corroborée, puis approche uniquement dans l'espace mesuré."""
 
     action: Action
     executeur: Executeur
@@ -78,51 +79,183 @@ class Chercher:
     _sous: A.Primitive | None = None
     _mode: str = "analyse"  # analyse | approche | rotation
     trouve: dict[str, Any] | None = None
+    _memoire_consultee: bool = False
+    _analyse_debut: float = 0.0
+    _reobserver_a: float = 0.0
+    _pool: ThreadPoolExecutor | None = None
+    _navigation: _NavigationConnue | None = None
+    _cible_id: int | None = None
+
+    def _monde_mesure(self) -> bool:
+        return callable(getattr(getattr(self.executeur, "monde", None), "resume", None))
+
+    def _connus(self, objet: str) -> list[dict[str, Any]]:
+        monde = getattr(self.executeur, "monde", None)
+        connus = monde.rechercher(objet) if monde is not None else []
+        return [o for o in connus if o.get("statut") == "confirme"
+                or (not self._monde_mesure() and "statut" not in o)]
+
+    def _fermer_sous(self) -> None:
+        fermer = getattr(self._sous, "fermer", None)
+        if callable(fermer):
+            fermer()
+        self._sous = None
+        if self._navigation is not None:
+            self._navigation.fermer()
+
+    def fermer(self) -> None:
+        if self._analyse is not None:
+            self._analyse.cancel()
+            self._analyse = None
+        self._fermer_sous()
+        if self._pool is not None:
+            self._pool.shutdown(wait=False, cancel_futures=True)
+            self._pool = None
+        self._navigation = None
 
     def pas(self, ctx: Contexte) -> Pas:
         objet = self.action["objet"]
+        if not self._memoire_consultee:
+            self._memoire_consultee = True
+            connus = self._connus(objet)
+            if connus and self.action.get("approcher", True):
+                cible = min(connus, key=lambda o: math.hypot(o["x"] - ctx.odom.pose.x,
+                                                           o["y"] - ctx.odom.pose.y))
+                self._cible_id = cible.get("id")
+                dx, dy = cible["x"] - ctx.odom.pose.x, cible["y"] - ctx.odom.pose.y
+                d = math.hypot(dx, dy)
+                if d > 1:
+                    x = ctx.odom.pose.x + dx * (d - 0.8) / d
+                    y = ctx.odom.pose.y + dy * (d - 0.8) / d
+                    self._mode = "memoire"
+                    self._sous = A.AllerA({"type": "aller_a", "x": x, "y": y, "repere": "odom"})
         if self._sous is not None:
-            resultat = self._sous.pas(ctx)
+            contexte = ctx
+            if self._monde_mesure() and self._mode in ("memoire", "approche"):
+                if not any(o.get("id") == self._cible_id for o in self._connus(objet)):
+                    self._fermer_sous()
+                    self._mode = "analyse"
+                    return Pas(detail=f"« {objet} » : repère à confirmer de nouveau")
+                if ctx.carte is None or ctx.navigation is None:
+                    self.fermer()
+                    return Pas(etat="echec", raison="carte connue indisponible pour approcher")
+                if self._pool is None:
+                    self._pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="chercher")
+                    marge = float(self.executeur.profil.valeur(
+                        "geometrie.emprise_demi_largeur_m", 0.225)) + 0.1
+                    self._navigation = _NavigationConnue(ctx.navigation, self._pool, marge,
+                                                        ctx.empattement, ctx.carte)
+                assert self._navigation is not None
+                self._navigation.carte = ctx.carte
+                contexte = replace(ctx, navigation=self._navigation)
+            resultat = self._sous.pas(contexte)
             if resultat.etat == "termine":
-                self._sous = None
-                if self._mode == "approche":
-                    return Pas(etat="termine", progression=1.0, detail=f"« {objet} » atteint")
+                self._fermer_sous()
+                if self._mode in ("approche", "exploration"):
+                    self.fermer()
+                    return Pas(etat="termine", progression=1.0, detail=(
+                        f"« {objet} » atteint" if self.action.get("approcher", True)
+                        else f"« {objet} » repéré"))
                 self._mode = "analyse"
             elif resultat.etat == "echec":
-                return resultat
+                self._fermer_sous()
+                if self._mode != "memoire":
+                    self.fermer()
+                    return resultat
+                self._mode = "analyse"
             else:
                 resultat.detail = f"{objet} : {resultat.detail}"
                 return resultat
         if self._analyse is None:
+            if ctx.t < self._reobserver_a:
+                return Pas(detail=f"« {objet} » : attente d'une acquisition indépendante")
             if self.essais >= 6:
+                self.fermer()
                 return Pas(etat="echec", raison=f"« {objet} » introuvable autour du rover")
             self.essais += 1
             self._pose_image = ctx.odom.pose
             self._analyse = self.executeur.lancer_ia(
                 "chercher", (objet, self.action.get("camera", "gauche")))
+            self._analyse_debut = ctx.t
             if self._analyse is None:
+                self.fermer()
                 return Pas(etat="echec", raison="IA indisponible")
             return Pas(detail=f"analyse de l'image ({self.essais}/6)")
         if not self._analyse.done():
+            if ctx.t - self._analyse_debut > 45:
+                self.fermer()
+                return Pas(etat="echec", raison="recherche visuelle expirée")
             return Pas(detail=f"analyse de l'image ({self.essais}/6)")
         try:
             points = self._analyse.result() or []
         except Exception as erreur:
+            self.fermer()
             return Pas(etat="echec", raison=f"vision : {erreur}")
         finally:
             self._analyse = None
+        # Les points d'une ancienne acquisition ne doivent ni terminer ni relancer une mission.
+        actuels = []
+        for point in points:
+            if not isinstance(point, dict):
+                continue
+            capture = point.get("image_t")
+            if capture is not None and (not isinstance(capture, int | float)
+                                        or not math.isfinite(capture)
+                                        or not -0.5 <= ctx.t - capture <= 45):
+                continue
+            sol = point.get("sol")
+            if sol is not None and (not isinstance(sol, list | tuple) or len(sol) != 2
+                                    or not all(isinstance(v, int | float) and math.isfinite(v)
+                                               for v in sol)):
+                continue
+            acquisition = point.get("pose_odom")
+            if acquisition is not None and (not isinstance(acquisition, list | tuple)
+                                            or len(acquisition) != 3
+                                            or not all(isinstance(v, int | float)
+                                                       and math.isfinite(v) for v in acquisition)):
+                continue
+            actuels.append(point)
+        points = actuels
         au_sol = [p for p in points if p.get("sol")]
+        if au_sol and self._monde_mesure():
+            # Le résultat visuel ne vaut pas corroboration. D-FINE et GX10 peuvent
+            # décrire la même acquisition ; seule la mémoire compte les captures.
+            connus = self._connus(objet)
+            confirmes = []
+            for point in au_sol:
+                acquisition = point.get("pose_odom")
+                pose = Pose2D(*acquisition) if acquisition is not None else self._pose_image
+                assert pose is not None
+                x, y = pose.vers_parent(*point["sol"])
+                correspondants = [o for o in connus if math.hypot(o["x"] - x, o["y"] - y) < 0.8]
+                if correspondants:
+                    cible = min(correspondants, key=lambda o: math.hypot(o["x"] - x, o["y"] - y))
+                    # La suite utilise la distance actuelle à la position mesurée,
+                    # même si le rover a bougé pendant l'analyse de l'image.
+                    sol = ctx.odom.pose.vers_local(cible["x"], cible["y"])
+                    confirmes.append({**point, "sol": sol, "id_memoire": cible.get("id"),
+                                      "pose_odom": [ctx.odom.pose.x, ctx.odom.pose.y,
+                                                    ctx.odom.pose.cap]})
+            if not confirmes:
+                self._reobserver_a = ctx.t + 0.5
+                return Pas(detail=f"« {objet} » aperçu : seconde observation nécessaire")
+            au_sol = confirmes
         if au_sol:
             self.trouve = au_sol[0]
+            self._cible_id = au_sol[0].get("id_memoire", self._cible_id)
             if not self.action.get("approcher", True):
+                self.fermer()
                 return Pas(etat="termine", progression=1.0, detail=f"« {objet} » repéré")
             x, y = au_sol[0]["sol"]
             distance = math.hypot(x, y)
             arret = max(0.0, distance - 0.5)  # s'arrêter à 50 cm de l'objet
             if arret < A.TOLERANCE_BUT_M:
+                self.fermer()
                 return Pas(etat="termine", progression=1.0, detail=f"« {objet} » devant le rover")
             assert self._pose_image is not None
-            cible = self._pose_image.vers_parent(x * arret / distance, y * arret / distance)
+            acquisition = au_sol[0].get("pose_odom")
+            pose_image = Pose2D(*acquisition) if acquisition is not None else self._pose_image
+            cible = pose_image.vers_parent(x * arret / distance, y * arret / distance)
             self._mode = "approche"
             self._sous = A.AllerA({"type": "aller_a", "x": cible[0], "y": cible[1],
                                    "repere": "odom"})
@@ -134,9 +267,17 @@ class Chercher:
                 self._mode = "rotation"
                 self._sous = A.Tourner({"type": "tourner", "angle_deg": angle})
                 return Pas(detail=f"« {objet} » au loin : orientation")
-            self._mode = "approche"
-            self._sous = A.Avancer({"type": "avancer", "distance_m": 1.5})
-            return Pas(detail=f"« {objet} » au loin : approche")
+            self._mode = "exploration"
+            self._sous = Explorer({"type": "explorer", "objet": objet,
+                                    "approcher": self.action.get("approcher", True),
+                                    "camera": self.action.get("camera", "gauche")}, self.executeur)
+            return Pas(detail=f"« {objet} » vu sans distance fiable : nouveau point de vue")
+        if self.essais >= 2:
+            self._mode = "exploration"
+            self._sous = Explorer({"type": "explorer", "objet": objet,
+                                    "approcher": self.action.get("approcher", True),
+                                    "camera": self.action.get("camera", "gauche")}, self.executeur)
+            return Pas(detail=f"« {objet} » pas ici : exploration progressive de la pièce")
         self._mode = "rotation"
         self._sous = A.Tourner({"type": "tourner", "angle_deg": 60})
         return Pas(detail=f"« {objet} » pas en vue : je tourne")
@@ -217,6 +358,77 @@ class AllerGps:
 
 
 @dataclass
+class Suivre:
+    """Suivre une personne à distance : désignée une fois (clic sur l'image ou description, par
+    le GX10), suivie image par image sur le Pi (perception.suivi), distance par le lidar.
+
+    La vitesse vient de l'écart à la distance voulue, la direction d'une poursuite pure vers la
+    personne ; jamais de marche arrière. Cible perdue : arrêt sur place, reprise automatique si
+    une détection lui ressemble, échec au bout de `PERTE_MAX_S`. La sécurité (couloir, distance
+    d'arrêt devant la personne elle-même) s'applique comme pour toute consigne."""
+
+    action: Action
+    executeur: Executeur
+    _designation: Future[Any] | None = None
+    _debut: float | None = None
+    PERTE_MAX_S = 20.0
+
+    def pas(self, ctx: Contexte) -> Pas:
+        suivi = self.executeur.suivi
+        if suivi is None:
+            return Pas(etat="echec", raison="suivi indisponible sur ce rover")
+        qui = self.action.get("description") or "la personne désignée"
+        if self._debut is None:
+            self._debut = ctx.t
+            argument = {"description": self.action.get("description"),
+                        "u": self.action.get("u"), "v": self.action.get("v"),
+                        "camera": self.action.get("camera", "gauche")}
+            self._designation = self.executeur.lancer_ia("designer", argument)
+            if self._designation is None:
+                return Pas(etat="echec", raison="IA indisponible pour désigner la cible")
+        if self._designation is not None:
+            if not self._designation.done():
+                return Pas(detail=f"je repère {qui}")
+            try:
+                trouve = self._designation.result()
+            except Exception as erreur:
+                return Pas(etat="echec", raison=f"désignation : {erreur}")
+            self._designation = None
+            if not trouve or not suivi.demarrer(trouve["image"], trouve["boite"], qui):
+                return Pas(etat="echec", raison=f"je ne vois pas {qui}")
+        suivi.garder()
+        duree = float(self.action.get("duree_s", 600.0))
+        if ctx.t - self._debut > duree:
+            suivi.arreter()
+            return Pas(etat="termine", progression=1.0, detail="durée de suivi écoulée")
+        cible = suivi.cible()
+        if cible.etat != "suivi":
+            perdu = ctx.t - (cible.perdu_depuis or ctx.t) if cible.perdu_depuis else 0.0
+            if perdu > self.PERTE_MAX_S:
+                suivi.arreter()
+                return Pas(etat="echec", raison=f"{qui} perdue de vue")
+            return Pas(etat="bloque", detail=f"{qui} perdue de vue : je la cherche")
+        voulu = float(self.action["distance_m"])
+        v_max = min(ctx.vitesse_max, float(self.executeur.profil.valeur(
+            "vitesses.max_suivi_m_s", 0.6)))
+        if cible.position is not None and cible.distance_m is not None:
+            x, y = cible.position
+            ecart = cible.distance_m - voulu
+            vitesse = 0.0 if ecart < 0.1 else min(v_max, 0.8 * ecart)
+            courbure = 2 * y / max(x * x + y * y, 0.25)
+            detail = f"{qui} à {cible.distance_m:.1f} m ({cible.source_distance})"
+        else:  # direction connue, distance inconnue : prudence
+            courbure = math.tan(cible.azimut or 0.0) / max(voulu, 1.0)
+            boite = cible.boite or (0.0, 0.0, 0.0, 0.0)
+            vitesse = 0.15 if boite[3] - boite[1] < 0.5 else 0.0
+            detail = f"{qui} en vue, distance inconnue"
+        braquage = math.atan(courbure * ctx.empattement)
+        braquage = max(-ctx.braquage_max, min(ctx.braquage_max, braquage))
+        return Pas(vitesse=vitesse, braquage=braquage, detail=detail.replace(".", ","),
+                   progression=min(1.0, (ctx.t - self._debut) / duree))
+
+
+@dataclass
 class AttenteIa:
     """Action sans mouvement qui attend le résultat de l'IA (décrire la scène)."""
 
@@ -249,17 +461,22 @@ class _Courante:
 
 class Executeur:
     def __init__(self, bus: Bus, profil: Profil, conduite: Any,
-                 navigation: Navigation | None = None) -> None:
+                 navigation: Navigation | None = None,
+                 dossier_photos: Path | None = None) -> None:
         self.bus, self.profil = bus, profil
         self.conduite = conduite
         self.navigation = navigation
+        self.dossier_photos = dossier_photos or DOSSIER_PHOTOS
         self._file: deque[tuple[str, Action]] = deque()
         self._courante: _Courante | None = None
         self._verrou = threading.RLock()
         self._ids = itertools.count(1)
+        self.generation = 0
         self.etat = "attente"
         self.en_pause = False
         self._dernier_message: dict[str, Any] = {}
+        self._derniere_exploration: dict[str, Any] | None = None
+        self.monde: Any = None
         self._actif = False
         self._fil = threading.Thread(target=self._boucle, name="mission", daemon=True)
         # Branchements facultatifs (app.py)
@@ -267,6 +484,7 @@ class Executeur:
         self.ia: Callable[[str, Any], Coroutine[Any, Any, Any]] | None = None
         self.pixel_vers_sol: Callable[[str, float, float], tuple[float, float] | None] | None = None
         self.memoire_obstacles: Callable[[], np.ndarray] | None = None
+        self.suivi: Any = None  # fieldmind.perception.suivi.SuiviCible (action « suivre »)
         self.gps: Any = None  # fieldmind.estimation.gps.NavigationGps
 
     # ------------------------------------------------------------------ interface
@@ -292,6 +510,11 @@ class Executeur:
         c = self.conduite
         if c.superviseur.arret_urgence:
             raise ActionRefusee("arrêt d'urgence actif : réarmer d'abord")
+        if (not c.arme and c.mode != "banc"
+                and bool(self.profil.valeur("conduite.armer_auto", False))):
+            c.changer_mode("auto")
+            if not c.arme:
+                c.armer()
         if not c.arme:
             raise ActionRefusee("rover désarmé : armer d'abord")
         if c.mode == "banc":
@@ -310,6 +533,9 @@ class Executeur:
         plan_id = f"p{next(self._ids)}"
         with self._verrou:
             if remplacer:
+                self.generation += 1
+                if self._courante is not None:
+                    self._liberer(self._courante.primitive)
                 self._file.clear()
                 self._courante = None
             for action in propres:
@@ -323,7 +549,8 @@ class Executeur:
         odom: Odometrie | None = self.bus.dernier(S.ODOM)
         for action in actions:
             if action["type"] == "photo":
-                enregistrer_photo(self.bus, action.get("camera", "gauche"))
+                enregistrer_photo(self.bus, action.get("camera", "gauche"),
+                                  self.dossier_photos)
             elif action["type"] == "memoriser_lieu":
                 if self.gps is None or odom is None:
                     raise ActionRefusee("position du rover inconnue")
@@ -352,7 +579,10 @@ class Executeur:
 
     def annuler(self, raison: str = "annulé") -> None:
         with self._verrou:
+            self.generation += 1
             avait = self._courante is not None or bool(self._file)
+            if self._courante is not None:
+                self._liberer(self._courante.primitive)
             self._file.clear()
             self._courante = None
             self.en_pause = False
@@ -407,7 +637,23 @@ class Executeur:
                 "detail": c.dernier.detail if c else None,
                 "file": [_publique(a) for _, a in self._file],
                 "plan_id": c.plan_id if c else None,
+                "generation": self.generation,
+                "exploration": self._exploration(c.primitive) if c else self._derniere_exploration,
             }
+
+    def _exploration(self, primitive: Any) -> dict[str, Any] | None:
+        for _ in range(4):
+            if isinstance(primitive, Explorer):
+                return primitive.resume_exploration()
+            primitive = getattr(primitive, "_sous", None)
+        return None
+
+    def _liberer(self, primitive: Any) -> None:
+        for _ in range(4):
+            fermer = getattr(primitive, "fermer", None)
+            if fermer is not None:
+                fermer()
+            primitive = getattr(primitive, "_sous", None)
 
     # ------------------------------------------------------------------ IA
 
@@ -454,26 +700,37 @@ class Executeur:
             return
         ctx = self._contexte(t)
         if ctx is None:
-            c.proposer(Consigne(t=t, source="auto"))
-            courante.dernier = Pas(etat="bloque", detail="odométrie indisponible")
-            self.etat = "bloque"
-            if t - courante.debut > 5:
-                self._fin(courante, Pas(etat="echec", raison="odométrie indisponible"))
+            with self._verrou:
+                if self._courante is not courante:
+                    return
+                c.proposer(Consigne(t=t, source="auto"))
+                courante.dernier = Pas(etat="bloque", detail="odométrie indisponible")
+                self.etat = "bloque"
+                if t - courante.debut > 5:
+                    self._fin(courante, Pas(etat="echec", raison="odométrie indisponible"))
             self._publier()
             return
         pas = courante.primitive.pas(ctx)
-        courante.dernier = pas
-        if pas.etat in ("termine", "echec"):
-            c.proposer(Consigne(t=t, source="auto"))
-            self._fin(courante, pas)
-        else:
-            self.etat = pas.etat
-            c.proposer(Consigne(t=t, vitesse=pas.vitesse, braquage=pas.braquage, source="auto"))
+        with self._verrou:
+            if self._courante is not courante:
+                return  # mission remplacée/annulée pendant ce pas : aucune ancienne commande
+            if self.en_pause or not c.arme or c.mode != "auto" or c.superviseur.arret_urgence:
+                c.proposer(Consigne(t=t, source="auto"))
+                return
+            courante.dernier = pas
+            if pas.etat in ("termine", "echec"):
+                c.proposer(Consigne(t=t, source="auto"))
+                self._fin(courante, pas)
+            else:
+                self.etat = pas.etat
+                c.proposer(Consigne(t=t, vitesse=pas.vitesse, braquage=pas.braquage, source="auto"))
         self._publier()
 
     def _fin(self, courante: _Courante, pas: Pas) -> None:
         texte = A.decrire_action(courante.action)
         with self._verrou:
+            self._derniere_exploration = self._exploration(courante.primitive)
+            self._liberer(courante.primitive)
             self._courante = None
             if pas.etat == "echec":
                 self._file.clear()
@@ -490,18 +747,26 @@ class Executeur:
             if self.etat == "termine":
                 self.bus.publier(S.CHAT, {"type": "chat", "id": f"x{time.monotonic_ns()}",
                                           "t": time.time(), "role": "systeme",
-                                          "texte": f"Terminé : {texte}."})
+                                          "texte": f"Terminé : {texte}. {pas.detail}"})
 
     def _primitive(self, action: Action) -> Any:
         t = action["type"]
+        if t == "rejoindre_piece":
+            from fieldmind.mission.pieces import RejoindrePiece
+
+            return RejoindrePiece(action, self)
+        if t == "explorer":
+            return Explorer(action, self)
         if t == "chercher":
             return Chercher(action, self)
+        if t == "suivre":
+            return Suivre(action, self)
         if t == "decrire":
             return AttenteIa(action, self)
         if t == "cap":
             return _Cap(action)
         if t == "photo":
-            return _Photo(action, self.bus)
+            return _Photo(action, self.bus, self.dossier_photos)
         if t == "aller_gps":
             return AllerGps(action, self)
         if t == "memoriser_lieu":
@@ -521,20 +786,29 @@ class Executeur:
         p = self.profil
         scan: Scan | None = self.bus.dernier(S.SCAN)
         morceaux = [scan.points()] if scan is not None and self.bus.age(S.SCAN) < 0.5 else []
+        # Stéréo et mémoire des obstacles bas : bloquantes, ou seulement indicatives (réglage
+        # securite.stereo_bloquante) — le pilote passe alors là où il y en a le moins
+        bas: list[np.ndarray] = []
         stereo: Obstacles | None = self.bus.dernier(S.OBSTACLES_STEREO)
         if stereo is not None and self.bus.age(S.OBSTACLES_STEREO) < 1.0 and len(stereo.points):
-            morceaux.append(stereo.points.astype(np.float32))
+            bas.append(stereo.points.astype(np.float32))
         if self.memoire_obstacles is not None:
             try:
                 memoire = self.memoire_obstacles()
                 if len(memoire):
-                    morceaux.append(np.asarray(memoire, np.float32))
+                    bas.append(np.asarray(memoire, np.float32))
             except Exception:
                 pass
+        indicatifs = np.zeros((0, 2), np.float32)
+        if bool(p.valeur("securite.stereo_bloquante", True)):
+            morceaux.extend(bas)
+        elif bas:
+            indicatifs = np.vstack(bas)
         obstacles = np.vstack(morceaux) if morceaux else np.zeros((0, 2), np.float32)
         return Contexte(
             t=t, odom=odom, securite=self.bus.dernier(S.SECURITE), carte=self.bus.dernier(S.CARTE),
-            obstacles=obstacles, vitesse_max=float(p.valeur("vitesses.max_auto_m_s", 0.5)),
+            obstacles=obstacles, indicatifs=indicatifs,
+            vitesse_max=float(p.valeur("vitesses.max_auto_m_s", 0.5)),
             vitesse_defaut=float(p.valeur("vitesses.defaut_action_m_s", 0.35)),
             braquage_max=braquage_max(p),
             empattement=float(p.geometrie.empattement_m), navigation=self.navigation)
@@ -586,7 +860,10 @@ class _AllerLieu:
             lieu = gps.lieu(self.action["nom"]) if gps is not None else None
             if lieu is None:
                 return Pas(etat="echec", raison=f"lieu « {self.action['nom']} » inconnu")
-            if "lat" in lieu and lieu.get("lat") is not None:
+            if lieu.get("session") == getattr(gps, "session", None) and "x" in lieu:
+                self._sous = A.AllerA({"type": "aller_a", "x": lieu["x"], "y": lieu["y"],
+                                       "repere": "odom"})
+            elif "lat" in lieu and lieu.get("lat") is not None:
                 self._sous = AllerGps({"type": "aller_gps", "lat": lieu["lat"],
                                        "lon": lieu["lon"]}, self.executeur)
             elif gps is not None and (position := gps.lieu_vers_odom(lieu)) is not None:
@@ -601,13 +878,16 @@ class _AllerLieu:
 class _Photo:
     action: Action
     bus: Bus
+    dossier: Path | None = None  # None : DOSSIER_PHOTOS lu à l’appel
 
     def pas(self, ctx: Contexte) -> Pas:
-        enregistrer_photo(self.bus, self.action.get("camera", "gauche"))
+        if enregistrer_photo(self.bus, self.action.get("camera", "gauche"), self.dossier) is None:
+            return Pas(etat="echec", raison="photo impossible : aucune image disponible")
         return Pas(etat="termine", progression=1.0)
 
 
-def enregistrer_photo(bus: Bus, camera: str) -> Path | None:
+def enregistrer_photo(bus: Bus, camera: str,
+                      dossier: Path | None = None) -> Path | None:
     if camera == "profondeur":
         donnees = bus.dernier(S.PROFONDEUR)
     elif camera == "drone":
@@ -620,8 +900,9 @@ def enregistrer_photo(bus: Bus, camera: str) -> Path | None:
     if not donnees:
         bus.journaliser("photo", f"pas d'image {camera}", "alerte")
         return None
-    DOSSIER_PHOTOS.mkdir(parents=True, exist_ok=True)
-    chemin = DOSSIER_PHOTOS / f"{time.strftime('%Y%m%d_%H%M%S')}_{camera}.jpg"
+    destination = dossier or DOSSIER_PHOTOS
+    destination.mkdir(parents=True, exist_ok=True)
+    chemin = destination / f"{time.strftime('%Y%m%d_%H%M%S')}_{camera}.jpg"
     chemin.write_bytes(donnees)
     bus.journaliser("photo", f"photo enregistrée : {chemin.name}", "succes")
     return chemin

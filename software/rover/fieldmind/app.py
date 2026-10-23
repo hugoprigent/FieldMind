@@ -12,16 +12,18 @@ le reste continue. Seule la sécurité et la conduite sont indispensables au mou
 from __future__ import annotations
 
 import asyncio
+import copy
 import math
 import threading
 import time
 from collections import deque
+from types import SimpleNamespace
 from typing import Any
 
 import numpy as np
 
 from fieldmind.bus import Bus, S
-from fieldmind.config import Profil
+from fieldmind.config import DOSSIER_UTILISATEUR, Profil
 from fieldmind.controle.conduite import Conduite
 from fieldmind.mission.actions import ActionRefusee
 from fieldmind.mission.executeur import Executeur, Navigation
@@ -55,6 +57,11 @@ class Estimation:
         self.trajectoire: deque[tuple[float, float]] = deque(maxlen=2000)
         self.duree_icp_ms = 0.0
         self._derniere_carte = 0.0
+        # Entrées venues d'autres fils (conduite à 20 Hz, lecteur de l'ESP à 50 Hz, GPS) : file
+        # sans verrou, vidée par l'estimation avant chaque calcul. La conduite ne doit jamais
+        # attendre l'ICP et la carte (jusqu'à 300 ms sous le verrou sur le Pi).
+        self._entrees: deque[tuple[str, Any]] = deque(maxlen=2000)
+        self._memoire_bas = np.zeros((0, 2), np.float32)
         self._fils = [threading.Thread(target=self._boucle, name="estimation", daemon=True),
                       threading.Thread(target=self._prediction, name="odom-20hz", daemon=True)]
         bus.abonner(S.IMU, self._imu)
@@ -79,16 +86,25 @@ class Estimation:
                              "effacée")
 
     def _imu(self, imu: Imu) -> None:
-        with self._verrou:
-            self.odometre.imu(imu)
+        self._entrees.append(("imu", imu))
 
     def _commande(self, commande: CommandeRoues) -> None:
-        with self._verrou:
-            self.odometre.commande(commande)
+        self._entrees.append(("commande", commande))
 
     def _gnss(self, gnss: Gnss) -> None:
-        with self._verrou:
-            self.odometre.gnss(gnss)
+        self._entrees.append(("gnss", gnss))
+
+    def _vider_entrees(self) -> None:
+        """Appelé verrou pris : transmet à l'odométrie ce qui est arrivé depuis le dernier
+        calcul, dans l'ordre d'arrivée."""
+        while self._entrees:
+            genre, valeur = self._entrees.popleft()
+            if genre == "imu":
+                self.odometre.imu(valeur)
+            elif genre == "commande":
+                self.odometre.commande(valeur)
+            else:
+                self.odometre.gnss(valeur)
 
     def _obstacles(self, obstacles: Obstacles) -> None:
         odom: Odometrie | None = self.bus.dernier(S.ODOM)
@@ -103,8 +119,16 @@ class Estimation:
         odom: Odometrie | None = self.bus.dernier(S.ODOM)
         if odom is None or self.bus.age(S.ODOM) > 0.5:
             return np.zeros((0, 2), np.float32)
-        with self._verrou:
-            return self.cartographe.obstacles_proches(odom.pose, 3.0, bas_seulement=True).points
+        # Appelé par la sécurité à 20 Hz : jamais d'attente. Carte occupée (ICP, mise à jour) :
+        # la dernière liste calculée, vieille de quelques dizaines de millisecondes au plus.
+        if not self._verrou.acquire(blocking=False):
+            return self._memoire_bas
+        try:
+            self._memoire_bas = self.cartographe.obstacles_proches(
+                odom.pose, 3.0, bas_seulement=True).points
+        finally:
+            self._verrou.release()
+        return self._memoire_bas
 
     def _boucle(self) -> None:
         import queue
@@ -117,6 +141,7 @@ class Estimation:
             try:
                 debut = time.perf_counter()
                 with self._verrou:
+                    self._vider_entrees()
                     odom = self.odometre.scan(scan)
                     if odom is not None:
                         self.cartographe.integrer_scan(scan, odom.pose)
@@ -144,6 +169,7 @@ class Estimation:
                 continue
             try:
                 with self._verrou:
+                    self._vider_entrees()
                     odom = self.odometre.courant(time.monotonic())
                 self.bus.publier(S.ODOM, odom)
             except Exception as erreur:
@@ -154,10 +180,12 @@ class Estimation:
 class Perception:
     """Fil de la stéréo : dernière paire (images à moins de 60 ms d'écart), 4 Hz."""
 
-    def __init__(self, bus: Bus, profil: Profil) -> None:
+    def __init__(self, bus: Bus, profil: Profil, simulee: bool = False) -> None:
         from fieldmind.perception.stereo import Stereo
 
         self.bus, self.profil = bus, profil
+        self._averti = False
+        self.simulee = simulee  # caméras virtuelles : exactement le modèle par défaut
         self.stereo = Stereo(profil)
         self._actif = False
         self.duree_ms = 0.0
@@ -204,7 +232,17 @@ class Perception:
                     pose = odom.pose if odom is not None and self.bus.age(S.ODOM) < 0.5 else None
                     resultat = self.stereo.traiter(g, d, roulis, tangage, pose)
                     self.duree_ms = 0.8 * self.duree_ms + 200 * (time.perf_counter() - t0)
-                    if resultat is not None:
+                    fiable = self.stereo.calibree or self.simulee or bool(
+                        self.profil.valeur("perception.stereo_sans_calibration", False))
+                    if resultat is not None and not fiable and not self._averti:
+                        self._averti = True
+                        self.bus.journaliser(
+                            "stereo", "stéréo non calibrée : ses obstacles ne servent pas à la "
+                            "sécurité (lidar seul, vitesse plafonnée) ; la calibrer avec le "
+                            "damier (Système > Calibration > Stéréo)", "alerte")
+                    if resultat is not None and fiable:
+                        # Sans calibration, la profondeur est fausse et invente des obstacles
+                        # bas : seulement l'image de profondeur, pas d'obstacles pour la sécurité
                         self.bus.publier(S.OBSTACLES_STEREO, resultat.obstacles)
                         if getattr(resultat, "profondeur_jpeg", None):
                             self.bus.publier(S.PROFONDEUR, resultat.profondeur_jpeg)
@@ -235,6 +273,7 @@ class Scene:
         self._dernier_stereo = -1.0
         self._dernier_auto = 0.0
         self._pose_auto: Pose2D | None = None
+        self._origine_t = time.monotonic()
         self._fil = threading.Thread(target=self._boucle, name="scene", daemon=True)
         bus.abonner(S.VISION, lambda m: self._visions.append(m) if isinstance(m, dict) else None)
         self._detections: list[dict[str, Any]] = []
@@ -251,12 +290,17 @@ class Scene:
     def _boucle(self) -> None:
         while self._actif:
             debut = time.monotonic()
-            try:
-                self._cycle(debut)
-            except Exception as erreur:
-                self.bus.journaliser("scene", f"erreur : {erreur!r}", "erreur")
-                time.sleep(1.0)
-            time.sleep(max(0.02, 0.25 - (time.monotonic() - debut)))
+            # Vue 3D seulement : rien à reconstruire sans poste connecté, et 2 Hz suffisent
+            # (c'était le plus gros utilisateur du processeur, devant l'odométrie)
+            periode = 1.0 / max(0.5, float(self.profil.valeur("perception.scene_hz", 2.0)))
+            if (self.rover is None or self.rover.superviseur.operateurs > 0
+                    or self.executeur.occupe()):
+                try:
+                    self._cycle(debut)
+                except Exception as erreur:
+                    self.bus.journaliser("scene", f"erreur : {erreur!r}", "erreur")
+                    time.sleep(1.0)
+            time.sleep(max(0.02, periode - (time.monotonic() - debut)))
 
     def _cycle(self, t: float) -> None:
         bus = self.bus
@@ -276,12 +320,28 @@ class Scene:
             r.integrer_stereo(stereo, pose or Pose2D(), t)
         self._fusionner_camera_auto(pose or Pose2D(), t)
         while self._visions:
-            r.integrer_vision(self._visions.pop(0), pose or Pose2D(), t)
+            vision = self._visions.pop(0)
+            if vision.get("image_t", t) < self._origine_t:
+                continue
+            acquisition = vision.get("pose_image")
+            r.integrer_vision(vision, Pose2D(**acquisition) if acquisition is not None
+                             else pose or Pose2D(), t)
         while self._detections:
             r.integrer_detections(self._detections.pop(0), pose or Pose2D(), t)
         chemin, but = self.executeur.chemin_courant()
-        bus.publier(S.SCENE, r.message(pose, bus.dernier(S.CARTE), bus.dernier(S.SECURITE),
-                                       chemin, but, t))
+        message = r.message(pose, bus.dernier(S.CARTE), bus.dernier(S.SECURITE), chemin, but, t)
+        if self.rover is not None:
+            memoire = self.rover.monde_semantique.resume()
+            message["memoire"] = memoire
+            for o in memoire["objets"]:
+                if o.get("observations_visuelles", 1) < 1:
+                    continue
+                if not any(obj.get("texte") == o["label"] and math.hypot(
+                        obj["x"] - o["x"], obj["y"] - o["y"]) < 0.8 for obj in message["objets"]):
+                    message["objets"].append({"id": 500000 + o["id"], "type": "etiquette",
+                                              "x": o["x"], "y": o["y"], "texte": o["label"],
+                                              "age_s": o["age_s"], "memorise": True})
+        bus.publier(S.SCENE, message)
 
     def _fusionner_camera_auto(self, pose: Pose2D, t: float) -> None:
         """En tâche de fond, fusionne les objets vus par la caméra avec le lidar et la profondeur
@@ -331,10 +391,17 @@ class OutilsRover:
                       for lieu in r.gps.lieux],
             "gps": {"aligne": r.gps.alignement.ok, "fix": r.gps.dernier_fix.fix
                     if r.gps.dernier_fix else "aucun"},
+            "situation": _situation(r.bus),
+            "monde": r.monde_semantique.resume(),
+            "cible_suivie": r.suivi.resume() if getattr(r, "suivi", None) is not None else None,
         }
 
     def ajouter_actions(self, actions: list[Action], remplacer: bool) -> str:
         return self.rover.executeur.ajouter(actions, remplacer=remplacer, origine="ia")
+
+    def memoriser_pieces(self, propositions: list[dict[str, Any]], *,
+                        generation: int | None = None) -> list[dict[str, Any]]:
+        return self.rover.monde_semantique.integrer_pieces(propositions, generation=generation)
 
     def annuler(self) -> None:
         self.rover.executeur.annuler("annulé par l'IA")
@@ -346,9 +413,16 @@ class OutilsRover:
         r.bus.journaliser("ia", f"arrêt demandé : {raison}", "alerte")
 
     def derniere_image(self, camera: str) -> ImageCamera | None:
-        if camera == "drone":
-            return self.rover.bus.dernier(S.IMAGE_DRONE)
-        return self.rover.bus.dernier(S.IMAGE_GAUCHE if camera != "droite" else S.IMAGE_DROITE)
+        sujet = {"gauche": S.IMAGE_GAUCHE, "droite": S.IMAGE_DROITE,
+                 "drone": S.IMAGE_DRONE}.get(camera)
+        if sujet is None or self.rover.bus.age(sujet) > 1.5:
+            return None
+        image = self.rover.bus.dernier(sujet)
+        return image if image is not None and abs(time.monotonic() - image.t) < 1.5 else None
+
+    def snapshot_image(self, camera: str = "gauche") -> ObservationCamera | None:
+        image = self.derniere_image(camera)
+        return None if image is None else ObservationCamera(self.rover, image)
 
     def pixel_vers_sol(self, camera: str, u: float, v: float) -> tuple[float, float] | None:
         return self.rover.pixel_vers_sol(camera, u, v)
@@ -370,11 +444,73 @@ def _arrondi(valeur: float | None) -> float | None:
     return None if valeur is None else round(valeur, 2)
 
 
+class _BusObservation(Bus):
+    def age(self, sujet: str) -> float:
+        # La fraîcheur est vérifiée lors de la capture ; le temps réseau ne vieillit pas la scène.
+        return 0.0 if self.dernier(sujet) is not None else math.inf
+
+
+class ObservationCamera:
+    """Image et géométrie figées avant le réseau, utilisables pendant que le rover avance.
+
+    La copie n'expose que les méthodes de mesure ; aucun matériel n'est commandé. Les tableaux
+    de profondeur sont copiés sous leur verrou, les scans sont immuables après publication.
+    """
+
+    def __init__(self, rover: Rover, image: ImageCamera) -> None:
+        self.image, self.image_t = image, image.t
+        historique = tuple(rover._poses_camera)
+        if not historique:
+            odom = rover.bus.dernier(S.ODOM)
+            historique = (odom,) if odom is not None else ()
+        historique = tuple(o for o in historique if o.t >= rover._origine_odom_t
+                           and all(math.isfinite(v) for v in (o.pose.x, o.pose.y, o.pose.cap)))
+        proche = min(historique, key=lambda o: abs(o.t - image.t)) if historique else None
+        self.pose = (copy.copy(proche.pose) if proche is not None and abs(proche.t - image.t) < 0.35
+                     else None)
+        mesure = self._mesure = copy.copy(rover)
+        mesure.bus = _BusObservation()
+        mesure.profil = Profil(rover.profil.dict(), {}, None)
+        mesure._projections = dict(rover._projections)
+        for sujet in (S.SCAN, S.IMU):
+            valeur = rover.bus.dernier(sujet)
+            if valeur is not None and abs(valeur.t - image.t) < 0.4:
+                mesure.bus.publier(sujet, valeur)
+        mesure.perception = None
+        obstacles = rover.bus.dernier(S.OBSTACLES_STEREO)
+        if (rover.perception is not None and obstacles is not None
+                and abs(obstacles.t - image.t) < 0.5):
+            stereo = rover.perception.stereo
+            with stereo._verrou:
+                copie = copy.copy(stereo)
+                copie._verrou = threading.Lock()
+                if stereo._derniere is not None:
+                    geo, profondeur = stereo._derniere
+                    copie._derniere = (geo, profondeur.copy())
+                copie._sol_lisse = (None if stereo._sol_lisse is None
+                                    else np.array(stereo._sol_lisse, copy=True))
+            mesure.perception = SimpleNamespace(stereo=copie)
+
+    def pixel_vers_sol(self, camera: str, u: float, v: float) -> tuple[float, float] | None:
+        return self._mesure.pixel_vers_sol(camera, u, v)
+
+    def mesurer_objet(self, camera: str, u: float, v: float,
+                      boite: tuple[float, float, float, float] | None = None,
+                      categorie: str | None = None) -> dict[str, Any] | None:
+        return self._mesure.mesurer_objet(camera, u, v, boite, categorie)
+
+
 class Rover:
     def __init__(self, profil: Profil, simulation: bool = False, **options: Any) -> None:
+        import sys
+
+        # Python change de fil toutes les 2 ms (5 par défaut) : la boucle de conduite à 20 Hz
+        # attend moins son tour derrière la perception
+        sys.setswitchinterval(0.002)
         self.profil = profil
         options = dict(options)
         enregistrer = options.pop("enregistrer", not simulation)
+        dossier_utilisateur = options.pop("dossier_utilisateur", DOSSIER_UTILISATEUR)
         self.bus = Bus()
         self.debut = time.monotonic()
         if simulation:
@@ -392,18 +528,30 @@ class Rover:
         self.superviseur.remorque = self.remorque
         self.conduite = Conduite(self.bus, profil, self.materiel.esp, self.superviseur)
         self.estimation = self._facultatif("estimation", lambda: Estimation(self.bus, profil))
-        self.perception = self._facultatif("stéréo", lambda: Perception(self.bus, profil))
+        self.perception = self._facultatif("stéréo",
+                                           lambda: Perception(self.bus, profil, simulation))
         self._projections: dict[str, Any] = {}
         navigation = self._facultatif("navigation", lambda: Navigation(profil))
         self.executeur = Executeur(self.bus, profil, self.conduite, navigation)
+        self._poses_camera: deque[Odometrie] = deque(maxlen=128)
+        self._origine_odom_t = float("-inf")
+        self.bus.abonner(S.ODOM, self._poses_camera.append)
+        from fieldmind.estimation.semantique import MemoireSemantique
+
+        self.monde_semantique = MemoireSemantique(self.bus)
+        self.executeur.monde = self.monde_semantique
         self.executeur.pixel_vers_sol = self.pixel_vers_sol
+        self.suivi = self._facultatif("suivi de personne", lambda: self._suivi(profil))
+        if self.suivi is not None:
+            self.executeur.suivi = self.suivi
+            self.superviseur.cible_suivie = self.suivi.pour_securite
         if self.estimation is not None:
             self.superviseur.memoire_obstacles = self.estimation.memoire_obstacles_bas
             self.executeur.memoire_obstacles = self.estimation.memoire_obstacles_bas
         self.outils = OutilsRover(self)
         from fieldmind.estimation.gps import NavigationGps
 
-        self.gps = NavigationGps(profil)
+        self.gps = NavigationGps(profil, dossier=dossier_utilisateur)
         self.bus.abonner(S.GNSS, lambda fix: self.gps.mesure(fix, self.bus.dernier(S.ODOM)))
         self.superviseur.zone = self.gps.hors_zone
         self.executeur.gps = self.gps
@@ -418,6 +566,11 @@ class Rover:
             self.enregistreur = Enregistreur(self.bus)
         self.ia: Any = None  # fieldmind.ia, branché par demarrer_ia
         self.calibration_stereo: Any = None
+
+    def _suivi(self, profil: Profil) -> Any:
+        from fieldmind.perception.suivi import SuiviCible
+
+        return SuiviCible(self.bus, profil)
 
     def _facultatif(self, nom: str, fabrique: Any) -> Any:
         try:
@@ -436,6 +589,8 @@ class Rover:
         for module in (self.estimation, self.perception, self.scene):
             if module is not None:
                 module.demarrer()
+        if self.suivi is not None:
+            self.suivi.demarrer_fil()
         self.executeur.demarrer()
         self.bus.journaliser("rover", f"démarré ({self.materiel.nom}) : mode arrêt, désarmé",
                              "succes")
@@ -638,9 +793,29 @@ class Rover:
         return c
 
     def remise_a_zero_odom(self) -> None:
+        self._origine_odom_t = time.monotonic()
+        self.executeur.annuler("remise à zéro de l'odométrie")
+        self.executeur._derniere_exploration = None
+        self.monde_semantique.effacer()
+        self._poses_camera.clear()
+        if self.scene is not None:
+            self.scene.reconstructeur.objets.clear()
+            self.scene._origine_t = time.monotonic()
+            self.scene._visions.clear()
         if self.estimation is not None:
             self.estimation.remettre_a_zero()
         self.gps.oublier_odometrie()
+
+    def reinitialiser_environnement(self) -> None:
+        """Repart d'un environnement vierge : missions annulées, position remise à l'origine,
+        carte, objets vus, scène 3D et conversation de l'agent effacés. Réglages, calibrations
+        et lieux nommés sont gardés."""
+        self.remise_a_zero_odom()
+        agent = getattr(self.ia, "agent", None) if self.ia is not None else None
+        if agent is not None:
+            agent.effacer_historique()
+        self.bus.journaliser("environnement", "environnement réinitialisé : carte, objets, "
+                             "position et missions effacés", "succes")
 
     def _reglage_change(self, cle: str, _valeur: Any) -> None:
         """Applique tout de suite un réglage qui touche le matériel ou la perception."""
@@ -656,6 +831,17 @@ class Rover:
         elif cle.startswith("capteurs."):
             etat = "actif" if _valeur else "coupé"
             self.bus.journaliser("capteurs", f"{cle.split('.')[1]} {etat}")
+        if cle == "remorque.volets_deplies":
+            esp = self.materiel.esp()
+            if esp is not None and hasattr(esp, "mouvoir_volets"):
+                deplies = bool(_valeur)
+
+                def mouvoir() -> None:
+                    if esp.mouvoir_volets(deplies):
+                        etat = "dépliés" if deplies else "repliés"
+                        self.bus.journaliser("remorque", f"volets {etat}")
+
+                threading.Thread(target=mouvoir, name="volets", daemon=True).start()
         if cle.startswith("cameras.") or cle.startswith("perception."):
             self._projections.clear()
             if self.perception is not None and cle in ("cameras.inclinaison_deg",
@@ -675,3 +861,18 @@ class Rover:
         odom: Odometrie | None = self.bus.dernier(S.ODOM)
         if odom is not None and abs(odom.vitesse) > 0.05:
             raise ActionRefusee("le rover roule")
+
+
+def _situation(bus: Bus) -> dict[str, Any] | None:
+    """Dernier résumé de l'agent de veille et dernières détections, pour l'agent de
+    conversation (« qu'est-ce qui se passe ? »)."""
+    situation = bus.dernier(S.SITUATION)
+    detections = bus.dernier(S.DETECTIONS)
+    sortie: dict[str, Any] = {}
+    if isinstance(situation, dict) and bus.age(S.SITUATION) < 120:
+        sortie.update({k: situation.get(k) for k in ("resume", "niveau", "alerte")})
+        sortie["age_s"] = round(bus.age(S.SITUATION), 1)
+    if isinstance(detections, dict) and bus.age(S.DETECTIONS) < 10:
+        sortie["vus"] = [{"label": o.get("label"), "distance_m": o.get("distance_m")}
+                         for o in detections.get("objets") or [] if o.get("score", 0) > 0.5][:8]
+    return sortie or None

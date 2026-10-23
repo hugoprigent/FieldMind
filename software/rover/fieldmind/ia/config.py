@@ -112,6 +112,10 @@ class ProfilIA:
     cle_obligatoire: bool = False
     reprises: int = 1
     url_inference: str = ""
+    hote: str = ""  # adresse en cours (le tunnel Cloudflare, ou l'adresse de base)
+    hote_base: str = ""  # adresse de ia.toml ou de variable_hote (Tailscale)
+    url_tunnel: str = ""  # où lire l'adresse du tunnel (sur l'adresse de base)
+    appels_successifs: bool = False  # l'agent appelle une fonction à la fois (Qwen) : on relance
     agent: ConfigRole | None = None
     vision: ConfigRole | None = None
     pointage: ConfigRole | None = None  # modèle incarné ; sans lui, la vision pointe
@@ -269,15 +273,17 @@ def _role(nom_profil: str, role: Role, d: Mapping[str, Any], profil: Mapping[str
     )
 
 
-def _profil(nom: str, d: Mapping[str, Any], env: Mapping[str, str]) -> ProfilIA:
+def _profil(nom: str, d: Mapping[str, Any], env: Mapping[str, str],
+            hote_force: str | None = None) -> ProfilIA:
     api = str(d.get("api", "openai"))
     if api not in API_CONNUES:
         raise ErreurConfigIA(f"profil {nom} : api {api!r} inconnue ({', '.join(API_CONNUES)})")
     if api == "aucun":
         return ProfilIA(nom=nom, description=str(d.get("description", nom)), api=api)
-    hote = str(d.get("hote", ""))
+    hote_base = str(d.get("hote", ""))
     if d.get("variable_hote") and env.get(str(d["variable_hote"])):
-        hote = env[str(d["variable_hote"])]
+        hote_base = env[str(d["variable_hote"])]
+    hote = hote_force or hote_base
     url = str(d.get("url", "")).replace("{hote}", hote)
     roles = {r: _role(nom, r, d[r], d, hote) for r in ROLES if isinstance(d.get(r), dict)}
     return ProfilIA(
@@ -290,6 +296,10 @@ def _profil(nom: str, d: Mapping[str, Any], env: Mapping[str, str]) -> ProfilIA:
         cle_obligatoire=bool(d.get("cle_obligatoire", False)),
         reprises=max(0, int(d.get("reprises", 1))),
         url_inference=str(d.get("url_inference", "")).replace("{hote}", hote),
+        hote=hote,
+        hote_base=hote_base,
+        url_tunnel=str(d.get("url_tunnel", "")).replace("{hote}", hote_base),
+        appels_successifs=bool(d.get("appels_successifs", False)),
         **roles,
     )
 
@@ -333,6 +343,7 @@ class ConfigIA:
         self._verrou = threading.Lock()
         self._rappels: list[Callable[[ProfilIA], None]] = []
         self._passerelle: Passerelle | None = None
+        self._bruts: dict[str, dict[str, Any]] = {}
 
     # ------------------------------------------------------------------ chargement
 
@@ -345,6 +356,7 @@ class ConfigIA:
         if not isinstance(brut, dict) or not brut:
             raise ErreurConfigIA("aucun profil dans la configuration de l'IA")
         profils = {nom: _profil(nom, d, env) for nom, d in brut.items()}
+        bruts = {nom: dict(d) for nom, d in brut.items()}
         agent = donnees.get("agent", {})
         config = cls(
             profils=profils,
@@ -358,6 +370,7 @@ class ConfigIA:
             fichier_choix=fichier_choix,
             fichier_env=fichier_env,
         )
+        config._bruts = bruts
         choix = env.get(VARIABLE_PROFIL) or config._choix_enregistre()
         if choix in profils:
             config._nom_actif = choix
@@ -418,6 +431,20 @@ class ConfigIA:
             rappels = list(self._rappels)
         for rappel in rappels:
             rappel(profil)
+        return profil
+
+    def changer_hote(self, nom: str, hote: str | None) -> ProfilIA:
+        """Passe un profil sur une autre adresse (tunnel Cloudflare), ou revient à son adresse de
+        base (`hote` None). Les clients HTTP suivent : ils sont rangés par adresse."""
+        actuel = self.profil(nom)
+        if nom not in self._bruts:
+            return actuel
+        cible = hote or None
+        if (cible or actuel.hote_base) == actuel.hote:
+            return actuel
+        profil = _profil(nom, self._bruts[nom], self.env, cible)
+        with self._verrou:
+            self.profils[nom] = profil
         return profil
 
     def sur_changement(self, rappel: Callable[[ProfilIA], None]) -> None:

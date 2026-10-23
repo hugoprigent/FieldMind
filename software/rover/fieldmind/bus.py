@@ -48,6 +48,8 @@ class S:
     MISSION = "mission"  # dict : état de l'exécuteur
     JOURNAL = "journal"  # dict : {"t", "niveau", "source", "message"}
     CHAT = "chat"  # dict : {"role", "texte", "t", ...}
+    SITUATION = "situation"  # dict : résumé de l'agent de veille (ia.distant.VeilleSituation)
+    CIBLE = "cible"  # dict : personne suivie (perception.suivi), ≈ 10 Hz
     PAROLE = "parole"  # dict : voix du rover (WAV en base64) pour une réponse du chat
     VOIX = "voix"  # dict : état de l'écoute et transcriptions
     VOIX_NIVEAU = "voix.niveau"  # float : niveau sonore du micro (10 Hz, mode vocal)
