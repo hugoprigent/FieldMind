@@ -4,6 +4,11 @@
 
 **Un rover de terrain dont les missions et la perception sont pilotées par une IA locale.**
 
+<p align="center">
+  <img src="docs/images/prototype-remorque-drone.jpg" alt="Le rover FieldMind et sa remorque porte-drone, en intérieur" width="380">
+</p>
+<p align="center"><em>Le rover, sans coque, avec la remorque porte-drone et le drone posé dessus.</em></p>
+
 Projet de Hugo Prigent, finaliste du **ASUS Ascent GX10 AI Developer Challenge 2026**.
 FieldMind relie un rover Raspberry Pi / ESP32, un poste opérateur web et des modèles exécutés sur un ASUS Ascent GX10. La navigation, les vérifications des commandes et l'arrêt restent dans le logiciel du rover.
 
@@ -20,6 +25,29 @@ L'objectif : aider un opérateur à explorer et documenter une zone difficile d'
 
 ![Vue CAO du prototype FieldMind](docs/images/prototype-cao.png)
 *Vue CAO du rover avec sa coque et la remorque. Le rover réel roule pour l'instant sans la coque.*
+
+## Le prototype
+
+| | |
+| :---: | :---: |
+| <img src="docs/images/prototype-navigation-couloir.jpg" alt="Le rover en navigation dans un couloir" width="300"> | <img src="docs/images/prototype-planche-electronique.jpg" alt="Planche électronique en cours de câblage" width="360"> |
+| Essai de navigation dans un couloir, avec les caméras stéréo et le lidar sur le châssis. | Câblage de la planche : Raspberry Pi, contrôleurs moteurs, convertisseurs, batterie. |
+| <img src="docs/images/prototype-carte-capteurs.jpg" alt="Carte capteurs avec écran OLED" width="360"> | |
+| Carte capteurs I²C : IMU et écran OLED qui affiche l'état des capteurs. | |
+
+## Le poste de pilotage
+
+![Vue Pilotage de la simulation publique](docs/images/poste-pilotage-simulation.jpg)
+*Pilotage (simulation publique) : caméra gauche avec le couloir projeté devant le rover, vue 3D en incrustation, lidar et modes à droite.*
+
+![Onglet Mission de la simulation publique](docs/images/poste-mission-simulation.jpg)
+*Mission (simulation publique) : la consigne « explore la pièce » est refusée tant que le rover n'est pas armé.*
+
+![Carte lidar pendant un essai réel](docs/images/poste-carte-essai-reel.jpg)
+*Carte (essai réel du 21 octobre) : carte d'occupation lidar, trajet parcouru et chemin prévu en mode auto.*
+
+![Vue 3D pendant un essai réel](docs/images/poste-vue-3d-essai-reel.jpg)
+*Vue 3D (essai réel du 21 octobre) : murs issus du lidar, objets nommés par la vision du GX10, caméra du rover en incrustation.*
 
 ## Essayer le logiciel actuel, sans matériel
 
