@@ -1,3 +1,5 @@
+**Français** · [English](architecture.en.md)
+
 # Architecture du prototype
 
 Le **Raspberry Pi 4** exécute les pilotes, la perception géométrique, l'estimation de pose, la carte, la navigation et les missions. Le **XIAO ESP32-C5** lit les capteurs et applique les consignes de traction et de servo ; son chien de garde annule la traction si les consignes cessent. Le poste web affiche les capteurs, la carte et la mission, et permet le pilotage manuel.

@@ -1,3 +1,5 @@
+**Français** · [English](publication.en.md)
+
 # Provenance de cette édition
 
 Cette édition est un instantané sélectionné du dépôt de travail FieldMind. La première édition (21 octobre 2026) reprenait l'arbre de travail, modifications locales comprises. La mise à jour du 23 octobre 2026 reprend le logiciel du rover, le firmware ESP32-C5 et la CAO imprimable depuis un commit du dépôt source, sans modification locale non commitée. Un test de sécurité dont l'obstacle tombait exactement sur la distance d'arrêt absolu (résultat dépendant de l'arrondi flottant sous Linux) a été rapproché à 0,62 m. Elle ne reprend pas l'historique du dépôt de travail privé.

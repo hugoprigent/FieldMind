@@ -1,3 +1,5 @@
+**Français** · [English](README.en.md)
+
 # FieldMind
 
 [![Tests](https://github.com/hugoprigent/FieldMind/actions/workflows/checks.yml/badge.svg)](https://github.com/hugoprigent/FieldMind/actions/workflows/checks.yml)

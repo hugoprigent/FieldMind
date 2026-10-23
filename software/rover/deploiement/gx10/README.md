@@ -1,3 +1,5 @@
+**Français** · [English](README.en.md)
+
 # Inférence FieldMind sur ASUS Ascent GX10
 
 Ces fichiers configurent les services IA du profil `gx10` du rover. Au 23 octobre 2026, huit modèles sont servis sur le GB10 du GX10. Qwen3.6, Qwen3-ASR et RoboBrain 2.5 ont été vérifiés par de vrais appels ; les autres sont branchés au rover et vérifiés en simulation (état détaillé dans [MODELES.md](../../MODELES.md)). Ce fichier décrit leur configuration ; ce n'est pas un benchmark.

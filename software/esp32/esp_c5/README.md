@@ -1,3 +1,5 @@
+**Français** · [English](README.en.md)
+
 # Logiciel ESP32 du rover - ESP C5
 
 Ouvrir `software/esp32/esp_c5/` dans VS Code avec PlatformIO.

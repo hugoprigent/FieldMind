@@ -1,3 +1,5 @@
+**Français** · [English](README.en.md)
+
 # Logiciels FieldMind
 
 ## Rover actuel

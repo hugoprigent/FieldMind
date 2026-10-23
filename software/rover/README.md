@@ -1,3 +1,5 @@
+**Français** · [English](README.en.md)
+
 # Logiciel du rover FieldMind
 
 Le logiciel qui tourne **sur le Raspberry Pi du rover** : pilotes du matériel, sécurité,

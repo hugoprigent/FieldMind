@@ -1,3 +1,5 @@
+**Français** · [English](README.en.md)
+
 # Conception mécanique
 
 Le prototype courant utilise une base en contreplaqué de 10 mm, une direction par servo central, des roues avant imprimées à jantes rigides et pneus TPU à crampons, et les motoréducteurs arrière récupérés d'un robot tondeuse.

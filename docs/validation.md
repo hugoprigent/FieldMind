@@ -1,3 +1,5 @@
+**Français** · [English](validation.en.md)
+
 # État et validation — 23 octobre 2026
 
 | Élément | Preuve disponible | Limite |

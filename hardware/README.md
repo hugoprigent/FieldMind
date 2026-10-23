@@ -1,3 +1,5 @@
+**Français** · [English](README.en.md)
+
 # Électronique du prototype
 
 Les [connexions actuelles](electronics/CONNEXIONS.md) et le [firmware C5](../software/esp32/esp_c5/README.md) sont le point de départ pour comprendre le montage. Le GNSS est relié au Raspberry Pi ; le XIAO ESP32-C5 relie capteurs I²C, écran, servo et commandes des deux drivers de moteurs.
